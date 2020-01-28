@@ -1,0 +1,22 @@
+session_name: yocto-nxp
+start_directory: ~/src/customers/nxp/
+windows:
+  - window_name: yocto
+    panes:
+      - focus: true
+        shell_command:
+          - cd yocto
+          - source ./setup-environment build
+  - window_name: docs
+    panes:
+      - focus: true
+        shell_command:
+          - cd docs
+
+  - window_name: homepage
+    panes:
+      - focus: true
+        shell_command:
+          - cd homepage
+
+      

@@ -1,0 +1,16 @@
+session_name: jig-framework
+start_directory: ~/src/jig-framework/
+windows:
+  - window_name: yocto
+    panes:
+      - focus: true
+        shell_command:
+          - cd ~/src/jig-framework/yocto
+          - source ./setup-environment build-musl
+      - shell_command:
+          - cd yocto/sources
+  - window_name: rust
+    panes:
+      - focus: true
+        shell_command:
+          - cd ~/src/jig-framework/apps/jig-framework

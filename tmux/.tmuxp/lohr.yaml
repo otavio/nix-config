@@ -1,0 +1,11 @@
+session_name: yocto-lohr
+start_directory: ~/src/customers/lohr/
+windows:
+  - window_name: yocto
+    panes:
+      - focus: true
+        shell_command:
+          - cd yocto
+          - source ./setup-environment build
+      - shell_command:
+          - cd yocto/sources

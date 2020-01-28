@@ -1,0 +1,27 @@
+[submodule "zsh/.base16-shell"]
+	path = zsh/.base16-shell
+	url = git@github.com:chriskempson/base16-shell.git
+[submodule "tmux/.tmux/plugins/tpm"]
+	path = tmux/.tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm
+[submodule "tmux/.tmux/plugins/tmux-yank"]
+	path = tmux/.tmux/plugins/tmux-yank
+	url = https://git::@github.com/tmux-plugins/tmux-yank
+[submodule "tmux/.tmux/plugins/tmux-resurrect"]
+	path = tmux/.tmux/plugins/tmux-resurrect
+	url = https://git::@github.com/tmux-plugins/tmux-resurrect
+[submodule "tmux/.tmux/plugins/tmux-prefix-highlight"]
+	path = tmux/.tmux/plugins/tmux-prefix-highlight
+	url = https://git::@github.com/tmux-plugins/tmux-prefix-highlight
+[submodule "tmux/.tmux/plugins/tmux-open"]
+	path = tmux/.tmux/plugins/tmux-open
+	url = https://git::@github.com/tmux-plugins/tmux-open
+[submodule "tmux/.tmux/plugins/tmux-fzf"]
+	path = tmux/.tmux/plugins/tmux-fzf
+	url = https://git::@github.com/sainnhe/tmux-fzf
+[submodule "tmux/.tmux/plugins/tmux-fzf-url"]
+	path = tmux/.tmux/plugins/tmux-fzf-url
+	url = https://git::@github.com/wfxr/tmux-fzf-url
+[submodule "tmux/.tmux/plugins/tmux-copycat"]
+	path = tmux/.tmux/plugins/tmux-copycat
+	url = https://git::@github.com/tmux-plugins/tmux-copycat

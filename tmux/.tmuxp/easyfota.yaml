@@ -1,0 +1,12 @@
+session_name: yocto-easyfota
+start_directory: ~/src/easyfota/
+windows:
+  - window_name: yocto
+    panes:
+      - focus: true
+        shell_command:
+          - docker-debian
+          - cd ~/src/easyfota/yocto
+          - source ./setup-environment build-musl
+      - shell_command:
+          - cd yocto/sources

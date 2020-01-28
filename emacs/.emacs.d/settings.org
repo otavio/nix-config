@@ -1,0 +1,755 @@
+#+TITLE: ~/dotfiles/emacs/settings.org
+#+STARTUP: indent
+* Configurations
+** Package Setup
+*** Setup the package repositories.
+#+BEGIN_SRC emacs-lisp
+  (require 'package)
+  (setq package-enable-at-startup nil)
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (package-initialize)
+#+END_SRC
+*** Automatically install and then setup =use-package=
+#+BEGIN_SRC emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (eval-and-compile
+    (setq use-package-always-ensure t)
+    (setq use-package-expand-minimally t)
+    (setq use-package-compute-statistics t)
+    (setq use-package-enable-imenu-support t))
+
+  (eval-when-compile
+    (require 'use-package)
+    (require 'bind-key))
+#+END_SRC
+** System names
+#+BEGIN_SRC emacs-lisp
+  (defun system-is-laptop ()
+    "Return true if the system we are running on is mynotebook"
+    (or
+     (string-equal system-name "lenovo")
+     )
+    )
+
+  (defun system-is-desktop ()
+    "Return true if the system we are running on is mydesktop"
+    (or
+     (string-equal system-name "berton")
+     )
+    )
+  (defun system-is-remote ()
+    "Return true if the system we are running on is mydesktop"
+    (or
+     (string-equal system-name "pikachu")
+     (string-equal system-name "centrium")
+     )
+    )
+#+END_SRC
+** Theme and fonts
+#+BEGIN_SRC emacs-lisp
+  (if (system-is-laptop)
+      (set-frame-font "Source Code Pro-11" nil t))
+
+  (if (system-is-desktop)
+      (set-frame-font "Source Code Pro-12" nil t))
+
+  (use-package color-theme-sanityinc-tomorrow
+    :init
+    (load-theme 'sanityinc-tomorrow-eighties t))
+#+END_SRC
+** Personal Information
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Otavio Salvador"
+        user-mail-address "otavio@ossystems.com.br")
+#+END_SRC
+** Diminish
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :config
+    (eval-after-load "eldoc" '(diminish 'eldoc-mode)))
+#+END_SRC
+** GNU Elpa Keyring Update
+#+BEGIN_SRC emacs-lisp
+  (use-package gnu-elpa-keyring-update)
+#+END_SRC
+** General modifications
+#+BEGIN_SRC emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (setq confirm-kill-emacs 'yes-or-no-p)
+
+  (require 'saveplace)
+  (setq-default save-place t)
+  (setq save-place-file (concat user-emacs-directory "places"))
+  (setq auto-save-default nil)
+  (setq backup-directory-alist `(("." . ,(concat user-emacs-directory
+                                                 "backups"))))
+  (setq browse-url-browser-function 'browse-url-generic
+        browse-url-generic-program "chromium")
+
+  (windmove-default-keybindings)
+
+  (global-auto-revert-mode t)
+  (setq vc-follow-symlinks nil)
+
+  (setq load-prefer-newer t)
+  (setq create-lockfiles nil)
+
+  (set-default 'truncate-lines t)
+  (setq truncate-partial-width-windows nil)
+
+  (setq-default indent-tabs-mode nil
+                tab-width 4)
+
+  (electric-pair-mode 1)
+
+  (setq require-final-newline t)
+  (setq tab-always-indent 'complete)
+#+END_SRC
+** Encoding
+#+BEGIN_SRC emacs-lisp
+  (prefer-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+#+END_SRC
+** Ui customizations
+#+BEGIN_SRC emacs-lisp
+  (if (system-is-laptop)
+      (setq split-width-threshold 120))
+
+  (blink-cursor-mode t)
+
+  (setq-default cursor-type 'hbar)
+  (setq ring-bell-function 'ignore)
+  (setq scroll-conservatively 10)
+  (setq scroll-margin 7)
+
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+
+  (if (display-graphic-p)
+      (scroll-bar-mode -1))
+
+  (setq inhibit-startup-message t)
+  (setq inhibit-splash-screen t)
+  (setq column-number-mode t)
+#+END_SRC
+** Projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :diminish projectile-mode
+    :config
+    (define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
+    (projectile-mode +1))
+#+END_SRC
+** Spelling
+#+BEGIN_SRC emacs-lisp
+  (use-package flyspell :diminish flyspell-mode)
+#+END_SRC
+** Custom Keybindings
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-h") 'delete-backward-char)
+  (define-key global-map (kbd "RET") 'newline-and-indent)
+#+END_SRC
+** Custom function
+#+BEGIN_SRC emacs-lisp
+  (defun buffer-cleanup ()
+    (interactive)
+    (whitespace-cleanup)
+    (untabify (point-min) (point-max)))
+
+  ;; Copy to clipboard
+  (defun copy-to-clipboard ()
+    "Copies selection to x-clipboard."
+    (interactive)
+    (if (display-graphic-p)
+        (progn
+          (message "Yanked region to x-clipboard!")
+          (call-interactively 'clipboard-kill-ring-save)
+          )
+      (if (region-active-p)
+          (progn
+            (shell-command-on-region (region-beginning) (region-end) "xsel -i -b")
+            (message "Yanked region to clipboard!")
+            (deactivate-mark))
+        (message "No region active; can't yank to clipboard!")))
+    )
+
+  ;; Paste from clipboard
+  (defun paste-from-clipboard ()
+    (interactive)
+    (if (display-graphic-p)
+        (progn
+          (clipboard-yank)
+          (message "graphics active")
+          )
+      (insert (shell-command-to-string "xsel -o -b"))
+      )
+    )
+
+  (global-set-key (kbd "C-c c") 'copy-to-clipboard)
+  (global-set-key (kbd "C-c v") 'paste-from-clipboard)
+
+  ;; Indent commit messages
+  (fset 'indent-commit
+        (lambda (&optional arg) "Keyboard macro." (interactive "p")
+          (kmacro-exec-ring-item (quote ([67108896 134217829 1 24 114 116 32 32 32 32 45 32 13] 0 "%d")) arg)))
+
+  ;; Highlight tabs
+  (defun highlight-tabs ()
+    (interactive)
+    (hi-lock-face-buffer "\t"))
+  (defun unhighlight-tabs ()
+    (interactive)
+    (hi-lock-unface-buffer "\t"))
+
+  ;;; Toggle window dedication
+  (defun pin-buffer ()
+    "Pin buffer to current window."
+    (interactive)
+    (message
+     (if (let (window (get-buffer-window (current-buffer)))
+           (set-window-dedicated-p window (not (window-dedicated-p window))))
+         "pinned buffer" "un-pinned buffer")
+     ))
+
+  (defun open-terminal ()
+    "Open default terminal emulator in the current directory."
+    (interactive)
+    (start-process "terminal" nil (getenv "TERMINAL")))
+
+  (defun open-terminal-in-project-root ()
+    "Open default terminal in the project root."
+    (interactive)
+    (let ((default-directory (projectile-project-root)))
+      (open-terminal)))
+#+END_SRC
+** Delete Word Without Copying to Clipboard/kill-ring
+#+BEGIN_SRC emacs-lisp
+  (defun my-delete-word (arg)
+    "Delete characters forward until encountering the end of a word.
+    With argument, do this that many times.
+    This command does not push text to `kill-ring'."
+    (interactive "p")
+    (delete-region
+     (point)
+     (progn
+       (forward-word arg)
+       (point))))
+
+  (defun my-backward-delete-word (arg)
+    "Delete words backward until encountering the beginning of a word.
+    With argument, do this that many times.
+    This command does not push text to `kill-ring'."
+    (interactive "p")
+    (my-delete-word (- arg)))
+
+  (defun my-backward-delete-char (arg)
+    "Delete characters backward until encountering the beginning of a word.
+  With argument ARG, do this that many times."
+    (interactive "p")
+    (delete-region (point) (progn (delete-backward-char arg) (point))))
+
+  (defun my-delete-line ()
+    "Delete text from current position to end of line char.
+    This command does not push text to `kill-ring'."
+    (interactive)
+    (delete-region
+     (point)
+     (progn (end-of-line 1) (point)))
+    (delete-char 1))
+
+  (defun my-delete-line-backward ()
+    "Delete text between the beginning of the line to the cursor position.
+    This command does not push text to `kill-ring'."
+    (interactive)
+    (let (p1 p2)
+      (setq p1 (point))
+      (beginning-of-line 1)
+      (setq p2 (point))
+      (delete-region p1 p2)))
+
+  (global-set-key (kbd "C-k") 'my-delete-line)
+  (global-set-key (kbd "M-d") 'my-delete-word)
+  (global-set-key (kbd "<M-backspace>") 'my-backward-delete-word)
+  (global-set-key (kbd "M-h") 'my-backward-delete-word)
+#+END_SRC
+** Dired
+#+BEGIN_SRC emacs-lisp
+  (use-package dired
+    :ensure nil
+    :custom
+    ;; Always delete and copy recursively
+    (dired-recursive-deletes 'always)
+    (dired-recursive-copies 'always)
+    ;; Auto refresh Dired, but be quiet about it
+    (global-auto-revert-non-file-buffers t)
+    (auto-revert-verbose nil)
+    ;; Quickly copy/move file in Dired
+    (dired-dwim-target t)
+    ;; Move files to trash when deleting
+    (delete-by-moving-to-trash t)
+    :config
+    ;; Reuse same dired buffer, to prevent numerous buffers while navigating in dired
+    (put 'dired-find-alternate-file 'disabled nil)
+    :hook
+    (dired-mode . (lambda ()
+                    (local-set-key (kbd "<mouse-2>") #'dired-find-alternate-file)
+                    (local-set-key (kbd "RET") #'dired-find-alternate-file)
+                    (local-set-key (kbd "^")
+                                   (lambda () (interactive) (find-alternate-file ".."))))))
+#+END_SRC
+** Editing
+#+BEGIN_SRC emacs-lisp
+  (use-package whitespace
+    :diminish global-whitespace-mode
+    :init
+    (setq whitespace-style
+          '(face newline trailing space-before-tab space-after-tab))
+    (global-whitespace-mode 1))
+
+  (use-package browse-kill-ring
+    :init
+    (browse-kill-ring-default-keybindings))
+
+  (use-package expand-region
+    :bind
+    ("M-=" . er/expand-region))
+
+  (use-package rainbow-delimiters
+    :init
+    (progn
+      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
+
+  (use-package smartparens
+    :diminish smartparens-mode
+    :config
+    (show-smartparens-global-mode +1)
+    (smartparens-global-mode 1))
+
+  (use-package ws-butler
+    :diminish ws-butler-mode
+    :config
+    (ws-butler-global-mode t))
+
+  (use-package undo-tree
+    :diminish undo-tree-mode
+    :init
+    (global-undo-tree-mode))
+
+  (use-package move-text
+    :bind (("M-<up>" . move-text-up)
+           ("M-<down>" . move-text-down)))
+
+  ;; Original idea from
+  ;; http://www.opensubscriber.com/message/emacs-devel@gnu.org/10971693.html
+  (defun comment-dwim-line (&optional arg)
+    "Replacement for the comment-dwim command.
+          If no region is selected and current line is not blank and we are not at the end of the line,
+          then comment current line.
+          Replaces default behaviour of comment-dwim, when it inserts comment at the end of the line."
+    (interactive "*P")
+    (comment-normalize-vars)
+    (if (and (not (region-active-p)) (not (looking-at "[ \t]*$")))
+        (comment-or-uncomment-region (line-beginning-position) (line-end-position))
+      (comment-dwim arg)))
+
+  (global-set-key (kbd "M-;") 'comment-dwim-line)
+#+END_SRC
+** Company
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :diminish company-mode
+    :init
+    (add-hook 'after-init-hook 'global-company-mode)
+    :config
+    (setq company-idle-delay              nil
+          company-dabbrev-downcase          nil
+          company-minimum-prefix-length     2
+          company-show-numbers              t
+          company-tooltip-limit             20
+          company-tooltip-align-annotations t
+          company-lsp-enable-snippet        t)
+    (company-mode)
+    (global-set-key (kbd "TAB") #'company-indent-or-complete-common))
+#+END_SRC
+** Flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :diminish flycheck-mode
+    :init (global-flycheck-mode))
+#+END_SRC
+** Git
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'git-commit-mode-hook (lambda () (setq fill-column 72)))
+
+  (use-package magit
+    :init
+    (global-git-commit-mode)
+    (add-hook 'git-commit-mode-hook 'flyspell-mode)
+    (add-hook 'git-commit-setup-hook 'git-commit-turn-on-flyspell)
+    :config
+    (setq magit-commit-arguments (quote ("--signoff")))
+    (setq magit-revert-arguments (quote ("--signoff")))
+    :bind
+    ("C-x g" . magit-status))
+
+  (use-package git-timemachine
+    :bind
+    ("C-c g" . git-timemachine))
+
+  (use-package git-gutter
+    :diminish git-gutter-mode
+    :init
+    (global-git-gutter-mode +1)
+    (add-hook 'magit-post-refresh-hook
+              #'git-gutter:update-all-windows))
+#+END_SRC
+** Misc
+#+BEGIN_SRC emacs-lisp
+  (use-package dockerfile-mode
+    :init (require 'dockerfile-mode))
+
+  (use-package dts-mode
+    :init (require 'dts-mode))
+
+  (use-package json-mode
+    :init (require 'json-mode))
+
+  (use-package pkgbuild-mode
+    :init (require 'pkgbuild-mode))
+
+  (use-package systemd
+    :init (require 'systemd))
+
+  (use-package yaml-mode
+    :init (require 'yaml-mode))
+
+  (use-package aggressive-indent)
+#+END_SRC
+** Navigation
+#+BEGIN_SRC emacs-lisp
+  (use-package ido
+    :config
+    (require 'ido)
+    (setq ido-auto-merge-work-directories-length -1)
+    (setq ido-use-filename-at-point nil)
+    (setq ido-use-faces nil)
+    (ido-everywhere t)
+    (ido-mode 1))
+
+  (use-package flx-ido
+    :config
+    (flx-ido-mode 1)
+    (setq ido-enable-flex-matching t))
+
+  (use-package smex
+    :init
+    (smex-initialize)
+    :config
+    (setq smex-save-file (concat user-emacs-directory ".smex-items"))
+    :bind
+    ("M-x" . smex))
+#+END_SRC
+** Org
+#+BEGIN_SRC emacs-lisp
+  (use-package ob-async
+    :config
+    (require 'ob-async))
+
+  (use-package org :defer
+    :config
+    (setq org-confirm-babel-evaluate nil
+          org-export-babel-evaluate 'inline-only)
+    (setq org-src-tab-acts-natively t)
+    (setq org-startup-with-inline-images t)
+    (setq org-image-actual-width 600)
+    (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+    (setq org-src-fontify-natively t)
+    (setq org-confirm-babel-evaluate nil)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '(
+       (emacs-lisp . t)
+       (gnuplot . t)
+       (latex . t)
+       (makefile . t)
+       (org . t)
+       (python . t)
+       (shell . t)
+       )))
+
+  (use-package org-bullets
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+  (use-package org-tree-slide
+    :disabled
+    )
+
+  (setq org-hide-emphasis-markers t)
+  (add-hook 'org-mode-hook 'visual-line-mode)
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+  (setq org-todo-keywords
+        (quote ((sequence "TODO(t)" "DOING(s)" "NEXT(n)" "|" "DONE(d)")
+                (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "SOMEDAY"))))
+
+  (setq org-todo-keyword-faces
+        (quote (("TODO" :foreground "red" :weight bold)
+                ("DOING" :foreground "yellow" :weight bold)
+                ("NEXT" :foreground "blue" :weight bold)
+                ("DONE" :foreground "forest green" :weight bold)
+                ("WAITING" :foreground "orange" :weight bold)
+                ("HOLD" :foreground "magenta" :weight bold)
+                ("CANCELLED" :foreground "forest red" :weight bold)
+                ("SOMEDAY" :foreground "forest yellow" :weight bold))))
+
+  (setq org-todo-state-tags-triggers
+        (quote (("CANCELLED" ("CANCELLED" . t))
+                ("WAITING" ("WAITING" . t))
+                ("DOING" ("DOING" . t))
+                ("HOLD" ("WAITING") ("HOLD" . t))
+                (done ("WAITING") ("HOLD") ("DOING"))
+                ("TODO" ("WAITING") ("CANCELLED") ("HOLD") ("DOING"))
+                ("NEXT" ("WAITING") ("CANCELLED") ("HOLD") ("DOING"))
+                ("DONE" ("WAITING") ("CANCELLED") ("HOLD") ("DOING")))))
+#+END_SRC
+** Shell
+#+BEGIN_SRC emacs-lisp
+  (use-package sane-term
+    :if window-system
+    :bind
+    ("C-x t" . sane-term)
+    ("C-x T" . sane-term-create))
+#+END_SRC
+** Bitbake
+#+BEGIN_SRC emacs-lisp
+  (use-package mmm-mode
+    :config (require 'mmm-mode))
+
+  (define-minor-mode bitbake-minor-mode
+    :init-value nil
+    :lighter nil
+    :group 'bitbake
+    :global t)
+
+  (defun bitbake-comment-dwim (arg)
+    (interactive "*P")
+    (require 'newcomment)
+    (let ((comment-start "#") (comment-end ""))
+      (comment-dwim arg)))
+
+  (defvar bitbake-syntax-table
+    (let ((table (make-syntax-table)))
+      (modify-syntax-entry ?# "< b" table)
+      (modify-syntax-entry ?\n "> b" table)
+      table)
+    "Syntax table used in `bitbake-mode'.")
+
+  (defvar bitbake-font-lock-defaults
+    `((
+       ;; fakeroot python do_foo() {
+       ("\\b\\(include\\|require\\|inherit\\|python\\|addtask\\|export\\|fakeroot\\|unset\\)\\b" . font-lock-keyword-face)
+       ;; do_install_append() {
+       ("^\\(fakeroot *\\)?\\(python *\\)?\\([a-zA-Z0-9\-_+.${}/~]+\\) *( *) *{" 3 font-lock-function-name-face)
+       ;; do_deploy[depends] ??=
+       ("^\\(export *\\)?\\([a-zA-Z0-9\-_+.${}/~]+\\(\\[[a-zA-Z0-9\-_+.${}/~]+\\]\\)?\\) *\\(=\\|\\?=\\|\\?\\?=\\|:=\\|+=\\|=+\\|.=\\|=.\\)" 2 font-lock-variable-name-face)
+       )))
+
+  ;;;###autoload
+  (define-derived-mode bitbake-mode shell-script-mode
+    "A mode for editing bitbake recipe files."
+    :syntax-table bitbake-syntax-table
+    (setq font-lock-defaults bitbake-font-lock-defaults)
+    (setq mode-name "BitBake")
+    (define-key bitbake-mode-map [remap comment-dwim] 'bitbake-comment-dwim))
+
+  (mmm-add-classes
+   '((bitbake-shell
+      :submode shell-script-mode
+      :delimiter-mode nil
+      :case-fold-search nil
+      :front "^\\(fakeroot *\\)?\\([a-zA-Z0-9\-_+.${}/~]+\\) *( *) *{"
+      :back "^}")
+     (bitbake-python
+      :submode python-mode
+      :delimiter-mode nil
+      :case-fold-search nil
+      :front "^\\(fakeroot *\\)?python *\\([a-zA-Z0-9\-_+.${}/~]+\\) *( *) *{"
+      :back "^}")))
+
+  (mmm-add-mode-ext-class 'bitbake-mode "\\.bb\\(append\\|class\\)?\\'" 'bitbake-shell)
+  (mmm-add-mode-ext-class 'bitbake-mode "\\.bb\\(append\\|class\\)?\\'" 'bitbake-python)
+  (mmm-add-mode-ext-class 'bitbake-mode "\\.inc\\" 'bitbake-shell)
+  (mmm-add-mode-ext-class 'bitbake-mode "\\.inc\\" 'bitbake-python)
+  (add-to-list 'auto-mode-alist
+               '("\\.bb\\(append\\|class\\)?\\'" . bitbake-mode))
+  (add-to-list 'auto-mode-alist
+               '("\\.inc\\'" . bitbake-mode))
+#+END_SRC
+** C/C++
+#+BEGIN_SRC emacs-lisp
+  (use-package aggressive-indent)
+
+  (use-package cc-mode
+    :defer
+    :config
+    (c-set-offset 'case-label '+)
+    (setq-default c-basic-offset 4))
+
+  (defconst linux-kernel
+    '((c-basic-offset . 8)
+      (c-label-minimum-indentation . 0)
+      (c-offsets-alist . (
+                          (arglist-close         . c-lineup-arglist-tabs-only)
+                          (arglist-cont-nonempty .
+                                                 (c-lineup-gcc-asm-reg c-lineup-arglist-tabs-only))
+                          (arglist-intro         . +)
+                          (brace-list-intro      . +)
+                          (c                     . c-lineup-C-comments)
+                          (case-label            . 0)
+                          (comment-intro         . c-lineup-comment)
+                          (cpp-define-intro      . +)
+                          (cpp-macro             . -1000)
+                          (cpp-macro-cont        . +)
+                          (defun-block-intro     . +)
+                          (else-clause           . 0)
+                          (func-decl-cont        . +)
+                          (inclass               . +)
+                          (inher-cont            . c-lineup-multi-inher)
+                          (knr-argdecl-intro     . 0)
+                          (label                 . -1000)
+                          (statement             . 0)
+                          (statement-block-intro . +)
+                          (statement-case-intro  . +)
+                          (statement-cont        . +)
+                          (substatement          . +)
+                          ))
+      (indent-tabs-mode . t)
+      (show-trailing-whitespace . t)))
+  (c-add-style "linux-kernel" linux-kernel)
+#+END_SRC
+** ibuffer
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+
+  (setq ibuffer-expert t)
+  (setq ibuffer-show-empty-filter-groups nil)
+
+  (setq ibuffer-saved-filter-groups
+        '(("default"
+           ("Bitbake"
+            (or
+             (filename . "\\.bb$")
+             (filename . "\\.bbappend$")
+             (filename . "\\.inc$")))
+           ("Shell scripts"
+            (or
+             (mode . sh-mode)
+             (mode . shell-mode)
+             (mode . makefile-bsdmake-mode)
+             (mode . makefile-imake-mode)
+             (mode . makefile-automake-mode)
+             (mode . makefile-gmake-mode)
+             (mode . makefile-makeapp-mode)))
+           ("Git" (or
+                   (derived-mode . magit-mode)
+                   (mode . diff-mode)))
+           ("Org"
+            (or (mode . org-mode)
+                (filename . "OrgMode")))
+           ("Markup"
+            (or
+             (mode . tex-mode)
+             (mode . latex-mode)
+             (mode . tex-fold-mode)
+             (mode . tex-doctex-mode)
+             (mode . context-mode)
+             (mode . bibtex-style-mode)
+             (mode . sgml-mode)
+             (mode . css-mode)
+             (mode . nxml-mode)
+             (mode . html-mode)))
+           ("Dired" (mode . dired-mode))
+           ("Man pages"
+            (mode . Man-mode))
+           ("Shells"
+            (or
+             (mode . ansi-term-mode)
+             (mode . term-mode)
+             (mode . eshell-mode)
+             (mode . shell-mode)))
+           ("Emacs"
+            (name . "^\*\.*\*\$"))
+           )))
+
+  (add-hook 'ibuffer-mode-hook
+            '(lambda ()
+               (ibuffer-auto-mode 1)
+               (ibuffer-switch-to-saved-filter-groups "default")))
+#+END_SRC
+** Latex
+#+BEGIN_SRC emacs-lisp
+  (use-package auctex
+    :preface
+    (defun apm-latex-mode-setup ()
+      "Tweaks and customisations for LaTeX mode."
+      (TeX-source-correlate-mode 1)
+      (LaTeX-math-mode 1)
+      (turn-on-reftex))
+    (defun my-latex-mode-setup ()
+      (setq-local company-backends
+                  (append '((company-math-symbols-latex company-latex-commands))
+                          company-backends)))
+    :defer t
+    :commands (LaTeX-math-mode TeX-source-correlate-mode)
+    :mode ("\\.tex\\'" . LaTeX-mode)
+    :hook
+    ((LaTeX-mode . apm-latex-mode-setup)
+     (LaTex-mode . my-latex-mode-setup))
+    :init
+    (setq-default TeX-auto-save t)
+    (setq-default TeX-parse-self t)
+    (setq-default TeX-PDF-mode t)
+    (setq-default TeX-master nil)
+    (setq-default flyspell-mode t)
+    (setq-default TeX-source-correlate-start-server t))
+
+  (use-package latex-preview-pane
+    :hook ((LaTeX-mode . latex-preview-pane-mode)))
+#+END_SRC
+** Go
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode
+    :init (add-hook 'go-mode-hook
+                    (lambda ()
+                      (setq gofmt-command "goimports")
+                      (add-hook 'before-save-hook 'gofmt-before-save)
+                      (setq truncate-lines t)
+                      (setq indent-tabs-mode t)
+                      (setq tab-width 4))))
+
+  (use-package go-eldoc
+    :init (add-hook 'go-mode-hook 'go-eldoc-setup))
+
+  (use-package go-guru
+    :init (add-hook 'go-mode-hook 'go-guru-hl-identifier-mode))
+#+END_SRC
+** Markdown
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :mode
+    (("README\\.md\\'" . gfm-mode)
+     ("\\.md\\'" . markdown-mode)
+     ("\\.markdown\\'" . markdown-mode))
+    :init
+    (setq markdown-command "multimarkdown")
+    (setq-default fill-column 80))
+#+END_SRC

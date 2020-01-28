@@ -1,0 +1,46 @@
+#+TITLE: Machine Install instructions
+#+STARTUP: indent
+* System installation
+** Package installation
+*** Base packages
+#+BEGIN_SRC shell :async :results output
+  sudo pacman -S --needed --noconfirm unison grml-zsh-config sudo tmuxp zsh git net-tools stow
+#+END_SRC
+
+*** Yay installation
+#+BEGIN_SRC shell :async :results output
+  git clone https://aur.archlinux.org/yay.git /tmp/yay
+  cd /tmp/yay && makepkg -si
+  rm -rf /tmp/yay
+#+END_SRC
+
+*** Extra packages for desktop / laptop
+#+BEGIN_SRC shell :async :results output
+  sudo pacman -S --needed --noconfirm bluez-utils networkmanager emacs firefox ttf-dejavu i3-wm i3status openssh parcellite rxvt-unicode sway swaylock weston xorg-server xorg-server-xwayland xorg-xinit xorg-xmodmap xorg-xrdb xss-lock evince xorg-xclipboard intel-ucode xsel tree lesspipe gtk-engines diff-so-fancy gtk3-print-backends system-config-printer cups aspell-en aspell-pt fzf
+ #+END_SRC
+
+*** Yay extra packages
+#+BEGIN_SRC shell :async :results output
+ yay -S skypeforlinux-stable-bin exa bat ripgrep
+#+END_SRC
+*** Rust
+**** Compiler
+#+BEGIN_SRC shell :async :results output
+ curl https://sh.rustup.rs -sSf --output /tmp/rustup.sh
+ sh rustup.sh --default-toolchain stable -y --profile=minimal
+#+END_SRC
+**** Tools
+#+BEGIN_SRC shell :async :results output
+ cargo install cargo-audit cargo-bloat cargo-cache cargo-count cargo-edit cargo-lichking cargo-outdated cargo-release cargo-tree cargo-udeps cargo-watch loc ripgrep topgrade
+#+END_SRC
+
+** Bluetooth installation
+#+BEGIN_SRC shell :async :results output
+ sudo sed -i 's,#AutoEnable=*,AutoEnable=true,g' /etc/bluetooth/main.conf
+ sudo systemctl restart bluetooth
+#+END_SRC
+* System cleanup
+** Remove unused packages
+#+BEGIN_SRC shell :async :results output
+ sudo pacman -Rns --noconfirm $(pacman -Qtdq)
+#+END_SRC

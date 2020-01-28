@@ -1,0 +1,8 @@
+alias uboot 		U-Boot Development Mailing List		<u-boot@lists.denx.de>
+alias me 		Otavio Salvador 			<otavio@ossystems.com.br>
+alias meta-fsl 		meta-freescale Mailing List 		<meta-freescale@yoctoproject.org>
+alias oe-core 		OpenEmbedded Core Mailing List 		<openembedded-core@lists.openembedded.org>
+alias meta-oe		Meta-OpenEmbedded Mailing listing	<openembedded-devel@lists.openembedded.org>
+alias lkml		Linux Kernel      			<linux-kernel@vger.kernel.org>
+alias artem		Artem Bityutskiy			<artem.bityutskiy@linux.intel.com>
+alias yocto             Yocto Project Mailing List              <yocto@yoctoproject.org>

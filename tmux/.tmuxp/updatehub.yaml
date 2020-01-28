@@ -1,0 +1,11 @@
+session_name: yocto-updatehub
+start_directory: ~/src/updatehub/
+windows:
+  - window_name: yocto
+    panes:
+      - focus: true
+        shell_command:
+          - cd ~/src/updatehub/yocto
+          - source ./setup-environment build
+      - shell_command:
+          - cd yocto/sources
