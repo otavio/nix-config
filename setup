@@ -16,6 +16,7 @@ useronly=(
 stowit() {
     usr=$1
     app=$2
+    stow -D -t    ${usr} ${app}
     stow -v -R -t ${usr} ${app}
 }
 
