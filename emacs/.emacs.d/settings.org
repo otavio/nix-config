@@ -151,6 +151,15 @@
 #+BEGIN_SRC emacs-lisp
   (use-package flyspell :diminish flyspell-mode)
 #+END_SRC
+** Use regexp search for C-s
+#+BEGIN_SRC emacs-lisp
+  ;; Interactive search key bindings. By default, C-s runs
+  ;; isearch-forward, so this swaps the bindings.
+  (global-set-key (kbd "C-s") 'isearch-forward-regexp)
+  (global-set-key (kbd "C-r") 'isearch-backward-regexp)
+  (global-set-key (kbd "C-M-s") 'isearch-forward)
+  (global-set-key (kbd "C-M-r") 'isearch-backward)
+#+END_SRC
 ** Custom Keybindings
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-h") 'delete-backward-char)
