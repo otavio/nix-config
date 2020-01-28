@@ -762,3 +762,9 @@
     (setq markdown-command "multimarkdown")
     (setq-default fill-column 80))
 #+END_SRC
+** Which Key
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :diminish which-key-mode
+  :hook (after-init . which-key-mode))
+#+END_SRC
