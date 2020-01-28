@@ -1,0 +1,49 @@
+#!/bin/sh
+
+changeset=$1
+branch=$2
+
+if [ -z $changeset ]; then
+	echo "ERROR: Please specify the changeset"
+	exit 1
+fi
+
+if [ -z $branch ]; then
+	echo "ERROR: Please specify the branch"
+	exit 1
+fi
+
+repo=`pwd | sed -e 's,.*\/\([^\/]*\)$,\1,g'`
+tmp=`mktemp`
+
+cat > $tmp <<EOF
+Subject: Updates to $repo ($branch) in `date --rfc-3339=date`
+Hello,
+
+I pushed following updates:
+
+$(git log $changeset)
+
+Regards,
+
+--
+Otavio Salvador                             O.S. Systems
+http://www.ossystems.com.br        http://code.ossystems.com.br
+Mobile: +55 (53) 9981-7854            Mobile: +1 (347) 903-9750
+EOF
+
+more -d $tmp
+echo
+echo -n "Send it? [y|N] "
+read REPLY
+case "$REPLY" in
+    y|Y)
+	echo "Send!"
+	tail -n +2 $tmp | mail -s "Updates to $repo ($branch) in `date --rfc-3339=date`" 'Meta-OpenEmbedded Mailing listing <openembedded-devel@lists.openembedded.org>'
+    ;;
+    *)
+	echo "Skiped!"
+    ;;
+esac
+
+rm $tmp

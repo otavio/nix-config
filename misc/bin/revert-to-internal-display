@@ -1,0 +1,5 @@
+#!/bin/bash
+intern=DSI-1
+extern=HDMI-1
+
+xrandr --output "$extern" --off --output "$intern" --rotate right --auto --dpi 130

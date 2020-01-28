@@ -1,0 +1,35 @@
+#!/bin/sh
+
+add_multiconfig_setting() {
+	mkdir -p conf/multiconfig
+	echo "MACHINE = \"$1\"" > conf/multiconfig/$1.conf
+	#echo "TMPDIR = \"\${TOPDIR}/tmp/$1\"" > conf/multiconfig/$1.conf
+
+	MULTICONFIG="$MULTICONFIG $1"
+	CMDLINE="$CMDLINE multiconfig:$1:$2"
+}
+
+MULTICONFIG=""
+CMDLINE=""
+IMAGE=$1
+
+if [ -z "$MACHINES" ] || [ -z "$IMAGE" ]; then
+	echo "Please set the machines to build."
+	echo "e.g: MACHINES=\"machineA machineB\" $0 <image>"
+	exit 1
+fi
+
+if [ ! -e conf/local.conf ]; then
+	echo "ERROR: Please run from the build directory"
+	exit 1
+fi
+
+rm -rf conf/multiconfig
+for m in $MACHINES; do
+	add_multiconfig_setting $m $IMAGE
+done
+
+sed -i '/BBMULTICONFIG.*/d' conf/local.conf
+echo "BBMULTICONFIG = \"$MULTICONFIG\"" >> conf/local.conf
+
+bitbake $CMDLINE
