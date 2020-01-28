@@ -18,7 +18,6 @@
 #+BEGIN_SRC shell :async :results output
   sudo pacman -S --needed --noconfirm bluez-utils networkmanager emacs firefox ttf-dejavu i3-wm i3status openssh parcellite rxvt-unicode sway swaylock weston xorg-server xorg-server-xwayland xorg-xinit xorg-xmodmap xorg-xrdb xss-lock evince xorg-xclipboard intel-ucode xsel tree lesspipe gtk-engines diff-so-fancy gtk3-print-backends system-config-printer cups aspell-en aspell-pt fzf
  #+END_SRC
-
 *** Yay extra packages
 #+BEGIN_SRC shell :async :results output
  yay -S skypeforlinux-stable-bin exa bat ripgrep
@@ -33,7 +32,10 @@
 #+BEGIN_SRC shell :async :results output
  cargo install cargo-audit cargo-bloat cargo-cache cargo-count cargo-edit cargo-lichking cargo-outdated cargo-release cargo-tree cargo-udeps cargo-watch loc ripgrep topgrade
 #+END_SRC
-
+*** Keyboard layout
+#+BEGIN_SRC shell :async :results output
+  sudo localectl set-x11-keymap us pc101 intl caps:super
+#+END_SRC
 ** Bluetooth installation
 #+BEGIN_SRC shell :async :results output
  sudo sed -i 's,#AutoEnable=*,AutoEnable=true,g' /etc/bluetooth/main.conf
