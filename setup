@@ -10,6 +10,7 @@ useronly=(
     tmux
     git
     emacs
+    i3wm
     misc
     topgrade
     x11
