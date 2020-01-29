@@ -7,6 +7,7 @@ base=(
 
 # Normal user only
 useronly=(
+    aspell
     tmux
     git
     emacs
