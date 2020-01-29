@@ -11,6 +11,7 @@ useronly=(
     tmux
     git
     emacs
+    gtk
     i3wm
     misc
     topgrade
