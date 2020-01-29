@@ -80,7 +80,6 @@
 ** General modifications
 #+BEGIN_SRC emacs-lisp
   (fset 'yes-or-no-p 'y-or-n-p)
-  (setq confirm-kill-emacs 'yes-or-no-p)
 
   (require 'saveplace)
   (setq-default save-place t)
