@@ -15,6 +15,7 @@ useronly=(
     i3wm
     irssi
     misc
+    parcellite
     patman
     screen
     topgrade
@@ -33,6 +34,7 @@ stowit() {
 echo ""
 echo "Stowing for user: $(whoami)"
 
+git submodule init
 git submodule update
 
 # Common contents
