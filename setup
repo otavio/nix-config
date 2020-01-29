@@ -13,6 +13,7 @@ useronly=(
     emacs
     gtk
     i3wm
+    irssi
     misc
     topgrade
     x11
