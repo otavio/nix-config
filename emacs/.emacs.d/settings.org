@@ -392,6 +392,39 @@
     :diminish flycheck-mode
     :init (global-flycheck-mode))
 #+END_SRC
+** LSP
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :diminish lsp-mode
+    :config
+    (setq lsp-enable-snippet nil)
+    (setq lsp-enable-file-watchers nil)
+    (setq lsp-prefer-flymake nil)
+    :commands lsp)
+
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode
+    :config
+    (setq lsp-ui-sideline-show-symbol nil)
+    (setq lsp-ui-sideline-show-hover nil)
+    (setq lsp-ui-sideline-show-diagnostics nil)
+    (setq lsp-ui-doc-enable nil)
+    (setq lsp-ui-sideline-ignore-duplicate t)
+    (setq lsp-eldoc-render-all nil)
+    (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+    (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+    (define-key lsp-ui-mode-map (kbd "C-h") #'lsp-describe-thing-at-point))
+
+  (use-package helm-lsp
+    :ensure t
+    :commands helm-lsp-workspace-symbol)
+  (use-package company-lsp
+    :ensure t
+    :commands company-lsp
+    :config (push 'company-lsp company-backends))
+#+END_SRC
 ** Git
 #+BEGIN_SRC emacs-lisp
   (add-hook 'git-commit-mode-hook (lambda () (setq fill-column 72)))
@@ -749,6 +782,17 @@
 
   (use-package go-guru
     :init (add-hook 'go-mode-hook 'go-guru-hl-identifier-mode))
+#+END_SRC
+** Rust
+#+BEGIN_SRC emacs-lisp
+  (use-package toml-mode)
+
+  (use-package rust-mode
+    :hook (rust-mode . lsp))
+
+  ;; Add keybindings for interacting with Cargo
+  (use-package cargo
+    :hook (rust-mode . cargo-minor-mode))
 #+END_SRC
 ** Markdown
 #+BEGIN_SRC emacs-lisp
