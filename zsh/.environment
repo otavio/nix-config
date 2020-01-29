@@ -1,0 +1,17 @@
+export TERMINAL="urxvt"
+if type alacritty > /dev/null; then
+   export TERMINAL=alacritty
+fi
+
+export PATH="$HOME/bin:$HOME/hacking/ossystems/internal/devel-tools/bin:${PATH}"
+export DH_ALWAYS_EXCLUDE=CVS:.svn:.git
+export EDITOR="emacs -nw"
+export BROWSER=firefox
+export MAIL=/var/mail/otavio
+export GTK_IM_MODULE=cedilla
+export LESS='-R'
+export TERM=tmux-256color
+
+if type lesspipe.sh > /dev/null; then
+    eval $(lesspipe.sh)
+fi

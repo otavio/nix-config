@@ -1,0 +1,885 @@
+#compdef jig-cli
+
+autoload -U is-at-least
+
+_jig-cli() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    if is-at-least 5.2; then
+        _arguments_options=(-s -S -C)
+    else
+        _arguments_options=(-s -C)
+    fi
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_jig-cli_commands" \
+"*::: :->jig-cli" \
+&& ret=0
+    case $state in
+    (jig-cli)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:jig-cli-command-$line[1]:"
+        case $line[1] in
+            (users)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_jig-cli__users_commands" \
+"*::: :->users" \
+&& ret=0
+case $state in
+    (users)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:jig-cli-users-command-$line[1]:"
+        case $line[1] in
+            (login)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(new)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(update-password)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(admin)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_jig-cli__users__admin_commands" \
+"*::: :->admin" \
+&& ret=0
+case $state in
+    (admin)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:jig-cli-users-admin-command-$line[1]:"
+        case $line[1] in
+            (enable)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':username:_files' \
+&& ret=0
+;;
+(disable)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':username:_files' \
+&& ret=0
+;;
+(grant-admin)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':username:_files' \
+&& ret=0
+;;
+(change-password)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':username:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(orders)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_jig-cli__orders_commands" \
+"*::: :->orders" \
+&& ret=0
+case $state in
+    (orders)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:jig-cli-orders-command-$line[1]:"
+        case $line[1] in
+            (import)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':product-id -- The project's id to witch this orders belongs to:_files' \
+':file -- Path of the file to be imported:_files' \
+&& ret=0
+;;
+(list)
+_arguments "${_arguments_options[@]}" \
+'-l+[Set the limit to display orders]' \
+'--limit=[Set the limit to display orders]' \
+'-s+[Set to skip the *n* first orders]' \
+'--skip=[Set to skip the *n* first orders]' \
+'--project=[Filter by project ID]' \
+'--product=[Filter by product ID]' \
+'--status=[Filter order by status]' \
+'-v+[Filter by version]' \
+'--version=[Filter by version]' \
+'--model=[Filter by model]' \
+'--serial=[Filter by matching serial]' \
+'--created-by=[Filter by user'\''s ID]' \
+'--controller-uuid=[Filter by order associated to this controller]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+&& ret=0
+;;
+(show)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':order-id -- The id of the order:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(logs)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_jig-cli__logs_commands" \
+"*::: :->logs" \
+&& ret=0
+case $state in
+    (logs)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:jig-cli-logs-command-$line[1]:"
+        case $line[1] in
+            (list)
+_arguments "${_arguments_options[@]}" \
+'-l+[Set the limit to display orders]' \
+'--limit=[Set the limit to display orders]' \
+'-s+[Set to skip the *n* first orders]' \
+'--skip=[Set to skip the *n* first orders]' \
+'--status=[Filter by log status \[aborted, successful, failed\]]' \
+'--controller-uuid=[Filter by controller'\''s access-key]' \
+'-r[Filter by review status]' \
+'--reviewed[Filter by review status]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(get)
+_arguments "${_arguments_options[@]}" \
+'-m+[Alternative ways to display the order'\''s log \[raw/screen\] (this ignores the `step` and `test` filters)]' \
+'--modifier=[Alternative ways to display the order'\''s log \[raw/screen\] (this ignores the `step` and `test` filters)]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':order-id -- The id of the order:_files' \
+'::step -- Specify the step to show info:_files' \
+'::test -- Specify test on <step> to show info and log:_files' \
+&& ret=0
+;;
+(reviewed)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':order-id -- The id of the order:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(controllers)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_jig-cli__controllers_commands" \
+"*::: :->controllers" \
+&& ret=0
+case $state in
+    (controllers)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:jig-cli-controllers-command-$line[1]:"
+        case $line[1] in
+            (list)
+_arguments "${_arguments_options[@]}" \
+'-l+[Set the limit to display orders]' \
+'--limit=[Set the limit to display orders]' \
+'-s+[Set to skip the *n* first orders]' \
+'--skip=[Set to skip the *n* first orders]' \
+'-a+[Filter controller by it'\''s status \[yes, no\]]' \
+'--active=[Filter controller by it'\''s status \[yes, no\]]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(register)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':location -- The location of the controller:_files' \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" \
+'--set-location=[Set the new location of the controller]' \
+'--set-queue-size=[Set the new queue_size]' \
+'--set-product-id=[Set the new product of this controller]' \
+'--active=[Set the status of the controller \[Yes, No\]]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':access-key -- Controller access key:_files' \
+&& ret=0
+;;
+(unassociate)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':access-key -- Controller access key:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(settings)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_jig-cli__settings_commands" \
+"*::: :->settings" \
+&& ret=0
+case $state in
+    (settings)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:jig-cli-settings-command-$line[1]:"
+        case $line[1] in
+            (get)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(set)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+'::server:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(projects)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_jig-cli__projects_commands" \
+"*::: :->projects" \
+&& ret=0
+case $state in
+    (projects)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:jig-cli-projects-command-$line[1]:"
+        case $line[1] in
+            (list)
+_arguments "${_arguments_options[@]}" \
+'-l+[Set the limit to display the project(s)]' \
+'--limit=[Set the limit to display the project(s)]' \
+'-s+[Set to skip the *n* first project(s)]' \
+'--skip=[Set to skip the *n* first project(s)]' \
+'-n+[Filter by project name]' \
+'--name=[Filter by project name]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(create)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':name -- Name of the project:_files' \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" \
+'-n+[The new name for the project]' \
+'--name=[The new name for the project]' \
+'--active-package=[The new active package]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':project-id -- The id of the project:_files' \
+&& ret=0
+;;
+(products)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_jig-cli__projects__products_commands" \
+"*::: :->products" \
+&& ret=0
+case $state in
+    (products)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:jig-cli-projects-products-command-$line[1]:"
+        case $line[1] in
+            (list)
+_arguments "${_arguments_options[@]}" \
+'-l+[Set the limit to display the product(s)]' \
+'--limit=[Set the limit to display the product(s)]' \
+'-s+[Set to skip the *n* first project(s)]' \
+'--skip=[Set to skip the *n* first project(s)]' \
+'-n+[Filter by product name]' \
+'--name=[Filter by product name]' \
+'-a+[Filter by alias]' \
+'--alias=[Filter by alias]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':project-id -- The ID of the project:_files' \
+&& ret=0
+;;
+(register)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':project-id -- The ID of the project:_files' \
+':name -- Name of the product:_files' \
+':alias -- Alias of the product:_files' \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':project-id -- The ID of the project:_files' \
+':product-id -- The ID of the project:_files' \
+'::name -- The new name of the product:_files' \
+'::alias -- The new alias of the product:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(completions)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+'::shell -- Shell to generate the completions:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+}
+
+(( $+functions[_jig-cli_commands] )) ||
+_jig-cli_commands() {
+    local commands; commands=(
+        "users:Handle users operations" \
+"orders:Manages manufacture orders with the cloud" \
+"logs:Manages production logs" \
+"controllers:Manages Controllers information" \
+"settings:Manages cli's settings" \
+"projects:Manages project(s) settings" \
+"completions:Generate completion for Shell" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'jig-cli commands' commands "$@"
+}
+(( $+functions[_jig-cli__users__admin_commands] )) ||
+_jig-cli__users__admin_commands() {
+    local commands; commands=(
+        "enable:Enables user on pending state" \
+"disable:Disable user" \
+"grant-admin:Grant administration access to user" \
+"change-password:Changes password if any user" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'jig-cli users admin commands' commands "$@"
+}
+(( $+functions[_jig-cli__users__admin__change-password_commands] )) ||
+_jig-cli__users__admin__change-password_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli users admin change-password commands' commands "$@"
+}
+(( $+functions[_jig-cli__completions_commands] )) ||
+_jig-cli__completions_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli completions commands' commands "$@"
+}
+(( $+functions[_jig-cli__controllers_commands] )) ||
+_jig-cli__controllers_commands() {
+    local commands; commands=(
+        "list:List controllers (all/active/inactive)" \
+"register:Register a new controller to the cloud" \
+"update:Updates information of a controller" \
+"unassociate:Unassociates the controller from any product" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'jig-cli controllers commands' commands "$@"
+}
+(( $+functions[_jig-cli__projects__create_commands] )) ||
+_jig-cli__projects__create_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli projects create commands' commands "$@"
+}
+(( $+functions[_jig-cli__users__admin__disable_commands] )) ||
+_jig-cli__users__admin__disable_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli users admin disable commands' commands "$@"
+}
+(( $+functions[_jig-cli__users__admin__enable_commands] )) ||
+_jig-cli__users__admin__enable_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli users admin enable commands' commands "$@"
+}
+(( $+functions[_jig-cli__logs__get_commands] )) ||
+_jig-cli__logs__get_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli logs get commands' commands "$@"
+}
+(( $+functions[_jig-cli__settings__get_commands] )) ||
+_jig-cli__settings__get_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli settings get commands' commands "$@"
+}
+(( $+functions[_jig-cli__users__admin__grant-admin_commands] )) ||
+_jig-cli__users__admin__grant-admin_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli users admin grant-admin commands' commands "$@"
+}
+(( $+functions[_jig-cli__controllers__help_commands] )) ||
+_jig-cli__controllers__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli controllers help commands' commands "$@"
+}
+(( $+functions[_jig-cli__help_commands] )) ||
+_jig-cli__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli help commands' commands "$@"
+}
+(( $+functions[_jig-cli__logs__help_commands] )) ||
+_jig-cli__logs__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli logs help commands' commands "$@"
+}
+(( $+functions[_jig-cli__orders__help_commands] )) ||
+_jig-cli__orders__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli orders help commands' commands "$@"
+}
+(( $+functions[_jig-cli__projects__help_commands] )) ||
+_jig-cli__projects__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli projects help commands' commands "$@"
+}
+(( $+functions[_jig-cli__projects__products__help_commands] )) ||
+_jig-cli__projects__products__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli projects products help commands' commands "$@"
+}
+(( $+functions[_jig-cli__settings__help_commands] )) ||
+_jig-cli__settings__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli settings help commands' commands "$@"
+}
+(( $+functions[_jig-cli__users__admin__help_commands] )) ||
+_jig-cli__users__admin__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli users admin help commands' commands "$@"
+}
+(( $+functions[_jig-cli__users__help_commands] )) ||
+_jig-cli__users__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli users help commands' commands "$@"
+}
+(( $+functions[_jig-cli__orders__import_commands] )) ||
+_jig-cli__orders__import_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli orders import commands' commands "$@"
+}
+(( $+functions[_jig-cli__controllers__list_commands] )) ||
+_jig-cli__controllers__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli controllers list commands' commands "$@"
+}
+(( $+functions[_jig-cli__logs__list_commands] )) ||
+_jig-cli__logs__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli logs list commands' commands "$@"
+}
+(( $+functions[_jig-cli__orders__list_commands] )) ||
+_jig-cli__orders__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli orders list commands' commands "$@"
+}
+(( $+functions[_jig-cli__projects__list_commands] )) ||
+_jig-cli__projects__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli projects list commands' commands "$@"
+}
+(( $+functions[_jig-cli__projects__products__list_commands] )) ||
+_jig-cli__projects__products__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli projects products list commands' commands "$@"
+}
+(( $+functions[_jig-cli__users__login_commands] )) ||
+_jig-cli__users__login_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli users login commands' commands "$@"
+}
+(( $+functions[_jig-cli__logs_commands] )) ||
+_jig-cli__logs_commands() {
+    local commands; commands=(
+        "list:List the log entries" \
+"get:Get log for a entry" \
+"reviewed:Mark failed log entrys as reviewed" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'jig-cli logs commands' commands "$@"
+}
+(( $+functions[_jig-cli__users__new_commands] )) ||
+_jig-cli__users__new_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli users new commands' commands "$@"
+}
+(( $+functions[_jig-cli__orders_commands] )) ||
+_jig-cli__orders_commands() {
+    local commands; commands=(
+        "import:Import a CSV data into the Cloud" \
+"list:List manufacture orders" \
+"show:Show a single order" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'jig-cli orders commands' commands "$@"
+}
+(( $+functions[_jig-cli__projects__products_commands] )) ||
+_jig-cli__projects__products_commands() {
+    local commands; commands=(
+        "list:List the product(s)" \
+"register:Register a new product" \
+"update:Update the information of the product" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'jig-cli projects products commands' commands "$@"
+}
+(( $+functions[_jig-cli__projects_commands] )) ||
+_jig-cli__projects_commands() {
+    local commands; commands=(
+        "list:List the project(s)" \
+"create:Create a new project" \
+"update:Update the informations of the project" \
+"products:Manages the project's product(s)" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'jig-cli projects commands' commands "$@"
+}
+(( $+functions[_jig-cli__controllers__register_commands] )) ||
+_jig-cli__controllers__register_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli controllers register commands' commands "$@"
+}
+(( $+functions[_jig-cli__projects__products__register_commands] )) ||
+_jig-cli__projects__products__register_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli projects products register commands' commands "$@"
+}
+(( $+functions[_jig-cli__logs__reviewed_commands] )) ||
+_jig-cli__logs__reviewed_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli logs reviewed commands' commands "$@"
+}
+(( $+functions[_jig-cli__settings__set_commands] )) ||
+_jig-cli__settings__set_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli settings set commands' commands "$@"
+}
+(( $+functions[_jig-cli__settings_commands] )) ||
+_jig-cli__settings_commands() {
+    local commands; commands=(
+        "get:List current config" \
+"set:Update current config" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'jig-cli settings commands' commands "$@"
+}
+(( $+functions[_jig-cli__orders__show_commands] )) ||
+_jig-cli__orders__show_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli orders show commands' commands "$@"
+}
+(( $+functions[_jig-cli__controllers__unassociate_commands] )) ||
+_jig-cli__controllers__unassociate_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli controllers unassociate commands' commands "$@"
+}
+(( $+functions[_jig-cli__controllers__update_commands] )) ||
+_jig-cli__controllers__update_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli controllers update commands' commands "$@"
+}
+(( $+functions[_jig-cli__projects__products__update_commands] )) ||
+_jig-cli__projects__products__update_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli projects products update commands' commands "$@"
+}
+(( $+functions[_jig-cli__projects__update_commands] )) ||
+_jig-cli__projects__update_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli projects update commands' commands "$@"
+}
+(( $+functions[_jig-cli__users__update-password_commands] )) ||
+_jig-cli__users__update-password_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'jig-cli users update-password commands' commands "$@"
+}
+(( $+functions[_jig-cli__users_commands] )) ||
+_jig-cli__users_commands() {
+    local commands; commands=(
+        "login:Login into the system" \
+"new:Creates a new user on disabled state" \
+"update-password:Updates password for current user" \
+"admin:Admin only operations" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'jig-cli users commands' commands "$@"
+}
+
+_jig-cli "$@"
