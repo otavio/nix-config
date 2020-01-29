@@ -15,6 +15,7 @@ useronly=(
     i3wm
     irssi
     misc
+    patman
     screen
     topgrade
     x11

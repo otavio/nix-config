@@ -1,0 +1,83 @@
+[alias]
+me: Otavio Salvador <otavio@ossystems.com.br>
+fabio: Fabio Estevam <fabio.estevam@nxp.com>
+marek: Marek Vasut <marex@denx.de>
+sbabic: Stefano Babic <sbabic@denx.de>
+u-boot: U-Boot Mailing List <u-boot@lists.denx.de>
+wolfgang: Wolfgang Denk <wd@denx.de>
+sjg: Simon Glass <sjg@chromium.org>
+agust: Anatolij Gustschin <agust@denx.de>
+awang: Alison Wang <b18965@freescale.com>
+andy: Andy Voltz <andy.voltz@timesys.com>
+iio: linux-iio@vger.kernel.org
+lkml: linux-kernel@vger.kernel.org
+lkml-arm: linux-arm-kernel@lists.infradead.org
+jic23: Jonathan Cameron <jic23@kernel.org>
+panto: Pantelis Antoniou <panto@antoniou-consulting.com>
+afleming: Andy Fleming <afleming@gmail.com>
+armin: Armin Kuster <akuster808@gmail.com>
+rhu: Richard Hu <richard.hu@technexion.com>
+jweber: John Weber <john.weber@technexion.com>
+rburton: Ross Burton <ross.burton@intel.com>
+gary: Gary Bisson <gary.bisson@boundarydevices.com>
+
+rockchip: Jason Zhu <jason.zhu@rock-chips.com>, Vicent Chi <vicent.chi@rock-chips.com>, Andy Yan <andy.yan@rock-chips.com>, Philipp Tomsic <philipp.tomsich@theobroma-systems.com>, Tony Xie <tony.xie@rock-chips.com>
+usb: marek
+imx: sbabic, fabio, marek
+imx-fsl: sbabic, fabio
+imx-denx: sbabic, marek
+mx28: imx
+mx23: imx
+mx6: imx
+mx6sl: imx
+mx28evk: imx-fsl
+m28evk: imx-denx
+mx51evk: imx-fsl
+mx53loco: imx-fsl
+mx53ard: imx-fsl
+mx6qsabrelite: imx-fsl
+mx6sabresd: imx-fsl
+mx6sabreauto: imx-fsl
+mx6sabre_common: imx-fsl
+mx6sabre{auto,sd}: imx-fsl
+mx6sabre{sd,auto}: imx-fsl
+mx6slevk: imx-fsl
+mx6qarm2: imx-fsl
+mx25pdk: imx-fsl
+pico-imx6ul: imx, technexion
+pico-imx7d: imx, technexion
+pico-imx6qdl: imx, technexion
+imx7d-pico: imx, technexion
+imx6ul-pico: imx, technexion
+imx6qdl-pico: imx, technexion
+technexion: rhu, jweber
+embestmx6boards: imx
+warp: imx
+udoo: imx-fsl
+hummingboard: imx-fsl
+nitrogen6x: imx, enelson
+cgtqmx6eval: imx
+mx23_olinuxino: imx
+mx23evk: imx
+mx6cuboxi: imx
+wandboard: imx-fsl
+vf610twr: imx-fsl, awang, andy
+mxs: imx
+mxsboot: imx
+sc_sps_1: sbabic, marek
+patman: sjg
+config: u-boot
+build: u-boot
+spl: u-boot
+led: agust
+gpio-led: led
+status-led: led
+cmd_led: led
+bmp: agust
+mtd: u-boot
+doc: u-boot
+ehci: usb
+mmc: panto, afleming
+fsl_esdhc: imx
+
+
