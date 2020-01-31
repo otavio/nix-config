@@ -1,3 +1,8 @@
+[settings]
+ignore_errors: True
+process_tags: False
+verbose: True
+
 [alias]
 me: Otavio Salvador <otavio@ossystems.com.br>
 fabio: Fabio Estevam <fabio.estevam@nxp.com>
