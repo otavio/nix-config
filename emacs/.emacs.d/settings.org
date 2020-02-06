@@ -334,6 +334,15 @@
     (progn
       (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
 
+  (use-package cua-base
+    :diminish cua-mode
+    :config (cua-mode t)
+    :init
+    (progn
+      (setq cua-auto-tabify-rectangles nil)
+      (setq cua-keep-region-after-copy nil)
+      (setq cua-enable-cua-keys nil)))
+
   (use-package smartparens
     :diminish smartparens-mode
     :config
