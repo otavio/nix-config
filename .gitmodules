@@ -25,3 +25,6 @@
 [submodule "tmux/.tmux/plugins/tmux-copycat"]
 	path = tmux/.tmux/plugins/tmux-copycat
 	url = https://git::@github.com/tmux-plugins/tmux-copycat
+[submodule "diff-so-fancy"]
+	path = diff-so-fancy
+	url = git@github.com:so-fancy/diff-so-fancy
