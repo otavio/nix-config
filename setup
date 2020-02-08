@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Directories which we intend to have included for every user
 base=(
