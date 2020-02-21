@@ -10,13 +10,94 @@ copy of repo in the checkout.
 
 from __future__ import print_function
 
+import datetime
+import os
+import platform
+import subprocess
+import sys
+
+
+def exec_command(cmd):
+  """Execute |cmd| or return None on failure."""
+  try:
+    if platform.system() == 'Windows':
+      ret = subprocess.call(cmd)
+      sys.exit(ret)
+    else:
+      os.execvp(cmd[0], cmd)
+  except Exception:
+    pass
+
+
+def check_python_version():
+  """Make sure the active Python version is recent enough."""
+  def reexec(prog):
+    exec_command([prog] + sys.argv)
+
+  MIN_PYTHON_VERSION = (3, 6)
+
+  ver = sys.version_info
+  major = ver.major
+  minor = ver.minor
+
+  # Abort on very old Python 2 versions.
+  if (major, minor) < (2, 7):
+    print('repo: error: Your Python version is too old. '
+          'Please use Python {}.{} or newer instead.'.format(
+              *MIN_PYTHON_VERSION), file=sys.stderr)
+    sys.exit(1)
+
+  # Try to re-exec the version specific Python 3 if needed.
+  if (major, minor) < MIN_PYTHON_VERSION:
+    # Python makes releases ~once a year, so try our min version +10 to help
+    # bridge the gap.  This is the fallback anyways so perf isn't critical.
+    min_major, min_minor = MIN_PYTHON_VERSION
+    for inc in range(0, 10):
+      reexec('python{}.{}'.format(min_major, min_minor + inc))
+
+    # Try the generic Python 3 wrapper, but only if it's new enough.  We don't
+    # want to go from (still supported) Python 2.7 to (unsupported) Python 3.5.
+    try:
+      proc = subprocess.Popen(
+          ['python3', '-c', 'import sys; '
+           'print(sys.version_info.major, sys.version_info.minor)'],
+          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      (output, _) = proc.communicate()
+      python3_ver = tuple(int(x) for x in output.decode('utf-8').split())
+    except (OSError, subprocess.CalledProcessError):
+      python3_ver = None
+
+    # The python3 version looks like it's new enough, so give it a try.
+    if python3_ver and python3_ver >= MIN_PYTHON_VERSION:
+      reexec('python3')
+
+    # We're still here, so diagnose things for the user.
+    if major < 3:
+      print('repo: warning: Python 2 is no longer supported; '
+            'Please upgrade to Python {}.{}+.'.format(*MIN_PYTHON_VERSION),
+            file=sys.stderr)
+    else:
+      print('repo: error: Python 3 version is too old; '
+            'Please use Python {}.{} or newer.'.format(*MIN_PYTHON_VERSION),
+            file=sys.stderr)
+      sys.exit(1)
+
+
+if __name__ == '__main__':
+  # TODO(vapier): Enable this on Windows once we have Python 3 issues fixed.
+  if platform.system() != 'Windows':
+    check_python_version()
+
+
 # repo default configuration
 #
 import os
 REPO_URL = os.environ.get('REPO_URL', None)
 if not REPO_URL:
   REPO_URL = 'https://gerrit.googlesource.com/git-repo'
-REPO_REV = 'stable'
+REPO_REV = os.environ.get('REPO_REV')
+if not REPO_REV:
+  REPO_REV = 'stable'
 
 # Copyright (C) 2008 Google Inc.
 #
@@ -33,10 +114,10 @@ REPO_REV = 'stable'
 # limitations under the License.
 
 # increment this whenever we make important changes to this script
-VERSION = (1, 26)
+VERSION = (2, 3)
 
 # increment this if the MAINTAINER_KEYS block is modified
-KEYRING_VERSION = (1, 2)
+KEYRING_VERSION = (2, 0)
 
 # Each individual key entry is created by using:
 # gpg --armor --export keyid
@@ -83,47 +164,19 @@ zE3GNvmJosh6leayjtI9P2A6iEkEGBECAAkFAkj3uiACGwwACgkQFlMNXpIPXGWp
 TACbBS+Up3RpfYVfd63c1cDdlru13pQAn3NQy/SN858MkxN+zym86UBgOad2
 =CMiZ
 -----END PGP PUBLIC KEY BLOCK-----
-
-     Conley Owens <cco3@android.com>
------BEGIN PGP PUBLIC KEY BLOCK-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-mQENBFHRvc8BCADFg45Xx/y6QDC+T7Y/gGc7vx0ww7qfOwIKlAZ9xG3qKunMxo+S
-hPCnzEl3cq+6I1Ww/ndop/HB3N3toPXRCoN8Vs4/Hc7by+SnaLFnacrm+tV5/OgT
-V37Lzt8lhay1Kl+YfpFwHYYpIEBLFV9knyfRXS/428W2qhdzYfvB15/AasRmwmor
-py4NIzSs8UD/SPr1ihqNCdZM76+MQyN5HMYXW/ALZXUFG0pwluHFA7hrfPG74i8C
-zMiP7qvMWIl/r/jtzHioH1dRKgbod+LZsrDJ8mBaqsZaDmNJMhss9g76XvfMyLra
-9DI9/iFuBpGzeqBv0hwOGQspLRrEoyTeR6n1ABEBAAG0H0NvbmxleSBPd2VucyA8
-Y2NvM0BhbmRyb2lkLmNvbT6JATgEEwECACIFAlHRvc8CGwMGCwkIBwMCBhUIAgkK
-CwQWAgMBAh4BAheAAAoJEGe35EhpKzgsP6AIAJKJmNtn4l7hkYHKHFSo3egb6RjQ
-zEIP3MFTcu8HFX1kF1ZFbrp7xqurLaE53kEkKuAAvjJDAgI8mcZHP1JyplubqjQA
-xvv84gK+OGP3Xk+QK1ZjUQSbjOpjEiSZpRhWcHci3dgOUH4blJfByHw25hlgHowd
-a/2PrNKZVcJ92YienaxxGjcXEUcd0uYEG2+rwllQigFcnMFDhr9B71MfalRHjFKE
-fmdoypqLrri61YBc59P88Rw2/WUpTQjgNubSqa3A2+CKdaRyaRw+2fdF4TdR0h8W
-zbg+lbaPtJHsV+3mJC7fq26MiJDRJa5ZztpMn8su20gbLgi2ShBOaHAYDDi5AQ0E
-UdG9zwEIAMoOBq+QLNozAhxOOl5GL3StTStGRgPRXINfmViTsihrqGCWBBUfXlUE
-OytC0mYcrDUQev/8ToVoyqw+iGSwDkcSXkrEUCKFtHV/GECWtk1keyHgR10YKI1R
-mquSXoubWGqPeG1PAI74XWaRx8UrL8uCXUtmD8Q5J7mDjKR5NpxaXrwlA0bKsf2E
-Gp9tu1kKauuToZhWHMRMqYSOGikQJwWSFYKT1KdNcOXLQF6+bfoJ6sjVYdwfmNQL
-Ixn8QVhoTDedcqClSWB17VDEFDFa7MmqXZz2qtM3X1R/MUMHqPtegQzBGNhRdnI2
-V45+1Nnx/uuCxDbeI4RbHzujnxDiq70AEQEAAYkBHwQYAQIACQUCUdG9zwIbDAAK
-CRBnt+RIaSs4LNVeB/0Y2pZ8I7gAAcEM0Xw8drr4omg2fUoK1J33ozlA/RxeA/lJ
-I3KnyCDTpXuIeBKPGkdL8uMATC9Z8DnBBajRlftNDVZS3Hz4G09G9QpMojvJkFJV
-By+01Flw/X+eeN8NpqSuLV4W+AjEO8at/VvgKr1AFvBRdZ7GkpI1o6DgPe7ZqX+1
-dzQZt3e13W0rVBb/bUgx9iSLoeWP3aq/k+/GRGOR+S6F6BBSl0SQ2EF2+dIywb1x
-JuinEP+AwLAUZ1Bsx9ISC0Agpk2VeHXPL3FGhroEmoMvBzO0kTFGyoeT7PR/BfKv
-+H/g3HsL2LOB9uoIm8/5p2TTU5ttYCXMHhQZ81AY
-=AUp4
------END PGP PUBLIC KEY BLOCK-----
 """
 
 GIT = 'git'                      # our git command
+# NB: The version of git that the repo launcher requires may be much older than
+# the version of git that the main repo source tree requires.  Keeping this at
+# an older version also makes it easier for users to upgrade/rollback as needed.
+#
+# git-1.7 is in (EOL) Ubuntu Precise.
 MIN_GIT_VERSION = (1, 7, 2)      # minimum supported git version
 repodir = '.repo'                # name of repo's private directory
 S_repo = 'repo'                  # special repo repository
 S_manifests = 'manifests'        # special manifest repository
 REPO_MAIN = S_repo + '/main.py'  # main script
-MIN_PYTHON_VERSION = (2, 7)      # minimum supported python version
 GITC_CONFIG_FILE = '/gitc/.config'
 GITC_FS_ROOT_DIR = '/gitc/manifest-rw/'
 
@@ -131,12 +184,9 @@ GITC_FS_ROOT_DIR = '/gitc/manifest-rw/'
 import collections
 import errno
 import optparse
-import platform
 import re
 import shutil
 import stat
-import subprocess
-import sys
 
 if sys.version_info[0] == 3:
   import urllib.request
@@ -149,105 +199,79 @@ else:
   urllib.error = urllib2
 
 
-# Python version check
-ver = sys.version_info
-if (ver[0], ver[1]) < MIN_PYTHON_VERSION:
-  print('error: Python version {} unsupported.\n'
-        'Please use Python {}.{} instead.'.format(
-            sys.version.split(' ')[0],
-            MIN_PYTHON_VERSION[0],
-            MIN_PYTHON_VERSION[1],
-        ), file=sys.stderr)
-  sys.exit(1)
-
 home_dot_repo = os.path.expanduser('~/.repoconfig')
 gpg_dir = os.path.join(home_dot_repo, 'gnupg')
 
 extra_args = []
 init_optparse = optparse.OptionParser(usage="repo init -u url [options]")
 
-# Logging
-group = init_optparse.add_option_group('Logging options')
-group.add_option('-q', '--quiet',
-                 dest="quiet", action="store_true", default=False,
-                 help="be quiet")
+def _InitParser():
+  """Setup the init subcommand parser."""
+  # Logging.
+  group = init_optparse.add_option_group('Logging options')
+  group.add_option('-q', '--quiet',
+                   action='store_true', default=False,
+                   help='be quiet')
 
-# Manifest
-group = init_optparse.add_option_group('Manifest options')
-group.add_option('-u', '--manifest-url',
-                 dest='manifest_url',
-                 help='manifest repository location', metavar='URL')
-group.add_option('-b', '--manifest-branch',
-                 dest='manifest_branch',
-                 help='manifest branch or revision', metavar='REVISION')
-group.add_option('-m', '--manifest-name',
-                 dest='manifest_name',
-                 help='initial manifest file', metavar='NAME.xml')
-group.add_option('--current-branch',
-                 dest='current_branch_only', action='store_true',
-                 help='fetch only current manifest branch from server')
-group.add_option('--mirror',
-                 dest='mirror', action='store_true',
-                 help='create a replica of the remote repositories '
-                      'rather than a client working directory')
-group.add_option('--reference',
-                 dest='reference',
-                 help='location of mirror directory', metavar='DIR')
-group.add_option('--dissociate',
-                 dest='dissociate', action='store_true',
-                 help='dissociate from reference mirrors after clone')
-group.add_option('--depth', type='int', default=None,
-                 dest='depth',
-                 help='create a shallow clone with given depth; see git clone')
-group.add_option('--partial-clone', action='store_true',
-                 dest='partial_clone',
-                 help='perform partial clone (https://git-scm.com/'
-                 'docs/gitrepository-layout#_code_partialclone_code)')
-group.add_option('--clone-filter', action='store', default='blob:none',
-                 dest='clone_filter',
-                 help='filter for use with --partial-clone [default: %default]')
-group.add_option('--archive',
-                 dest='archive', action='store_true',
-                 help='checkout an archive instead of a git repository for '
-                      'each project. See git archive.')
-group.add_option('--submodules',
-                 dest='submodules', action='store_true',
-                 help='sync any submodules associated with the manifest repo')
-group.add_option('-g', '--groups',
-                 dest='groups', default='default',
-                 help='restrict manifest projects to ones with specified '
-                      'group(s) [default|all|G1,G2,G3|G4,-G5,-G6]',
-                 metavar='GROUP')
-group.add_option('-p', '--platform',
-                 dest='platform', default="auto",
-                 help='restrict manifest projects to ones with a specified '
-                      'platform group [auto|all|none|linux|darwin|...]',
-                 metavar='PLATFORM')
-group.add_option('--no-clone-bundle',
-                 dest='no_clone_bundle', action='store_true',
-                 help='disable use of /clone.bundle on HTTP/HTTPS')
-group.add_option('--no-tags',
-                 dest='no_tags', action='store_true',
-                 help="don't fetch tags in the manifest")
+  # Manifest.
+  group = init_optparse.add_option_group('Manifest options')
+  group.add_option('-u', '--manifest-url',
+                   help='manifest repository location', metavar='URL')
+  group.add_option('-b', '--manifest-branch',
+                   help='manifest branch or revision', metavar='REVISION')
+  group.add_option('-m', '--manifest-name',
+                   help='initial manifest file', metavar='NAME.xml')
+  group.add_option('--current-branch',
+                   dest='current_branch_only', action='store_true',
+                   help='fetch only current manifest branch from server')
+  group.add_option('--mirror', action='store_true',
+                   help='create a replica of the remote repositories '
+                        'rather than a client working directory')
+  group.add_option('--reference',
+                   help='location of mirror directory', metavar='DIR')
+  group.add_option('--dissociate', action='store_true',
+                   help='dissociate from reference mirrors after clone')
+  group.add_option('--depth', type='int', default=None,
+                   help='create a shallow clone with given depth; '
+                        'see git clone')
+  group.add_option('--partial-clone', action='store_true',
+                   help='perform partial clone (https://git-scm.com/'
+                        'docs/gitrepository-layout#_code_partialclone_code)')
+  group.add_option('--clone-filter', action='store', default='blob:none',
+                   help='filter for use with --partial-clone '
+                        '[default: %default]')
+  group.add_option('--archive', action='store_true',
+                   help='checkout an archive instead of a git repository for '
+                        'each project. See git archive.')
+  group.add_option('--submodules', action='store_true',
+                   help='sync any submodules associated with the manifest repo')
+  group.add_option('-g', '--groups', default='default',
+                   help='restrict manifest projects to ones with specified '
+                        'group(s) [default|all|G1,G2,G3|G4,-G5,-G6]',
+                   metavar='GROUP')
+  group.add_option('-p', '--platform', default='auto',
+                   help='restrict manifest projects to ones with a specified '
+                        'platform group [auto|all|none|linux|darwin|...]',
+                   metavar='PLATFORM')
+  group.add_option('--no-clone-bundle', action='store_true',
+                   help='disable use of /clone.bundle on HTTP/HTTPS')
+  group.add_option('--no-tags', action='store_true',
+                   help="don't fetch tags in the manifest")
 
+  # Tool.
+  group = init_optparse.add_option_group('repo Version options')
+  group.add_option('--repo-url', metavar='URL',
+                   help='repo repository location ($REPO_URL)')
+  group.add_option('--repo-branch', metavar='REVISION',
+                   help='repo branch or revision ($REPO_REV)')
+  group.add_option('--no-repo-verify', action='store_true',
+                   help='do not verify repo source code')
 
-# Tool
-group = init_optparse.add_option_group('repo Version options')
-group.add_option('--repo-url',
-                 dest='repo_url',
-                 help='repo repository location', metavar='URL')
-group.add_option('--repo-branch',
-                 dest='repo_branch',
-                 help='repo branch or revision', metavar='REVISION')
-group.add_option('--no-repo-verify',
-                 dest='no_repo_verify', action='store_true',
-                 help='do not verify repo source code')
-
-# Other
-group = init_optparse.add_option_group('Other options')
-group.add_option('--config-name',
-                 dest='config_name', action="store_true", default=False,
-                 help='Always prompt for name/e-mail')
+  # Other.
+  group = init_optparse.add_option_group('Other options')
+  group.add_option('--config-name',
+                   action='store_true', default=False,
+                   help='Always prompt for name/e-mail')
 
 
 def _GitcInitOptions(init_optparse_arg):
@@ -366,15 +390,18 @@ def _Init(args, gitc_init=False):
 
   _CheckGitVersion()
   try:
-    if NeedSetupGnuPG():
-      can_verify = SetupGnuPG(opt.quiet)
+    if opt.no_repo_verify:
+      do_verify = False
     else:
-      can_verify = True
+      if NeedSetupGnuPG():
+        do_verify = SetupGnuPG(opt.quiet)
+      else:
+        do_verify = True
 
     dst = os.path.abspath(os.path.join(repodir, S_repo))
     _Clone(url, dst, opt.quiet, not opt.no_clone_bundle)
 
-    if can_verify and not opt.no_repo_verify:
+    if do_verify:
       rev = _Verify(dst, branch, opt.quiet)
     else:
       rev = 'refs/remotes/origin/%s^0' % branch
@@ -452,6 +479,39 @@ def _CheckGitVersion():
     raise CloneFailure()
 
 
+def SetGitTrace2ParentSid(env=None):
+  """Set up GIT_TRACE2_PARENT_SID for git tracing."""
+  # We roughly follow the format git itself uses in trace2/tr2_sid.c.
+  # (1) Be unique (2) be valid filename (3) be fixed length.
+  #
+  # Since we always export this variable, we try to avoid more expensive calls.
+  # e.g. We don't attempt hostname lookups or hashing the results.
+  if env is None:
+    env = os.environ
+
+  KEY = 'GIT_TRACE2_PARENT_SID'
+
+  now = datetime.datetime.utcnow()
+  value = 'repo-%s-P%08x' % (now.strftime('%Y%m%dT%H%M%SZ'), os.getpid())
+
+  # If it's already set, then append ourselves.
+  if KEY in env:
+    value = env[KEY] + '/' + value
+
+  _setenv(KEY, value, env=env)
+
+
+def _setenv(key, value, env=None):
+  """Set |key| in the OS environment |env| to |value|."""
+  if env is None:
+    env = os.environ
+  # Environment handling across systems is messy.
+  try:
+    env[key] = value
+  except UnicodeEncodeError:
+    env[key] = value.encode()
+
+
 def NeedSetupGnuPG():
   if not os.path.isdir(home_dot_repo):
     return True
@@ -488,10 +548,7 @@ def SetupGnuPG(quiet):
       sys.exit(1)
 
   env = os.environ.copy()
-  try:
-    env['GNUPGHOME'] = gpg_dir
-  except UnicodeEncodeError:
-    env['GNUPGHOME'] = gpg_dir.encode()
+  _setenv('GNUPGHOME', gpg_dir, env)
 
   cmd = ['gpg', '--import']
   try:
@@ -513,9 +570,8 @@ def SetupGnuPG(quiet):
     sys.exit(1)
   print()
 
-  fd = open(os.path.join(home_dot_repo, 'keyring-version'), 'w')
-  fd.write('.'.join(map(str, KEYRING_VERSION)) + '\n')
-  fd.close()
+  with open(os.path.join(home_dot_repo, 'keyring-version'), 'w') as fd:
+    fd.write('.'.join(map(str, KEYRING_VERSION)) + '\n')
   return True
 
 
@@ -698,10 +754,7 @@ def _Verify(cwd, branch, quiet):
       print(file=sys.stderr)
 
   env = os.environ.copy()
-  try:
-    env['GNUPGHOME'] = gpg_dir
-  except UnicodeEncodeError:
-    env['GNUPGHOME'] = gpg_dir.encode()
+  _setenv('GNUPGHOME', gpg_dir, env)
 
   cmd = [GIT, 'tag', '-v', cur]
   proc = subprocess.Popen(cmd,
@@ -766,6 +819,7 @@ def _FindRepo():
 
 class _Options(object):
   help = False
+  version = False
 
 
 def _ParseArguments(args):
@@ -777,7 +831,8 @@ def _ParseArguments(args):
     a = args[i]
     if a == '-h' or a == '--help':
       opt.help = True
-
+    elif a == '--version':
+      opt.version = True
     elif not a.startswith('-'):
       cmd = a
       arg = args[i + 1:]
@@ -822,6 +877,16 @@ def _Help(args):
   else:
     _Usage()
   sys.exit(1)
+
+
+def _Version():
+  """Show version information."""
+  print('<repo not installed>')
+  print('repo launcher version %s' % ('.'.join(str(x) for x in VERSION),))
+  print('       (from %s)' % (__file__,))
+  print('git %s' % (ParseGitVersion().full,))
+  print('Python %s' % sys.version)
+  sys.exit(0)
 
 
 def _NotInstalled():
@@ -876,6 +941,9 @@ def _SetDefaultsTo(gitdir):
 def main(orig_args):
   cmd, opt, args = _ParseArguments(orig_args)
 
+  # We run this early as we run some git commands ourselves.
+  SetGitTrace2ParentSid()
+
   repo_main, rel_repo_dir = None, None
   # Don't use the local repo copy, make sure to switch to the gitc client first.
   if cmd != 'gitc-init':
@@ -891,11 +959,14 @@ def main(orig_args):
           'command from the corresponding client under /gitc/',
           file=sys.stderr)
     sys.exit(1)
+  _InitParser()
   if not repo_main:
     if opt.help:
       _Usage()
     if cmd == 'help':
       _Help(args)
+    if opt.version or cmd == 'version':
+      _Version()
     if not cmd:
       _NotInstalled()
     if cmd == 'init' or cmd == 'gitc-init':
@@ -924,15 +995,9 @@ def main(orig_args):
         '--']
   me.extend(orig_args)
   me.extend(extra_args)
-  try:
-    if platform.system() == "Windows":
-      sys.exit(subprocess.call(me))
-    else:
-      os.execv(sys.executable, me)
-  except OSError as e:
-    print("fatal: unable to start %s" % repo_main, file=sys.stderr)
-    print("fatal: %s" % e, file=sys.stderr)
-    sys.exit(148)
+  exec_command(me)
+  print("fatal: unable to start %s" % repo_main, file=sys.stderr)
+  sys.exit(148)
 
 
 if __name__ == '__main__':
