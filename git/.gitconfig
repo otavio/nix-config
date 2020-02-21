@@ -62,8 +62,8 @@
 	pushInsteadOf = git://git.yoctoproject.org/
 
 [url "ssh://code.ossystems.com.br/"]
-	pushInsteadOf = http://code.ossystems.com.br/
-	InsteadOf = http://code.ossystems.com.br/
+	pushInsteadOf = https://code.ossystems.com.br/
+	InsteadOf = https://code.ossystems.com.br/
 
 [sendemail]
 #	smtpserver = smtp.gmail.com
