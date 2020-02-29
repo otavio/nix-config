@@ -23,10 +23,19 @@
  yay -S skypeforlinux-stable-bin exa bat ripgrep
 #+END_SRC
 *** Rust
-**** Compiler
+**** Compiler minimal
 #+BEGIN_SRC shell :async :results output
  curl https://sh.rustup.rs -sSf --output /tmp/rustup.sh
  sh rustup.sh --default-toolchain stable -y --profile=minimal
+#+END_SRC
+**** Add development tools
+#+BEGIN_SRC shell :async :results output
+ # install rust-analyzer
+ cargo install --git https://github.com/rust-analyzer/rust-analyzer rust-analyzer
+
+ # add extra tools
+ rustup component add rustfmt clippy rls
+ rustup toolchain add nightly
 #+END_SRC
 **** Tools
 #+BEGIN_SRC shell :async :results output
