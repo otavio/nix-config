@@ -402,6 +402,7 @@
     :init (global-flycheck-mode))
 #+END_SRC
 ** LSP
+*** General settings
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :ensure t
@@ -410,6 +411,16 @@
     (setq lsp-enable-snippet nil)
     (setq lsp-enable-file-watchers nil)
     (setq lsp-prefer-flymake nil)
+
+    ;;; Rust specifics
+    (setq lsp-rust-server 'rust-analyzer)
+
+    :hook (;; reformat code and add missing (or remove old) imports
+           (before-save . lsp-format-buffer)
+           (before-save . lsp-organize-imports)
+           ;; modes
+           (rust-mode . lsp))
+    :bind (("C-c e" . lsp-execute-code-action))
     :commands lsp)
 
   (use-package lsp-ui
@@ -433,6 +444,14 @@
     :ensure t
     :commands company-lsp
     :config (push 'company-lsp company-backends))
+
+  ;;; Rust specifics
+  (use-package toml-mode)
+
+  ;; Add keybindings for interacting with Cargo
+  (use-package cargo
+    :hook (rust-mode . cargo-minor-mode))
+
 #+END_SRC
 ** Git
 #+BEGIN_SRC emacs-lisp
@@ -791,17 +810,6 @@
 
   (use-package go-guru
     :init (add-hook 'go-mode-hook 'go-guru-hl-identifier-mode))
-#+END_SRC
-** Rust
-#+BEGIN_SRC emacs-lisp
-  (use-package toml-mode)
-
-  (use-package rust-mode
-    :hook (rust-mode . lsp))
-
-  ;; Add keybindings for interacting with Cargo
-  (use-package cargo
-    :hook (rust-mode . cargo-minor-mode))
 #+END_SRC
 ** Markdown
 #+BEGIN_SRC emacs-lisp
