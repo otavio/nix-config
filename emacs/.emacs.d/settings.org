@@ -215,27 +215,6 @@
   (defun unhighlight-tabs ()
     (interactive)
     (hi-lock-unface-buffer "\t"))
-
-  ;;; Toggle window dedication
-  (defun pin-buffer ()
-    "Pin buffer to current window."
-    (interactive)
-    (message
-     (if (let (window (get-buffer-window (current-buffer)))
-           (set-window-dedicated-p window (not (window-dedicated-p window))))
-         "pinned buffer" "un-pinned buffer")
-     ))
-
-  (defun open-terminal ()
-    "Open default terminal emulator in the current directory."
-    (interactive)
-    (start-process "terminal" nil (getenv "TERMINAL")))
-
-  (defun open-terminal-in-project-root ()
-    "Open default terminal in the project root."
-    (interactive)
-    (let ((default-directory (projectile-project-root)))
-      (open-terminal)))
 #+END_SRC
 ** Delete Word Without Copying to Clipboard/kill-ring
 #+BEGIN_SRC emacs-lisp
