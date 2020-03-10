@@ -519,7 +519,6 @@
     (setq org-image-actual-width 600)
     (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
     (setq org-src-fontify-natively t)
-    (setq org-confirm-babel-evaluate nil)
     (org-babel-do-load-languages
      'org-babel-load-languages
      '(
@@ -532,19 +531,9 @@
        (shell . t)
        )))
 
-  (use-package org-bullets
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-  (use-package org-tree-slide
-    :disabled
-    )
-
   (setq org-hide-emphasis-markers t)
   (add-hook 'org-mode-hook 'visual-line-mode)
-  (font-lock-add-keywords 'org-mode
-                          '(("^ *\\([-]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
   (setq org-todo-keywords
         (quote ((sequence "TODO(t)" "DOING(s)" "NEXT(n)" "|" "DONE(d)")
                 (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "SOMEDAY"))))
