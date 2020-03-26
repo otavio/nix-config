@@ -219,4 +219,4 @@ transfer() {
     rm -f $tmpfile
 }
 
-source ~/.zfunc/_bitbake_completion
+source ~/.bitbake-completion/*_completion

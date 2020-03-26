@@ -28,3 +28,6 @@
 [submodule "diff-so-fancy"]
 	path = diff-so-fancy
 	url = git@github.com:so-fancy/diff-so-fancy
+[submodule "zsh/.bitbake-completion"]
+	path = zsh/.bitbake-completion
+	url = https://github.com/lukaszgard/bitbake-completion
