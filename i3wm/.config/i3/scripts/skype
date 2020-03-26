@@ -1,0 +1,3 @@
+#!/bin/sh
+
+wmctrl -r "skype" -b remove,demands_attention

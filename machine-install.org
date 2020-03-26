@@ -20,7 +20,7 @@
  #+END_SRC
 *** Yay extra packages
 #+BEGIN_SRC shell :async :results output
- yay -S skypeforlinux-stable-bin exa bat ripgrep
+ yay -S skypeforlinux-stable-bin exa bat ripgrep dunst
 #+END_SRC
 *** Rust
 **** Compiler minimal
