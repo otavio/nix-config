@@ -6,4 +6,8 @@ xss-lock -- i3lock -n &
 parcellite &
 dusnt &
 
+if type gnome-keyring-daemon > /dev/null; then
+    eval $(/usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets)
+fi
+
 exec i3 -V > ~/.config/i3/log 2>&1
