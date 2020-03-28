@@ -55,3 +55,7 @@
 #+BEGIN_SRC shell :async :results output
  sudo pacman -Rns --noconfirm $(pacman -Qtdq)
 #+END_SRC
+** Reinstall all packages
+#+BEGIN_SRC shell :async :results output
+ pacman -Qqn | sudo pacman -Sy -
+#+END_SRC
