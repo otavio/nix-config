@@ -3,15 +3,15 @@
 	email = otavio@ossystems.com.br
 
 [core]
-    pager = less -MR
+	pager = less -MR
 
 [color]
 	ui = true
 
 [gui]
-    fontui   = -family terminus -size 9 -weight normal -slant roman -underline 0 -overstrike 0
-    fontdiff = -family terminus -size 9 -weight normal -slant roman -underline 0 -overstrike 0
-    editor = emacs
+	fontui	 = -family terminus -size 9 -weight normal -slant roman -underline 0 -overstrike 0
+	fontdiff = -family terminus -size 9 -weight normal -slant roman -underline 0 -overstrike 0
+	editor = emacs
 
 [merge]
 	summary = true
@@ -26,9 +26,9 @@
 	fetchpr = "!sh -c 'git fetch "$1" "pull/$2/head:pr-$2" "${@:3}"' -"
 
 [diff]
-    algorithm = minimal
-    compactionHeuristic = true
-    renames = true
+	algorithm = minimal
+	compactionHeuristic = true
+	renames = true
 
 [log]
 	decorate = true
@@ -38,7 +38,8 @@
 	rebase = true
 
 [status]
-    showUntrackedFiles = all
+	showUntrackedFiles = all
+	submoduleSummary = true
 
 [format]
 	numbered = auto
