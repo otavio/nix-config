@@ -478,11 +478,25 @@
 #+END_SRC
 ** Org
 #+BEGIN_SRC emacs-lisp
+  (use-package htmlize
+    :init (require 'htmlize))
+
   (use-package ob-async
     :config
     (require 'ob-async))
 
+  (defun endless/org-ispell ()
+    "Configure `ispell-skip-region-alist' for `org-mode'."
+    (make-local-variable 'ispell-skip-region-alist)
+    (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
+    (add-to-list 'ispell-skip-region-alist '("~" "~"))
+    (add-to-list 'ispell-skip-region-alist '("=" "="))
+    (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC")))
+
   (use-package org :defer
+    :init
+    (add-hook 'org-mode-hook 'turn-on-flyspell)
+    (add-hook 'org-mode-hook #'endless/org-ispell)
     :config
     (setq org-confirm-babel-evaluate nil
           org-export-babel-evaluate 'inline-only)
