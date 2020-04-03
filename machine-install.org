@@ -4,7 +4,11 @@
 ** Package installation
 *** Base packages
 #+BEGIN_SRC shell :async :results output
-  sudo pacman -S --needed --noconfirm unison grml-zsh-config sudo tmuxp zsh git net-tools stow
+  sudo pacman -S --needed --noconfirm unison grml-zsh-config sudo tmuxp zsh git net-tools stow reflector
+#+END_SRC
+*** Update mirror just
+#+BEGIN_SRC shell :async :results output
+  sudo reflector --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
 #+END_SRC
 
 *** Yay installation
