@@ -32,14 +32,15 @@
   (defun system-is-laptop ()
     "Return true if the system we are running on is mynotebook"
     (or
-     (string-equal system-name "lenovo")
+     (string-equal system-name "pico")
      )
     )
 
   (defun system-is-desktop ()
     "Return true if the system we are running on is mydesktop"
     (or
-     (string-equal system-name "berton")
+     (string-equal system-name "nano")
+     (string-equal system-name "micro")
      )
     )
   (defun system-is-remote ()
