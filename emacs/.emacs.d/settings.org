@@ -3,6 +3,7 @@
 * Configurations
 ** Package Setup
 *** Setup the package repositories.
+
 #+BEGIN_SRC emacs-lisp
   (require 'package)
   (setq package-enable-at-startup nil)
@@ -11,7 +12,9 @@
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
   (package-initialize)
 #+END_SRC
+
 *** Automatically install and then setup =use-package=
+
 #+BEGIN_SRC emacs-lisp
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
@@ -27,7 +30,9 @@
     (require 'use-package)
     (require 'bind-key))
 #+END_SRC
+
 ** System names
+
 #+BEGIN_SRC emacs-lisp
   (defun system-is-laptop ()
     "Return true if the system we are running on is mynotebook"
@@ -51,7 +56,9 @@
      )
     )
 #+END_SRC
+
 ** Theme and fonts
+
 #+BEGIN_SRC emacs-lisp
   (if (system-is-laptop)
       (set-frame-font "Source Code Pro-11" nil t))
@@ -69,33 +76,46 @@
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
 
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  (doom-themes-neotree-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-colors")
-  (doom-themes-treemacs-config)
-
-  (setq doom-themes-enable-org-fontification t)
-
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 #+END_SRC
+
+*** Use a thin window divider in terminal
+
+#+BEGIN_SRC emacs-lisp
+  (set-face-inverse-video-p 'vertical-border nil)
+  (set-face-background 'vertical-border (face-background 'default))
+  (set-display-table-slot standard-display-table
+                          'vertical-border
+                          (make-glyph-code ?┃))
+#+END_SRC
+
+**** Reference:
+- https://stackoverflow.com/questions/18210631/how-to-change-the-character-composing-the-emacs-vertical-border
+
 ** Personal Information
+
 #+BEGIN_SRC emacs-lisp
   (setq user-full-name "Otavio Salvador"
         user-mail-address "otavio@ossystems.com.br")
 #+END_SRC
+
 ** Diminish
+
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
     :config
     (eval-after-load "eldoc" '(diminish 'eldoc-mode)))
 #+END_SRC
+
 ** GNU Elpa Keyring Update
+
 #+BEGIN_SRC emacs-lisp
   (use-package gnu-elpa-keyring-update)
 #+END_SRC
+
 ** General modifications
+
 #+BEGIN_SRC emacs-lisp
   (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -127,14 +147,18 @@
   (setq require-final-newline t)
   (setq tab-always-indent 'complete)
 #+END_SRC
+
 ** Encoding
+
 #+BEGIN_SRC emacs-lisp
   (prefer-coding-system 'utf-8)
   (set-default-coding-systems 'utf-8)
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
 #+END_SRC
+
 ** Ui customizations
+
 #+BEGIN_SRC emacs-lisp
   (if (system-is-laptop)
       (setq split-width-threshold 120))
@@ -156,7 +180,9 @@
   (setq inhibit-splash-screen t)
   (setq column-number-mode t)
 #+END_SRC
+
 ** Projectile
+
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :diminish projectile-mode
@@ -164,7 +190,9 @@
     (define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
     (projectile-mode +1))
 #+END_SRC
+
 ** Spelling
+
 #+BEGIN_SRC emacs-lisp
   (use-package flyspell :diminish flyspell-mode)
 #+END_SRC
@@ -177,12 +205,16 @@
   (global-set-key (kbd "C-M-s") 'isearch-forward)
   (global-set-key (kbd "C-M-r") 'isearch-backward)
 #+END_SRC
+
 ** Custom Keybindings
+
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-h") 'delete-backward-char)
   (define-key global-map (kbd "RET") 'newline-and-indent)
 #+END_SRC
+
 ** Custom function
+
 #+BEGIN_SRC emacs-lisp
   (defun buffer-cleanup ()
     (interactive)
@@ -234,11 +266,15 @@
     (interactive)
     (hi-lock-unface-buffer "\t"))
 #+END_SRC
+
 ** Avoids saving active regions to the primary selection
+
 #+BEGIN_SRC emacs-lisp
   (setq select-active-regions nil)
 #+END_SRC
+
 ** Dired
+
 #+BEGIN_SRC emacs-lisp
   (use-package dired
     :ensure nil
@@ -263,7 +299,9 @@
                     (local-set-key (kbd "^")
                                    (lambda () (interactive) (find-alternate-file ".."))))))
 #+END_SRC
+
 ** Editing
+
 #+BEGIN_SRC emacs-lisp
   (use-package whitespace
     :diminish global-whitespace-mode
@@ -346,7 +384,9 @@
     (company-mode)
     (global-set-key (kbd "TAB") #'company-indent-or-complete-common))
 #+END_SRC
+
 ** Flycheck
+
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :diminish flycheck-mode
@@ -405,6 +445,7 @@
 
 #+END_SRC
 ** Git
+
 #+BEGIN_SRC emacs-lisp
   (add-hook 'git-commit-mode-hook (lambda () (setq fill-column 72)))
 
@@ -429,8 +470,13 @@
     (global-git-gutter-mode +1)
     (add-hook 'magit-post-refresh-hook
               #'git-gutter:update-all-windows))
+
+  (use-package forge
+    :after magit)
 #+END_SRC
+
 ** Misc
+
 #+BEGIN_SRC emacs-lisp
   (use-package dockerfile-mode
     :init (require 'dockerfile-mode))
@@ -452,7 +498,9 @@
 
   (use-package aggressive-indent)
 #+END_SRC
+
 ** Navigation
+
 #+BEGIN_SRC emacs-lisp
   (use-package ido
     :config
@@ -476,7 +524,9 @@
     :bind
     ("M-x" . smex))
 #+END_SRC
+
 ** Org
+
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize
     :init (require 'htmlize))
@@ -518,16 +568,14 @@
        )))
 
   (setq org-hide-emphasis-markers t)
-  (add-hook 'org-mode-hook 'visual-line-mode)
 
   (setq org-todo-keywords
-        (quote ((sequence "TODO(t)" "DOING(s)" "NEXT(n)" "|" "DONE(d)")
+        (quote ((sequence "TODO(t)" "DOING(s)" "|" "DONE(d!)")
                 (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "SOMEDAY"))))
 
   (setq org-todo-keyword-faces
         (quote (("TODO" :foreground "red" :weight bold)
                 ("DOING" :foreground "yellow" :weight bold)
-                ("NEXT" :foreground "blue" :weight bold)
                 ("DONE" :foreground "forest green" :weight bold)
                 ("WAITING" :foreground "orange" :weight bold)
                 ("HOLD" :foreground "magenta" :weight bold)
@@ -541,10 +589,17 @@
                 ("HOLD" ("WAITING") ("HOLD" . t))
                 (done ("WAITING") ("HOLD") ("DOING"))
                 ("TODO" ("WAITING") ("CANCELLED") ("HOLD") ("DOING"))
-                ("NEXT" ("WAITING") ("CANCELLED") ("HOLD") ("DOING"))
                 ("DONE" ("WAITING") ("CANCELLED") ("HOLD") ("DOING")))))
 #+END_SRC
+
+*** References:
+- https://superuser.com/questions/695096/how-to-enable-flyspell-in-org-mode-by-default
+- https://endlessparentheses.com/ispell-and-org-mode.html
+- http://doc.norang.ca/org-mode.html
+- https://orgmode.org/manual/Tracking-TODO-state-changes.html#Tracking-TODO-state-changes
+
 ** Shell
+
 #+BEGIN_SRC emacs-lisp
   (use-package sane-term
     :if window-system
@@ -552,7 +607,9 @@
     ("C-x t" . sane-term)
     ("C-x T" . sane-term-create))
 #+END_SRC
+
 ** Bitbake
+
 #+BEGIN_SRC emacs-lisp
   (use-package mmm-mode
     :config (require 'mmm-mode))
@@ -617,7 +674,9 @@
   (add-to-list 'auto-mode-alist
                '("\\.inc\\'" . bitbake-mode))
 #+END_SRC
+
 ** C/C++
+
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent)
 
@@ -718,7 +777,9 @@
                (ibuffer-auto-mode 1)
                (ibuffer-switch-to-saved-filter-groups "default")))
 #+END_SRC
+
 ** Latex
+
 #+BEGIN_SRC emacs-lisp
   (use-package auctex
     :preface
@@ -748,7 +809,9 @@
   (use-package latex-preview-pane
     :hook ((LaTeX-mode . latex-preview-pane-mode)))
 #+END_SRC
+
 ** Go
+
 #+BEGIN_SRC emacs-lisp
   (use-package go-mode
     :init (add-hook 'go-mode-hook
@@ -765,7 +828,9 @@
   (use-package go-guru
     :init (add-hook 'go-mode-hook 'go-guru-hl-identifier-mode))
 #+END_SRC
+
 ** Markdown
+
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :mode
@@ -782,3 +847,4 @@
   :diminish which-key-mode
   :hook (after-init . which-key-mode))
 #+END_SRC
+.
