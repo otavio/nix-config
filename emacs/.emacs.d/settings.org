@@ -318,6 +318,11 @@
     :bind
     ("M-=" . er/expand-region))
 
+  (use-package highlight-symbol
+    :init
+    (global-set-key (kbd "C-c h") 'highlight-symbol)
+    (global-set-key (kbd "C-c r h") 'highlight-symbol-query-replace))
+
   (use-package rainbow-delimiters
     :init
     (progn
