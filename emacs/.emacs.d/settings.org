@@ -416,13 +416,18 @@
 #+END_SRC
 ** LSP
 *** General settings
+
 #+BEGIN_SRC emacs-lisp
+  ;; set prefix for lsp-command-keymap (default is "s-l")
+  (setq lsp-keymap-prefix "C-c l")
+
   (use-package lsp-mode
     :ensure t
     :diminish lsp-mode
     :config
     (setq lsp-enable-file-watchers nil)
     (setq lsp-prefer-flymake nil)
+    (setq lsp-prefer-capf t)
 
     ;;; Rust specifics
     (setq lsp-rust-server 'rust-analyzer)
@@ -431,7 +436,9 @@
            (before-save . lsp-format-buffer)
            (before-save . lsp-organize-imports)
            ;; modes
-           (rust-mode . lsp))
+           (rust-mode . lsp)
+           ;; if you want which-key integration
+           (lsp-mode . lsp-enable-which-key-integration))
     :bind (("C-c e" . lsp-execute-code-action))
     :commands lsp)
 
