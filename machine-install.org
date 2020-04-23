@@ -3,15 +3,19 @@
 * System installation
 ** Package installation
 *** Base packages
+
 #+BEGIN_SRC shell :async :results output
   sudo pacman -S --needed --noconfirm unison grml-zsh-config sudo tmuxp zsh git net-tools stow reflector
 #+END_SRC
+
 *** Update mirror just
+
 #+BEGIN_SRC shell :async :results output
   sudo reflector --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
 #+END_SRC
 
 *** Yay installation
+
 #+BEGIN_SRC shell :async :results output
   git clone https://aur.archlinux.org/yay.git /tmp/yay
   cd /tmp/yay && makepkg -si
@@ -19,13 +23,17 @@
 #+END_SRC
 
 *** Extra packages for desktop / laptop
+
 #+BEGIN_SRC shell :async :results output
   sudo pacman -S --needed --noconfirm bluez-utils networkmanager emacs firefox ttf-dejavu i3-wm i3status openssh parcellite rxvt-unicode sway swaylock weston xorg-server xorg-server-xwayland xorg-xinit xorg-xmodmap xorg-xrdb xss-lock intel-ucode xsel tree lesspipe gtk-engines diff-so-fancy gtk3-print-backends system-config-printer cups aspell-en aspell-pt fzf gpicview gthumb zathura zathura-pdf-mupdf urxvt-perls xclip
- #+END_SRC
+#+END_SRC
+
 *** Yay extra packages
+
 #+BEGIN_SRC shell :async :results output
  yay -S skypeforlinux-stable-bin exa bat ripgrep dunst
 #+END_SRC
+
 *** Rust
 **** Compiler minimal
 
@@ -64,16 +72,21 @@
 #+END_SRC
 
 ** Bluetooth installation
+
 #+BEGIN_SRC shell :async :results output
  sudo sed -i 's,#AutoEnable=*,AutoEnable=true,g' /etc/bluetooth/main.conf
  sudo systemctl restart bluetooth
 #+END_SRC
+
 * System cleanup
 ** Remove unused packages
+
 #+BEGIN_SRC shell :async :results output
  sudo pacman -Rns --noconfirm $(pacman -Qtdq)
 #+END_SRC
+
 ** Reinstall all packages
+
 #+BEGIN_SRC shell :async :results output
  pacman -Qqn | sudo pacman -Sy -
 #+END_SRC
