@@ -485,6 +485,7 @@
     :config
     (setq magit-commit-arguments (quote ("--signoff")))
     (setq magit-revert-arguments (quote ("--signoff")))
+    (setq magit-diff-refine-hunk t)
     :bind
     ("C-x g" . magit-status))
 
