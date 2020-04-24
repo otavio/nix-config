@@ -78,6 +78,24 @@
  sudo systemctl restart bluetooth
 #+END_SRC
 
+** Swap using ZRam and Swap files
+
+#+BEGIN_SRC shell :async :results output
+  yay -S systemd-swap-git
+  systemctl enable systemd-swap
+
+  # Preferred settings for Desktop
+  echo vm.swappiness=5 | sudo tee -a /etc/sysctl.d/99-sysctl.conf
+  echo vm.vfs_cache_pressure=50 | sudo tee -a /etc/sysctl.d/99-sysctl.conf
+  sudo sysctl -p /etc/sysctl.d/99-sysctl.conf
+
+  # Enable zram
+  sudo sed -i 's,zram_enabled=0,zram_enabled=1,g' /etc/systemd/swap.conf
+
+  # Restart service
+  sudo systemctl restart systemd-swap
+#+END_SRC
+
 * System cleanup
 ** Remove unused packages
 
