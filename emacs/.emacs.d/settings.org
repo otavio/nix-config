@@ -1,4 +1,4 @@
-#+TITLE: ~/dotfiles/emacs/settings.org
+#+TITLE: Emacs settings
 #+STARTUP: indent
 * Configurations
 ** Package Setup
