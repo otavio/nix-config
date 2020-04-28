@@ -7,10 +7,18 @@ export PATH="$HOME/bin:$HOME/hacking/ossystems/internal/devel-tools/bin:${PATH}"
 export DH_ALWAYS_EXCLUDE=CVS:.svn:.git
 export EDITOR="emacs -nw"
 export BROWSER=firefox
-export MAIL=/var/mail/otavio
-export GTK_IM_MODULE=cedilla
 export LESS='-R'
-export TERM=tmux-256color
+
+# Set correct term
+export LANG='en_US.UTF-8'
+export LC_ALL="en_US.UTF-8"
+export TERM="xterm-256color"
+
+# Qt theme
+export QT_STYLE_OVERRIDE=adwaita
+
+# GTK
+export GTK_IM_MODULE=cedilla
 
 if type lesspipe.sh > /dev/null; then
     eval $(lesspipe.sh)
