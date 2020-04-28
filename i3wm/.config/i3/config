@@ -195,9 +195,8 @@ assign [class="Emacs"] $WS2
 assign [class="Google-chrome"] $WS3
 assign [class="chromium"] $WS3
 
-exec urxvtd -q -o -f
-exec urxvt
-exec autocutsel
-exec autocutsel -selection PRIMARY
-
-exec_always xmodmap ~/.xmodmaprc
+exec --no-startup-id urxvtd -q -o -f
+exec --no-startup-id urxvt
+exec --no-startup-id parcellite -n
+exec --no-startup-id dunst
+exec --no-startup-id unclutter --timeout 3
