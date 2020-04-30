@@ -556,6 +556,8 @@
 
 ** Org
 
+*** Org package configuration
+
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize
     :init (require 'htmlize))
@@ -630,6 +632,7 @@
 - https://endlessparentheses.com/ispell-and-org-mode.html
 - http://doc.norang.ca/org-mode.html
 - https://orgmode.org/manual/Tracking-TODO-state-changes.html#Tracking-TODO-state-changes
+- https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 
 ** Shell
 
