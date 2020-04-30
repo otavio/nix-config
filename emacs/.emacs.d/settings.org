@@ -428,6 +428,11 @@
     (setq lsp-enable-file-watchers nil)
     (setq lsp-prefer-flymake nil)
     (setq lsp-prefer-capf t)
+    (setq lsp-rust-clippy-preference "on")
+
+    (setq lsp-rust-analyzer-display-chaining-hints t)
+    (setq lsp-rust-analyzer-display-parameter-hints t)
+    (setq lsp-rust-analyzer-server-display-inlay-hints t)
 
     ;;; Rust specifics
     (setq lsp-rust-server 'rust-analyzer)
@@ -439,7 +444,9 @@
            (rust-mode . lsp)
            ;; if you want which-key integration
            (lsp-mode . lsp-enable-which-key-integration))
+
     :bind (("C-c e" . lsp-execute-code-action))
+
     :commands lsp)
 
   (use-package lsp-ui
