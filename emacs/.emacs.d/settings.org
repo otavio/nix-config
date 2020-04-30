@@ -596,6 +596,10 @@
        (shell . t)
        )))
 
+  (add-to-list 'org-latex-packages-alist '("" "listings" nil))
+  (setq org-latex-listings t)
+  (setq org-latex-listings-options '(("breaklines" "true")))
+
   (setq org-hide-emphasis-markers t)
 
   (setq org-todo-keywords
