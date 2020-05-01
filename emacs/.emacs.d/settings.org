@@ -853,9 +853,6 @@
     (setq-default TeX-master nil)
     (setq-default flyspell-mode t)
     (setq-default TeX-source-correlate-start-server t))
-
-  (use-package latex-preview-pane
-    :hook ((LaTeX-mode . latex-preview-pane-mode)))
 #+END_SRC
 
 ** Go
