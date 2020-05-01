@@ -562,7 +562,6 @@
 #+END_SRC
 
 ** Org
-
 *** Org package configuration
 
 #+BEGIN_SRC emacs-lisp
@@ -593,6 +592,16 @@
     (setq org-image-actual-width 600)
     (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
     (setq org-src-fontify-natively t)
+    (setq org-latex-listings 'minted
+          org-latex-packages-alist '(("" "minted"))
+          org-latex-pdf-process
+          '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+            ;;"bibtex %b"
+            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+            "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
+          org-latex-minted-options '(("breaklines" "true")
+                                     ("breakanywhere" "true")
+                                     ("fontsize" "\\footnotesize")))
     (org-babel-do-load-languages
      'org-babel-load-languages
      '(
@@ -604,10 +613,6 @@
        (python . t)
        (shell . t)
        )))
-
-  (add-to-list 'org-latex-packages-alist '("" "listings" nil))
-  (setq org-latex-listings t)
-  (setq org-latex-listings-options '(("breaklines" "true")))
 
   (setq org-hide-emphasis-markers t)
 
