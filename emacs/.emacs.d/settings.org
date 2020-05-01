@@ -603,7 +603,9 @@
             "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f")
           org-latex-minted-options '(("breaklines" "true")
                                      ("breakanywhere" "true")
-                                     ("fontsize" "\\footnotesize")))
+                                     ("fontsize" "\\footnotesize")
+                                     ("bgcolor" "white")
+                                     ("obeytabs" "true")))
     (org-babel-do-load-languages
      'org-babel-load-languages
      '(
