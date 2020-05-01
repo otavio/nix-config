@@ -117,6 +117,11 @@
 ** General modifications
 
 #+BEGIN_SRC emacs-lisp
+  ;;; Live reload of the settings, from inside of the Emacs
+  (global-set-key (kbd "C-c i")
+                  (lambda()(interactive)
+                    (org-babel-load-file "~/.emacs.d/settings.org")))
+
   (fset 'yes-or-no-p 'y-or-n-p)
 
   (require 'saveplace)
