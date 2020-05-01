@@ -506,9 +506,6 @@
     (global-git-gutter-mode +1)
     (add-hook 'magit-post-refresh-hook
               #'git-gutter:update-all-windows))
-
-  (use-package forge
-    :after magit)
 #+END_SRC
 
 ** Misc
