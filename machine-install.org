@@ -25,7 +25,7 @@
 *** Extra packages for desktop / laptop
 
 #+BEGIN_SRC shell :async :results output
-  sudo pacman -S --needed --noconfirm bluez-utils networkmanager emacs firefox ttf-dejavu i3-wm i3status openssh parcellite rxvt-unicode sway swaylock weston xorg-server xorg-server-xwayland xorg-xinit xorg-xmodmap xorg-xrdb xss-lock intel-ucode xsel tree lesspipe gtk-engines diff-so-fancy gtk3-print-backends system-config-printer cups aspell-en aspell-pt fzf gpicview gthumb zathura zathura-pdf-mupdf urxvt-perls xclip unclutter
+  sudo pacman -S --needed --noconfirm bluez-utils networkmanager emacs firefox ttf-dejavu i3-wm i3status openssh parcellite rxvt-unicode sway swaylock weston xorg-server xorg-server-xwayland xorg-xinit xorg-xmodmap xorg-xrdb xss-lock intel-ucode xsel tree lesspipe gtk-engines diff-so-fancy gtk3-print-backends system-config-printer cups aspell-en aspell-pt fzf gpicview gthumb zathura zathura-pdf-poppler urxvt-perls xclip unclutter
 #+END_SRC
 
 *** Yay extra packages
