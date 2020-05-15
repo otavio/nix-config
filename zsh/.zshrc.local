@@ -28,9 +28,9 @@ keys-load() {
 	if [ -z "$1" ]; then
 		unset SSH_AUTH_SOCK
 		echo Decriptando particao... && \
-		     sudo cryptsetup -v luksOpen /dev/disk/by-uuid/faae5ddb-df82-4a23-8a24-eedd6356ccff keys && \
-		     sudo mount /dev/mapper/keys /mnt && \
-		     echo done
+			 sudo cryptsetup -v luksOpen /dev/disk/by-uuid/faae5ddb-df82-4a23-8a24-eedd6356ccff keys && \
+			 sudo mount /dev/mapper/keys /mnt && \
+			 echo done
 
 		echo Carregando chave SSH ...
 		DISPLAY='' keychain id_rsa
