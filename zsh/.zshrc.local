@@ -91,6 +91,9 @@ zstyle ':prompt:grml:left:setup' items rc virtual-env change-root user at host p
 ## ignore ~/.ssh/known_hosts entries
 alias insecssh='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
 
+alias pacman-fzf="pacman -Slq | fzf -m --preview 'cat <(pacman -Si {1}) <(pacman -Fl {1} | awk \"{print \$2}\")' | xargs -ro sudo pacman -S"
+alias yay-fzf="yay -Slq | fzf -m --preview 'cat <(yay -Si {1}) <(yay -Fl {1} | awk \"{print \$2}\")' | xargs -ro sudo yay -S"
+
 ## ctrl-s will no longer freeze the terminal.
 stty erase "^?"
 
