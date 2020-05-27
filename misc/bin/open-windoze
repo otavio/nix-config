@@ -1,3 +1,3 @@
 #!/bin/sh
 
-exec virtualbox --startvm Windoze
+exec VBoxHeadless --startvm "Windoze" -vrde off
