@@ -447,6 +447,8 @@
            (before-save . lsp-organize-imports)
            ;; modes
            (rust-mode . lsp)
+           (go-mode . lsp)
+
            ;; if you want which-key integration
            (lsp-mode . lsp-enable-which-key-integration))
 
@@ -857,25 +859,6 @@
     (setq-default TeX-master nil)
     (setq-default flyspell-mode t)
     (setq-default TeX-source-correlate-start-server t))
-#+END_SRC
-
-** Go
-
-#+BEGIN_SRC emacs-lisp
-  (use-package go-mode
-    :init (add-hook 'go-mode-hook
-                    (lambda ()
-                      (setq gofmt-command "goimports")
-                      (add-hook 'before-save-hook 'gofmt-before-save)
-                      (setq truncate-lines t)
-                      (setq indent-tabs-mode t)
-                      (setq tab-width 4))))
-
-  (use-package go-eldoc
-    :init (add-hook 'go-mode-hook 'go-eldoc-setup))
-
-  (use-package go-guru
-    :init (add-hook 'go-mode-hook 'go-guru-hl-identifier-mode))
 #+END_SRC
 
 ** Markdown
