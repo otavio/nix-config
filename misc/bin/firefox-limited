@@ -1,3 +1,3 @@
 #!/bin/sh
 
-systemd-run --user --collect --setenv=DISPLAY=:0 --no-block -p MemoryHigh=1G -p MemoryAccounting=true firefox
+systemd-run --user --collect --setenv=DISPLAY=:0 --no-block -p MemoryHigh=4G -p MemoryAccounting=true firefox
