@@ -319,6 +319,8 @@
     :init
     (browse-kill-ring-default-keybindings))
 
+  (use-package boxquote)
+
   (use-package expand-region
     :bind
     ("M-=" . er/expand-region))
