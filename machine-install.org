@@ -59,6 +59,11 @@
  cargo install cargo-audit cargo-bloat cargo-cache cargo-count cargo-edit cargo-lichking cargo-outdated cargo-release cargo-tree cargo-udeps cargo-watch loc ripgrep topgrade
 #+END_SRC
 
+** Adjust boot params
+
+- Use cgroup unified hierarchy: systemd.unified_cgroup_hierarchy=1
+- Disable protections: mitigations=off
+
 ** Keyboard layout
 
 #+BEGIN_SRC shell :async :results output
