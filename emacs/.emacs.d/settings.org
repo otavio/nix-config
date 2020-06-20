@@ -189,11 +189,26 @@
 ** Projectile
 
 #+BEGIN_SRC emacs-lisp
+  ;; Manage and navigate projects
   (use-package projectile
     :diminish projectile-mode
+    :hook (after-init . projectile-mode)
+    :init
+    (setq projectile-sort-order 'recentf
+          projectile-use-git-grep t)
+
     :config
     (define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
-    (projectile-mode +1))
+    ;; (projectile-update-mode-line)         ; Update mode-line at the first time
+
+    ;; Use the faster searcher to handle project files: ripgrep `rg'.
+    (when (and (not (executable-find "fd"))
+               (executable-find "rg"))
+      (setq projectile-generic-command
+            (let ((rg-cmd ""))
+              (dolist (dir projectile-globally-ignored-directories)
+                (setq rg-cmd (format "%s --glob '!%s'" rg-cmd dir)))
+              (concat "rg -0 --files --color=never --hidden" rg-cmd)))))
 #+END_SRC
 
 ** Spelling
