@@ -31,7 +31,7 @@
 *** Yay extra packages
 
 #+BEGIN_SRC shell :async :results output
- yay -S skypeforlinux-stable-bin exa bat ripgrep dunst adwaita-qt
+ yay -S skypeforlinux-stable-bin exa bat ripgrep fd dunst adwaita-qt tokei topgrade ripgrep
 #+END_SRC
 
 *** Rust
@@ -56,7 +56,7 @@
 **** Tools
 
 #+BEGIN_SRC shell :async :results output
- cargo install cargo-audit cargo-bloat cargo-cache cargo-count cargo-edit cargo-lichking cargo-outdated cargo-release cargo-tree cargo-udeps cargo-watch loc ripgrep topgrade
+ cargo install cargo-audit cargo-bloat cargo-cache cargo-count cargo-edit cargo-lichking cargo-outdated cargo-release cargo-udeps cargo-watch topgrade
 #+END_SRC
 
 ** Adjust boot params
