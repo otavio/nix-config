@@ -522,6 +522,9 @@
     :bind
     ("C-x g" . magit-status))
 
+  (use-package forge
+    :after magit)
+
   (use-package git-timemachine
     :bind
     ("C-c g" . git-timemachine))
