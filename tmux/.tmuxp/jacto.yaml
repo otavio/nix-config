@@ -1,0 +1,11 @@
+session_name: yocto-jacto
+start_directory: ~/src/jacto/
+windows:
+  - window_name: yocto
+    panes:
+      - focus: true
+        shell_command:
+          - cd yocto
+          - source ./setup-environment build
+      - shell_command:
+          - cd yocto/sources
