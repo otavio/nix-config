@@ -101,6 +101,12 @@
   sudo systemctl restart systemd-swap
 #+END_SRC
 
+** Enable fstrim (for SSD disks) - once a week
+
+#+BEGIN_SRC sh
+sudo systemctl enable fstrim.timer
+#+END_SRC
+
 * System cleanup
 ** Remove unused packages
 
