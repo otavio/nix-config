@@ -10,6 +10,7 @@
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (add-to-list 'package-archives '("onpa" . "https://olanilsson.bitbucket.io/packages/") t)
   (package-initialize)
 #+END_SRC
 
@@ -690,69 +691,18 @@
 ** Bitbake
 
 #+BEGIN_SRC emacs-lisp
-  (use-package mmm-mode
-    :config (require 'mmm-mode))
-
-  (define-minor-mode bitbake-minor-mode
-    :init-value nil
-    :lighter nil
-    :group 'bitbake
-    :global t)
-
-  (defun bitbake-comment-dwim (arg)
-    (interactive "*P")
-    (require 'newcomment)
-    (let ((comment-start "#") (comment-end ""))
-      (comment-dwim arg)))
-
-  (defvar bitbake-syntax-table
-    (let ((table (make-syntax-table)))
-      (modify-syntax-entry ?# "< b" table)
-      (modify-syntax-entry ?\n "> b" table)
-      table)
-    "Syntax table used in `bitbake-mode'.")
-
-  (defvar bitbake-font-lock-defaults
-    `((
-       ;; fakeroot python do_foo() {
-       ("\\b\\(include\\|require\\|inherit\\|python\\|addtask\\|export\\|fakeroot\\|unset\\)\\b" . font-lock-keyword-face)
-       ;; do_install_append() {
-       ("^\\(fakeroot *\\)?\\(python *\\)?\\([a-zA-Z0-9\-_+.${}/~]+\\) *( *) *{" 3 font-lock-function-name-face)
-       ;; do_deploy[depends] ??=
-       ("^\\(export *\\)?\\([a-zA-Z0-9\-_+.${}/~]+\\(\\[[a-zA-Z0-9\-_+.${}/~]+\\]\\)?\\) *\\(=\\|\\?=\\|\\?\\?=\\|:=\\|+=\\|=+\\|.=\\|=.\\)" 2 font-lock-variable-name-face)
-       )))
-
-  ;;;###autoload
-  (define-derived-mode bitbake-mode shell-script-mode
-    "A mode for editing bitbake recipe files."
-    :syntax-table bitbake-syntax-table
-    (setq font-lock-defaults bitbake-font-lock-defaults)
-    (setq mode-name "BitBake")
-    (define-key bitbake-mode-map [remap comment-dwim] 'bitbake-comment-dwim))
-
-  (mmm-add-classes
-   '((bitbake-shell
-      :submode shell-script-mode
-      :delimiter-mode nil
-      :case-fold-search nil
-      :front "^\\(fakeroot *\\)?\\([a-zA-Z0-9\-_+.${}/~]+\\) *( *) *{"
-      :back "^}")
-     (bitbake-python
-      :submode python-mode
-      :delimiter-mode nil
-      :case-fold-search nil
-      :front "^\\(fakeroot *\\)?python *\\([a-zA-Z0-9\-_+.${}/~]+\\) *( *) *{"
-      :back "^}")))
-
-  (mmm-add-mode-ext-class 'bitbake-mode "\\.bb\\(append\\|class\\)?\\'" 'bitbake-shell)
-  (mmm-add-mode-ext-class 'bitbake-mode "\\.bb\\(append\\|class\\)?\\'" 'bitbake-python)
-  (mmm-add-mode-ext-class 'bitbake-mode "\\.inc\\" 'bitbake-shell)
-  (mmm-add-mode-ext-class 'bitbake-mode "\\.inc\\" 'bitbake-python)
-  (add-to-list 'auto-mode-alist
-               '("\\.bb\\(append\\|class\\)?\\'" . bitbake-mode))
-  (add-to-list 'auto-mode-alist
-               '("\\.inc\\'" . bitbake-mode))
+(use-package bitbake-modes
+    :defer t
+    :init
+    (add-to-list 'auto-mode-alist '("\\.bb\\'" . bitbake-mode))
+    (add-to-list 'auto-mode-alist '("\\.bbappend\\'" . bitbake-mode))
+    (add-to-list 'auto-mode-alist '("\\.bbclass\\'" . bitbake-mode))
+    (add-to-list 'auto-mode-alist '("\\.inc\\'" . bitbake-mode))
+    )
 #+END_SRC
+
+*** Reference:
+https://bitbucket.org/olanilsson/bitbake-modes/src/master/
 
 ** C/C++
 
