@@ -10,7 +10,6 @@
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-  (add-to-list 'package-archives '("onpa" . "https://olanilsson.bitbucket.io/packages/") t)
   (package-initialize)
 #+END_SRC
 
@@ -690,19 +689,110 @@
 
 ** Bitbake
 
-#+BEGIN_SRC emacs-lisp
-(use-package bitbake-modes
+*** mmm-mode
+#+begin_src emacs-lisp
+  (use-package mmm-mode
     :defer t
-    :init
-    (add-to-list 'auto-mode-alist '("\\.bb\\'" . bitbake-mode))
-    (add-to-list 'auto-mode-alist '("\\.bbappend\\'" . bitbake-mode))
-    (add-to-list 'auto-mode-alist '("\\.bbclass\\'" . bitbake-mode))
-    (add-to-list 'auto-mode-alist '("\\.inc\\'" . bitbake-mode))
+    :diminish mmm-mode
     )
+
+#+end_src
+
+*** Bitbake Mode
+#+BEGIN_SRC emacs-lisp
+  (require 'mmm-mode)
+
+  (defun bitbake-comment-dwim (arg)
+    (interactive "*P")
+    (require 'newcomment)
+    (let ((comment-start "#") (comment-end ""))
+      (comment-dwim arg)))
+
+  (defvar bitbake-mode-syntax-table
+    (let ((st (make-syntax-table)))
+      ;; Comments start with # and end at eol
+      (modify-syntax-entry ?#	  "<" st)
+      (modify-syntax-entry ?\n  ">" st)
+      (modify-syntax-entry ?\^m ">" st)
+      (modify-syntax-entry ?\"  "\""  st) ;strings are delimited by "
+      (modify-syntax-entry ?\'  "\""  st) ;strings are delimited by '
+      (modify-syntax-entry ?\\  "\\"  st) ;backslash is escape
+      st)
+    "Syntax table for `bitbake-mode'.")
+
+  (defvar bitbake-font-lock-defaults
+    `((
+       ;; fakeroot python do_foo() {
+       ("\\b\\(include\\|require\\|inherit\\|python\\|addtask\\|export\\|fakeroot\\|unset\\)\\b" . font-lock-keyword-face)
+       ;; do_install_append() {
+       ("^\\(fakeroot *\\)?\\(python *\\)?\\([a-zA-Z0-9\-_+.${}/~]+\\) *( *) *{" 3 font-lock-function-name-face)
+       ;; do_deploy[depends] ??=
+       ("^\\(export *\\)?\\([a-zA-Z0-9\-_+.${}/~]+\\(\\[[a-zA-Z0-9\-_+.${}/~]+\\]\\)?\\) *\\(=\\|\\?=\\|\\?\\?=\\|:=\\|+=\\|=+\\|.=\\|=.\\)" 2 font-lock-variable-name-face)
+       )))
+
+  (define-derived-mode bitbake-mode shell-script-mode
+    "Bitbake"
+    :syntax-table bitbake-mode-syntax-table
+    (setq font-lock-defaults bitbake-font-lock-defaults)
+    (setq mode-name "BitBake")
+    (define-key bitbake-mode-map [remap comment-dwim] 'bitbake-comment-dwim))
+
+  (mmm-add-classes
+   '((bitbake-shell
+      :submode shell-script-mode
+      :delimiter-mode nil
+      :case-fold-search nil
+      :front "^\\(?:fakeroot[[:blank:]]+\\)?\\([-[:alnum:]_${}]+[[:blank:]]*()[[:blank:]]*{\\)"
+      :back "^}")
+     (bitbake-python
+      :submode python-mode
+      :delimiter-mode nil
+      :case-fold-search nil
+      :front "^[ \t]*\\(?:fakeroot[ \t]+\\)?python[ \t]*\\(?:[ \t][^ \t]+[ \t]*\\)?([ \t]*)[ \t]*{[ \t]*\n"
+      :back "^}")))
+
+  (mmm-add-mode-ext-class 'bitbake-mode "\\.bb\\(append\\|class\\)?\\'" 'bitbake-shell)
+  (mmm-add-mode-ext-class 'bitbake-mode "\\.bb\\(append\\|class\\)?\\'" 'bitbake-python)
+  (mmm-add-mode-ext-class 'bitbake-mode "\\.inc\\" 'bitbake-shell)
+  (mmm-add-mode-ext-class 'bitbake-mode "\\.inc\\" 'bitbake-python)
+  (add-to-list 'auto-mode-alist
+               '("\\.bb\\(append\\|class\\)?\\'" . bitbake-mode))
+  (add-to-list 'auto-mode-alist
+               '("\\.inc\\'" . bitbake-mode))
 #+END_SRC
+
+*** WKS support
+#+begin_src emacs-lisp
+(defgroup bitbake-wic nil "Customization options for wic." :group 'bitbake)
+
+(defun wks-mode-font-lock-keywords ()
+  "Return the default font lock keywords for `wks-mode2'."
+   `("part" "bootloader" "include" "long-description" "short-description")
+   )
+
+;;;###autoload
+(define-derived-mode wks-mode prog-mode "wks"
+  :group 'bitbake-wic
+  (set (make-local-variable 'comment-start) "#")
+  (set (make-local-variable 'comment-start-skip) "#+[ \t]*")
+  (set (make-local-variable 'comment-indent-function) 'comment-indent-default)
+  (set (make-local-variable 'comment-style) 'plain)
+  (set (make-local-variable 'comment-continue) nil)
+  (setq-local font-lock-defaults '(wks-mode-font-lock-keywords))
+  )
+
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.wks\\(.in\\)?\\'" . wks-mode))
+
+(modify-syntax-entry ?# "<" wks-mode-syntax-table)
+(modify-syntax-entry ?\n  ">" wks-mode-syntax-table)
+(modify-syntax-entry ?\^m ">" wks-mode-syntax-table)
+(modify-syntax-entry ?\"  "\""  wks-mode-syntax-table) ;strings are delimited by "
+#+end_src
 
 *** Reference:
 https://bitbucket.org/olanilsson/bitbake-modes/src/master/
+http://xemacs.sourceforge.net/Documentation/packages/html/mmm_toc.html#SEC_Contents
 
 ** C/C++
 
