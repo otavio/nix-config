@@ -121,6 +121,9 @@ if type exa > /dev/null; then
     alias llfu='exa -bghHliS --git'
 fi
 
+# bat
+type bat > /dev/null && alias cat='bat'
+
 export GOPATH=~/go
 export GOBIN=$GOPATH/bin
 mkdir -p $GOBIN $GOPATH/src
