@@ -12,3 +12,4 @@
 /emacs/.emacs.d/transient/
 /i3wm/.config/i3/log
 /emacs/.emacs.d/eshell/history
+/emacs/.emacs.d/tramp
