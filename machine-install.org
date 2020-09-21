@@ -56,7 +56,7 @@
 **** Tools
 
 #+BEGIN_SRC shell :async :results output
- cargo install cargo-audit cargo-bloat cargo-cache cargo-count cargo-edit cargo-lichking cargo-outdated cargo-release cargo-udeps cargo-watch topgrade
+  cargo install cargo-audit cargo-bloat cargo-cache cargo-count cargo-edit cargo-lichking cargo-outdated cargo-release cargo-udeps cargo-watch topgrade cargo-limit cargo-valgrind
 #+END_SRC
 
 ** Adjust boot params
