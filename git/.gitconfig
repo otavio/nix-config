@@ -3,7 +3,19 @@
 	email = otavio@ossystems.com.br
 
 [core]
-	pager = less -MR
+	pager = delta
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    features = line-numbers decorations
+    whitespace-error-style = 22 reverse
+
+[delta "decorations"]
+    commit-decoration-style = bold yellow box ul
+    file-style = bold yellow ul
+    file-decoration-style = none
 
 [color]
 	ui = true
@@ -29,6 +41,7 @@
 	algorithm = minimal
 	compactionHeuristic = true
 	renames = true
+    colorMoved = default
 
 [log]
 	decorate = true
@@ -74,14 +87,6 @@
 	multiedit = false
 	aliasesfile = /home/otavio/.gitaliases
 	aliasfiletype = mutt
-[pager]
-	diff = diff-so-fancy | less --tabs=4 -RFX
-	show = diff-so-fancy | less --tabs=4 -RFX
-
-[diff-so-fancy]
-	markEmptyLines = false
-	changeHunkIndicators = false
-	stripLeadingSymbols = false
 
 [gitreview]
 	username=otavio
