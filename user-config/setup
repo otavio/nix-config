@@ -1,0 +1,41 @@
+#! /usr/bin/env bash
+
+# Directories which we intend to have included for every user
+base=(
+    zsh
+)
+
+# Normal user only
+useronly=(
+    gtk
+    irssi
+    misc
+    zsh
+)
+
+# run the stow command for the passed in directory ($2) in location $1
+stowit() {
+    usr=$1
+    app=$2
+    stow -D -t    ${usr} ${app}
+    stow -v -R -t ${usr} ${app}
+}
+
+echo ""
+echo "Stowing for user: $(whoami)"
+
+git submodule init
+git submodule update
+
+# Common contents
+for app in ${base[@]}; do
+    stowit "${HOME}" $app
+done
+
+# User only contents
+for app in ${useronly[@]}; do
+    [[ "$(whoami)" != "root" ]] && stowit "${HOME}" $app
+done
+
+echo ""
+echo "##### ALL DONE"

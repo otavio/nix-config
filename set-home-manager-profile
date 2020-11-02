@@ -1,0 +1,17 @@
+#! /usr/bin/env bash
+
+basedir=$(dirname $(readlink -f $0))
+
+if [ $# != 1 ]; then
+    echo "ERROR: Please pass the profile to use for this machine."
+    echo "The following profiles are available:"
+    echo
+
+    ls $basedir/home-manager.nix/*.nix -1 | sed 's,^.*/\(.*\).nix,  - \1,g'
+    exit 1
+fi
+
+mkdir -p $HOME/.config/nixpkgs
+rm -f $HOME/.config/nixpkgs/home.nix
+cp -sv $(readlink -f $basedir/home-manager.nix/$1).nix $HOME/.config/nixpkgs/home.nix
+

@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec wine .wine/drive_c/users/otavio/Application\ Data/Nelogica/ClearTrader/profitchart.exe

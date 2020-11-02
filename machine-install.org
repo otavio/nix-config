@@ -1,80 +1,43 @@
 #+TITLE: Machine Install instructions
 #+STARTUP: indent
 * System installation
+** NixOS channels configuration
+
+```sh
+nix-channel --add https://github.com/nix-community/home-manager/archive/release-20.09.tar.gz home-manager
+nix-channel --add https://nixos.org/channels/nixos-20.09 nixos
+```
+
 ** Package installation
-*** Base packages
-
-#+BEGIN_SRC shell :async :results output
-  sudo pacman -S --needed --noconfirm unison grml-zsh-config sudo tmuxp zsh git net-tools stow reflector openbsd-netcat
-#+END_SRC
-
-*** Update mirror just
-
-#+BEGIN_SRC shell :async :results output
-  sudo reflector --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
-#+END_SRC
-
-*** Yay installation
-
-#+BEGIN_SRC shell :async :results output
-  git clone https://aur.archlinux.org/yay.git /tmp/yay
-  cd /tmp/yay && makepkg -si
-  rm -rf /tmp/yay
-#+END_SRC
-
-*** Extra packages for desktop / laptop
-
-#+BEGIN_SRC shell :async :results output
-  sudo pacman -S --needed --noconfirm bluez-utils networkmanager emacs firefox ttf-dejavu i3-wm i3status openssh parcellite rxvt-unicode sway swaylock weston xorg-server xorg-server-xwayland xorg-xinit xorg-xmodmap xorg-xrdb xss-lock intel-ucode xsel tree lesspipe gtk-engines gtk3-print-backends system-config-printer cups aspell-en aspell-pt fzf gpicview gthumb zathura zathura-pdf-poppler urxvt-perls xclip unclutter
-#+END_SRC
-
-*** Yay extra packages
-
-#+BEGIN_SRC shell :async :results output
-  yay -S skypeforlinux-stable-bin exa bat ripgrep fd dunst adwaita-qt tokei topgrade git-delta-bin
-#+END_SRC
 
 *** Rust
 **** Compiler minimal
 
-#+BEGIN_SRC shell :async :results output
- curl https://sh.rustup.rs -sSf --output /tmp/rustup.sh
- sh rustup.sh --default-toolchain stable -y --profile=minimal
-#+END_SRC
+#+begin_src shell :async :results output
+rustup toolchain install nightly --profile=minimal --component rustfmt clippy
+#+end_src
 
 **** Add development tools
 
-#+BEGIN_SRC shell :async :results output
- # install rust-analyzer
- cargo install --git https://github.com/rust-analyzer/rust-analyzer rust-analyzer
+#+begin_src shell :async :results output
+  cargo install --git https://github.com/rust-analyzer/rust-analyzer rust-analyzer
 
- # add extra tools
- rustup component add rustfmt clippy
- rustup toolchain add nightly
-#+END_SRC
-
-**** Tools
-
-#+BEGIN_SRC shell :async :results output
-  cargo install cargo-audit cargo-bloat cargo-cache cargo-count cargo-edit cargo-lichking cargo-outdated cargo-release cargo-udeps cargo-watch topgrade cargo-limit cargo-valgrind
-#+END_SRC
-
-** Adjust boot params
-
-- Use cgroup unified hierarchy: systemd.unified_cgroup_hierarchy=1
-- Disable protections: mitigations=off
-
-** Keyboard layout
-
-#+BEGIN_SRC shell :async :results output
-  sudo localectl set-x11-keymap us pc101 intl caps:super
-#+END_SRC
-
-** Mime type configuration
-
-#+BEGIN_SRC shell :async :results output
-  xdg-mime default org.pwmt.zathura.desktop application/pdf
-#+END_SRC
+  cargo install \
+        cargo-audit \
+        cargo-bloat \
+        cargo-cache \
+        cargo-count \
+        cargo-edit \
+        cargo-lichking \
+        cargo-limit \
+        cargo-outdated \
+        cargo-release \
+        cargo-udeps \
+        cargo-valgrind
+        cargo-watch \
+        cargo-wipe \
+        cargo-spellcheck
+#+end_src
 
 ** Bluetooth installation
 
@@ -83,39 +46,3 @@
  sudo systemctl restart bluetooth
 #+END_SRC
 
-** Swap using ZRam and Swap files
-
-#+BEGIN_SRC shell :async :results output
-  yay -S systemd-swap-git
-  systemctl enable systemd-swap
-
-  # Preferred settings for Desktop
-  echo vm.swappiness=5 | sudo tee -a /etc/sysctl.d/99-sysctl.conf
-  echo vm.vfs_cache_pressure=50 | sudo tee -a /etc/sysctl.d/99-sysctl.conf
-  sudo sysctl -p /etc/sysctl.d/99-sysctl.conf
-
-  # Enable zram
-  sudo sed -i 's,zram_enabled=0,zram_enabled=1,g' /etc/systemd/swap.conf
-
-  # Restart service
-  sudo systemctl restart systemd-swap
-#+END_SRC
-
-** Enable fstrim (for SSD disks) - once a week
-
-#+BEGIN_SRC sh
-sudo systemctl enable fstrim.timer
-#+END_SRC
-
-* System cleanup
-** Remove unused packages
-
-#+BEGIN_SRC shell :async :results output
- sudo pacman -Rns --noconfirm $(pacman -Qtdq)
-#+END_SRC
-
-** Reinstall all packages
-
-#+BEGIN_SRC shell :async :results output
- pacman -Qqn | sudo pacman -Sy -
-#+END_SRC
