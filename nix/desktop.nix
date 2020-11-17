@@ -43,4 +43,6 @@
   services.dunst.enable = true;
   xdg.configFile."dunst/dunstrc".source = ../nix/dunst/dunstrc;
   xdg.configFile."dunst/skype".source = ../nix/dunst/skype;
+
+  services.flameshot.enable = true;
 }
