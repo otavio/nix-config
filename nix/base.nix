@@ -17,6 +17,7 @@
     rustup
     topgrade
     htop
+    xclip
 
     aspell
     aspellDicts.en

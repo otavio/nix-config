@@ -24,7 +24,6 @@
     teams
     topgrade
     vlc
-    xclip
 
     gnome3.gnome-keyring
   ];
