@@ -9,14 +9,14 @@
     exa
     fzf
     gitAndTools.delta
+    htop
+    keychain
     nnn
+    rustup
     tmux
     tmuxp
-    tree
-    keychain
-    rustup
     topgrade
-    htop
+    tree
     xclip
 
     aspell
