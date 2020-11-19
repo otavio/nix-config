@@ -1,0 +1,13 @@
+#! /usr/bin/env sh
+
+state_file=/tmp/.audio-wireless
+
+if [ -e $state_file ]; then
+    pactl set-card-profile alsa_card.usb-Sony_Computer_Entertainment_Wireless_Stereo_Headset-00 off
+    pactl set-card-profile alsa_card.pci-0000_00_1f.3 output:analog-stereo
+    rm $state_file
+else
+    pactl set-card-profile alsa_card.usb-Sony_Computer_Entertainment_Wireless_Stereo_Headset-00 output:analog-stereo+input:mono-fallback
+    pactl set-card-profile alsa_card.pci-0000_00_1f.3 off
+    touch $state_file
+fi
