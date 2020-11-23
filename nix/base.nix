@@ -11,6 +11,7 @@
     gitAndTools.delta
     htop
     keychain
+    mtr
     nnn
     rustup
     tmux
