@@ -1,12 +1,4 @@
 { config, pkgs, ... }:
-let
-  # https://docs.microsoft.com/en-us/answers/questions/42095/sharing-screen-not-working-anymore-bug.html
-  teams = pkgs.teams.overrideAttrs (oldAttrs: rec{
-    postFixup = oldAttrs.postFixup + ''
-      rm $out/opt/teams/resources/app.asar.unpacked/node_modules/slimcore/bin/rect-overlay
-    '';
-  });
-in
 {
   xdg.enable = true;
 
