@@ -5,7 +5,6 @@ base=()
 
 # Normal user only
 useronly=(
-    gtk
     irssi
     misc
 )

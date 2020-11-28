@@ -9,4 +9,6 @@
 
   programs.adb.enable = true;
   users.users.otavio.extraGroups = ["adbusers"];
+
+  services.dbus.packages = with pkgs; [ gnome3.dconf ];
 }
