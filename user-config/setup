@@ -1,16 +1,13 @@
 #! /usr/bin/env bash
 
 # Directories which we intend to have included for every user
-base=(
-    zsh
-)
+base=()
 
 # Normal user only
 useronly=(
     gtk
     irssi
     misc
-    zsh
 )
 
 # run the stow command for the passed in directory ($2) in location $1

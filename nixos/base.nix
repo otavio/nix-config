@@ -17,11 +17,10 @@
 
   time.timeZone = "America/Sao_Paulo";
 
+  environment.pathsToLink = [ "/share/zsh" ];
+  environment.sessionVariables.SHELL = "zsh";
+
   programs.zsh.enable = true;
-  programs.zsh.interactiveShellInit = ''
-    source ${pkgs.grml-zsh-config}/etc/zsh/zshrc
-  '';
-  programs.zsh.promptInit = ""; # or it replacez grml prompt.
 
   security.sudo.wheelNeedsPassword = false;
 
@@ -41,7 +40,6 @@
     zile
     nettools        # for ifconfig
     psmisc          # for killall
-    grml-zsh-config
     home-manager
   ];
 }
