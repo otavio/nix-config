@@ -14,6 +14,7 @@
     discord
     firefox
     gthumb
+    irssi
     libreoffice
     nixpkgs-fmt
     pavucontrol
@@ -44,4 +45,9 @@
   xdg.configFile."dunst/skype".source = ../nix/dunst/skype;
 
   services.flameshot.enable = true;
+
+  home.file.".irssi" = {
+    source = ../nix/irssi;
+    recursive = true;
+  };
 }
