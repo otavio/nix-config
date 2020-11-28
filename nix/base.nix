@@ -1,8 +1,17 @@
 { config, pkgs, ... }:
-
+let
+  local-scripts = pkgs.stdenv.mkDerivation {
+    name = "local-scripts";
+    src = ../nix/scripts;
+    installPhase = ''
+     mkdir -p $out/bin
+     cp -r * $out/bin
+   '';
+  };
+in
 {
   home.packages = with pkgs; [
-    stow # for old dotconfig files copy
+    local-scripts
 
     bat
     emacs
