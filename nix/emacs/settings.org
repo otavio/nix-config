@@ -1,8 +1,7 @@
 #+TITLE: Emacs settings
 #+STARTUP: indent
-* Configurations
-** Package Setup
-*** Setup the package repositories.
+* Package Setup
+** Setup the package repositories.
 
 #+BEGIN_SRC emacs-lisp
   (require 'package)
@@ -13,7 +12,7 @@
   (package-initialize)
 #+END_SRC
 
-*** Automatically install and then setup =use-package=
+** Automatically install and then setup =use-package=
 
 #+BEGIN_SRC emacs-lisp
   (unless (package-installed-p 'use-package)
@@ -31,7 +30,7 @@
     (require 'bind-key))
 #+END_SRC
 
-** System names
+* System names
 
 #+BEGIN_SRC emacs-lisp
   (defun system-is-laptop ()
@@ -57,7 +56,7 @@
     )
 #+END_SRC
 
-** Theme and fonts
+* Theme and fonts
 
 #+BEGIN_SRC emacs-lisp
   (if (system-is-laptop)
@@ -80,7 +79,7 @@
   (doom-themes-org-config))
 #+END_SRC
 
-*** Use a thin window divider in terminal
+** Use a thin window divider in terminal
 
 #+BEGIN_SRC emacs-lisp
   (set-face-inverse-video-p 'vertical-border nil)
@@ -90,17 +89,17 @@
                           (make-glyph-code ?┃))
 #+END_SRC
 
-**** Reference:
+** Reference:
 - https://stackoverflow.com/questions/18210631/how-to-change-the-character-composing-the-emacs-vertical-border
 
-** Personal Information
+* Personal Information
 
 #+BEGIN_SRC emacs-lisp
   (setq user-full-name "Otavio Salvador"
         user-mail-address "otavio@ossystems.com.br")
 #+END_SRC
 
-** Diminish
+* Diminish
 
 #+BEGIN_SRC emacs-lisp
   (use-package diminish
@@ -108,13 +107,13 @@
     (eval-after-load "eldoc" '(diminish 'eldoc-mode)))
 #+END_SRC
 
-** GNU Elpa Keyring Update
+* GNU Elpa Keyring Update
 
 #+BEGIN_SRC emacs-lisp
   (use-package gnu-elpa-keyring-update)
 #+END_SRC
 
-** General modifications
+* General modifications
 
 #+BEGIN_SRC emacs-lisp
   ;;; Live reload of the settings, from inside of the Emacs
@@ -153,7 +152,7 @@
   (setq tab-always-indent 'complete)
 #+END_SRC
 
-** Encoding
+* Encoding
 
 #+BEGIN_SRC emacs-lisp
   (prefer-coding-system 'utf-8)
@@ -162,7 +161,7 @@
   (set-keyboard-coding-system 'utf-8)
 #+END_SRC
 
-** Ui customizations
+* Ui customizations
 
 #+BEGIN_SRC emacs-lisp
   (if (system-is-laptop)
@@ -186,7 +185,7 @@
   (setq column-number-mode t)
 #+END_SRC
 
-** Projectile
+* Projectile
 
 #+BEGIN_SRC emacs-lisp
   ;; Manage and navigate projects
@@ -211,12 +210,12 @@
               (concat "rg -0 --files --color=never --hidden" rg-cmd)))))
 #+END_SRC
 
-** Spelling
+* Spelling
 
 #+BEGIN_SRC emacs-lisp
   (use-package flyspell :diminish flyspell-mode)
 #+END_SRC
-** Use regexp search for C-s
+* Use regexp search for C-s
 #+BEGIN_SRC emacs-lisp
   ;; Interactive search key bindings. By default, C-s runs
   ;; isearch-forward, so this swaps the bindings.
@@ -226,14 +225,14 @@
   (global-set-key (kbd "C-M-r") 'isearch-backward)
 #+END_SRC
 
-** Custom Keybindings
+* Custom Keybindings
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-h") 'delete-backward-char)
   (define-key global-map (kbd "RET") 'newline-and-indent)
 #+END_SRC
 
-** Custom function
+* Custom function
 
 #+BEGIN_SRC emacs-lisp
   (defun buffer-cleanup ()
@@ -287,13 +286,13 @@
     (hi-lock-unface-buffer "\t"))
 #+END_SRC
 
-** Avoids saving active regions to the primary selection
+* Avoids saving active regions to the primary selection
 
 #+BEGIN_SRC emacs-lisp
   (setq select-active-regions nil)
 #+END_SRC
 
-** Dired
+* Dired
 
 #+BEGIN_SRC emacs-lisp
   (use-package dired
@@ -320,7 +319,7 @@
                                    (lambda () (interactive) (find-alternate-file ".."))))))
 #+END_SRC
 
-** Editing
+* Editing
 
 #+BEGIN_SRC emacs-lisp
   (use-package whitespace
@@ -411,7 +410,7 @@
 
   (global-set-key (kbd "M-;") 'comment-dwim-line)
 #+END_SRC
-** Company
+* Company
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :diminish company-mode
@@ -429,15 +428,15 @@
     (global-set-key (kbd "TAB") #'company-indent-or-complete-common))
 #+END_SRC
 
-** Flycheck
+* Flycheck
 
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :diminish flycheck-mode
     :init (global-flycheck-mode))
 #+END_SRC
-** LSP
-*** General settings
+* LSP
+** General settings
 
 #+BEGIN_SRC emacs-lisp
   ;; set prefix for lsp-command-keymap (default is "s-l")
@@ -505,7 +504,7 @@
     :hook (rust-mode . cargo-minor-mode))
 
 #+END_SRC
-** Git
+* Git
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'git-commit-mode-hook (lambda () (setq fill-column 72)))
@@ -537,7 +536,7 @@
               #'git-gutter:update-all-windows))
 #+END_SRC
 
-** Misc
+* Misc
 
 #+BEGIN_SRC emacs-lisp
   (use-package dockerfile-mode
@@ -561,7 +560,7 @@
   (use-package aggressive-indent)
 #+END_SRC
 
-** Navigation
+* Navigation
 
 #+BEGIN_SRC emacs-lisp
   (use-package ido
@@ -587,8 +586,8 @@
     ("M-x" . smex))
 #+END_SRC
 
-** Org
-*** Org package configuration
+* Org
+** Org package configuration
 
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize
@@ -670,14 +669,14 @@
                 ("DONE" ("WAITING") ("CANCELLED") ("HOLD") ("DOING")))))
 #+END_SRC
 
-*** References:
+** References:
 - https://superuser.com/questions/695096/how-to-enable-flyspell-in-org-mode-by-default
 - https://endlessparentheses.com/ispell-and-org-mode.html
 - http://doc.norang.ca/org-mode.html
 - https://orgmode.org/manual/Tracking-TODO-state-changes.html#Tracking-TODO-state-changes
 - https://emacs.cafe/emacs/orgmode/gtd/2017/06/30/orgmode-gtd.html
 
-** Shell
+* Shell
 
 #+BEGIN_SRC emacs-lisp
   (use-package sane-term
@@ -687,9 +686,9 @@
     ("C-x T" . sane-term-create))
 #+END_SRC
 
-** Bitbake
+* Bitbake
 
-*** mmm-mode
+** mmm-mode
 #+begin_src emacs-lisp
   (use-package mmm-mode
     :defer t
@@ -698,7 +697,7 @@
 
 #+end_src
 
-*** Bitbake Mode
+** Bitbake Mode
 #+BEGIN_SRC emacs-lisp
   (require 'mmm-mode)
 
@@ -761,7 +760,7 @@
                '("\\.inc\\'" . bitbake-mode))
 #+END_SRC
 
-*** WKS support
+** WKS support
 #+begin_src emacs-lisp
 (defgroup bitbake-wic nil "Customization options for wic." :group 'bitbake)
 
@@ -790,11 +789,11 @@
 (modify-syntax-entry ?\"  "\""  wks-mode-syntax-table) ;strings are delimited by "
 #+end_src
 
-*** Reference:
+** Reference:
 https://bitbucket.org/olanilsson/bitbake-modes/src/master/
 http://xemacs.sourceforge.net/Documentation/packages/html/mmm_toc.html#SEC_Contents
 
-** C/C++
+* C/C++
 
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent)
@@ -837,7 +836,7 @@ http://xemacs.sourceforge.net/Documentation/packages/html/mmm_toc.html#SEC_Conte
       (show-trailing-whitespace . t)))
   (c-add-style "linux-kernel" linux-kernel)
 #+END_SRC
-** ibuffer
+* ibuffer
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 
@@ -897,7 +896,7 @@ http://xemacs.sourceforge.net/Documentation/packages/html/mmm_toc.html#SEC_Conte
                (ibuffer-switch-to-saved-filter-groups "default")))
 #+END_SRC
 
-** Latex
+* Latex
 
 #+BEGIN_SRC emacs-lisp
   (use-package auctex
@@ -926,7 +925,7 @@ http://xemacs.sourceforge.net/Documentation/packages/html/mmm_toc.html#SEC_Conte
     (setq-default TeX-source-correlate-start-server t))
 #+END_SRC
 
-** Markdown
+* Markdown
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -938,7 +937,7 @@ http://xemacs.sourceforge.net/Documentation/packages/html/mmm_toc.html#SEC_Conte
     (setq markdown-command "multimarkdown")
     (setq-default fill-column 80))
 #+END_SRC
-** Which Key
+* Which Key
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
   :diminish which-key-mode
