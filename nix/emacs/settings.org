@@ -1,5 +1,4 @@
 #+TITLE: Emacs settings
-#+STARTUP: indent
 * Package Setup
 ** Setup the package repositories.
 
@@ -611,7 +610,8 @@
 * Org
 ** Org package configuration
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
+
   (use-package htmlize
     :init (require 'htmlize))
 
@@ -622,18 +622,22 @@
   (use-package ox-gfm
     :after org)
 
-  (defun endless/org-ispell ()
-    "Configure `ispell-skip-region-alist' for `org-mode'."
+  (defun os/org-mode-setup ()
+    (org-indent-mode)
+    (auto-fill-mode 0)
+    (visual-line-mode 1)
+    (diminish org-indent-mode)
+
     (make-local-variable 'ispell-skip-region-alist)
     (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
     (add-to-list 'ispell-skip-region-alist '("~" "~"))
     (add-to-list 'ispell-skip-region-alist '("=" "="))
-    (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC")))
+    (add-to-list 'ispell-skip-region-alist '("^#\\+begin_src" . "^#\\+end_src")))
 
   (use-package org :defer
     :init
     (add-hook 'org-mode-hook 'turn-on-flyspell)
-    (add-hook 'org-mode-hook #'endless/org-ispell)
+    (add-hook 'org-mode-hook 'os/org-mode-setup)
     :config
     (setq org-confirm-babel-evaluate nil
           org-export-babel-evaluate 'inline-only)
@@ -656,8 +660,7 @@
                                      ("obeytabs" "true")))
     (org-babel-do-load-languages
      'org-babel-load-languages
-     '(
-       (emacs-lisp . t)
+     '((emacs-lisp . t)
        (gnuplot . t)
        (latex . t)
        (makefile . t)
@@ -689,7 +692,7 @@
                 (done ("WAITING") ("HOLD") ("DOING"))
                 ("TODO" ("WAITING") ("CANCELLED") ("HOLD") ("DOING"))
                 ("DONE" ("WAITING") ("CANCELLED") ("HOLD") ("DOING")))))
-#+END_SRC
+#+end_src
 
 ** References:
 - https://superuser.com/questions/695096/how-to-enable-flyspell-in-org-mode-by-default
