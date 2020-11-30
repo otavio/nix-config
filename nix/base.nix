@@ -16,7 +16,6 @@ in
     bat
     emacs
     exa
-    fzf
     gitAndTools.delta
     htop
     keychain

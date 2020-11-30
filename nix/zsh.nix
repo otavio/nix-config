@@ -37,6 +37,11 @@ in
     bitbake-completion
   ];
 
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   home.file.".config/zsh/zfunc" = {
     source = ../nix/zsh/zfunc;
     recursive = true;
