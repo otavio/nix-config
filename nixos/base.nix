@@ -17,9 +17,6 @@
 
   time.timeZone = "America/Sao_Paulo";
 
-  environment.pathsToLink = [ "/share/zsh" ];
-  environment.sessionVariables.SHELL = "zsh";
-
   programs.zsh.enable = true;
 
   security.sudo.wheelNeedsPassword = false;
