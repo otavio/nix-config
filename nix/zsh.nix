@@ -35,8 +35,11 @@ in
     grml-zsh-config
     base16-shell
     bitbake-completion
+
+    exa
   ];
 
+  programs.bat.enable = true;
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;

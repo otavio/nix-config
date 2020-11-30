@@ -13,9 +13,7 @@ in
   home.packages = with pkgs; [
     local-scripts
 
-    bat
     emacs
-    exa
     gitAndTools.delta
     htop
     keychain
