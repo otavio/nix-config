@@ -6,6 +6,7 @@
 ```sh
 nix-channel --add https://github.com/nix-community/home-manager/archive/release-20.09.tar.gz home-manager
 nix-channel --add https://nixos.org/channels/nixos-20.09 nixos
+nix-channel --update
 ```
 
 ** Package installation
@@ -14,27 +15,17 @@ nix-channel --add https://nixos.org/channels/nixos-20.09 nixos
 **** Compiler minimal
 
 #+begin_src shell :async :results output
-rustup toolchain install nightly --profile=minimal --component rustfmt clippy
+  rustup toolchain install nightly --profile=minimal --component rustfmt clippy
 #+end_src
 
 **** Add development tools
 
 #+begin_src shell :async :results output
-  cargo install --git https://github.com/rust-analyzer/rust-analyzer rust-analyzer
-
   cargo install \
-        cargo-audit \
-        cargo-bloat \
-        cargo-cache \
         cargo-count \
-        cargo-edit \
         cargo-lichking \
         cargo-limit \
-        cargo-outdated \
-        cargo-release \
-        cargo-udeps \
         cargo-valgrind
-        cargo-watch \
         cargo-wipe \
         cargo-spellcheck
 #+end_src

@@ -22,7 +22,6 @@ in
     keychain
     mtr
     nnn
-    rustup
     tmux
     tmuxp
     topgrade
