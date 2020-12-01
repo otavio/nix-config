@@ -24,6 +24,7 @@
     teams
     topgrade
     vlc
+    zoom-us
 
     gnome3.gnome-keyring
   ];
