@@ -63,85 +63,83 @@ in
       r() { nix run nixpkgs.$1 -c $@ }
 
       keys-load() {
-        if [ -z "$1" ]; then
-          unset SSH_AUTH_SOCK
-          echo Decriptando particao... && \
+          if [ -z "$1" ]; then
+              unset SSH_AUTH_SOCK
+              echo Decriptando particao...
               sudo cryptsetup -v luksOpen /dev/disk/by-uuid/faae5ddb-df82-4a23-8a24-eedd6356ccff keys && \
-              sudo mount /dev/mapper/keys /mnt && \
-              echo done
+                  sudo mount /dev/mapper/keys /mnt && \
+                  echo done || echo ERROR
 
-          echo Carregando chave SSH ...
-          DISPLAY="" keychain id_rsa
-        fi
+              echo Carregando chave SSH ...
+              DISPLAY="" keychain id_rsa
+          fi
 
-        [ -f $HOME/.keychain/$(hostname)-sh ] && \
-          source $HOME/.keychain/$(hostname)-sh
-        [ -f $HOME/.keychain/$(hostname)-sh-gpg ] && \
-          source  $HOME/.keychain/$(hostname)-sh-gpg
-       }
+          [ -f $HOME/.keychain/$(hostname)-sh ] && source $HOME/.keychain/$(hostname)-sh
+          [ -f $HOME/.keychain/$(hostname)-sh-gpg ] && source  $HOME/.keychain/$(hostname)-sh-gpg
+      }
 
-       keys-close() {
-         echo Descarregando chave SSH
-         keychain --stop mine
-         echo -n Desligando particao encriptada...
-         sudo umount /mnt > /dev/null
-         sudo cryptsetup -v luksClose keys && \
-         echo done
-       }
+      keys-close() {
+          echo Descarregando chave SSH
+          keychain --stop mine
+          echo -n Desligando particao encriptada...
+          sudo umount /mnt > /dev/null
+          sudo cryptsetup -v luksClose keys && \
+              echo done || echo ERROR
+      }
 
-       transfer() {
-         curl --version 2>&1 > /dev/null
-         if [ $? -ne 0 ]; then
-           echo "Could not find curl."
-           return 1
-         fi
+      transfer() {
+          curl --version 2>&1 > /dev/null
+          if [ $? -ne 0 ]; then
+              echo "Could not find curl."
+              return 1
+          fi
 
-         # check arguments
-         if [ $# -eq 0 ]; then
-           echo "No arguments specified. Usage:\necho transfer /tmp/test.md\ncat /tmp/test.md | transfer test.md"
-           return 1
-         fi
+          # check arguments
+          if [ $# -eq 0 ]; then
+              echo "No arguments specified. Usage:\necho transfer /tmp/test.md\ncat /tmp/test.md | transfer test.md"
+              return 1
+          fi
 
-         # get temporarily filename, output is written to this file show progress can be showed
-         tmpfile=$( mktemp -t transferXXX )
+          # get temporarily filename, output is written to this file show progress can be showed
+          tmpfile=$( mktemp -t transferXXX )
 
-         # upload stdin or file
-         file=$1
+          # upload stdin or file
+          file=$1
 
-         if tty -s; then
-           basefile=$(basename "$file" | sed -e 's/[^a-zA-Z0-9._-]/-/g')
+          if tty -s; then
+              basefile=$(basename "$file" | sed -e 's/[^a-zA-Z0-9._-]/-/g')
 
-           if [ ! -e $file ]; then
-             echo "File $file doesn't exists."
-             return 1
-           fi
+              if [ ! -e $file ]; then
+                  echo "File $file doesn't exists."
+                  return 1
+              fi
 
-           if [ -d $file ]; then
-             # zip directory and transfer
-             tgzfile=$( mktemp -t transferXXX.tgz )
-             cd $(dirname $file) && tar czf $tgzfile $(basename $file)
-             curl --progress-bar --upload-file "$tgzfile" "https://up.sceptique.eu/$basefile.tgz" >> $tmpfile
-             rm -f $tgzfile
-           else
-             # transfer file
-             curl --progress-bar --upload-file "$file" "https://up.sceptique.eu/$basefile" >> $tmpfile
-           fi
-         else
-           # transfer pipe
-           curl --progress-bar --upload-file "-" "https://up.sceptique.eu/$file" >> $tmpfile
-         fi
+              if [ -d $file ]; then
+                  # zip directory and transfer
+                  tgzfile=$( mktemp -t transferXXX.tgz )
+                  cd $(dirname $file) && tar czf $tgzfile $(basename $file)
+                  curl --progress-bar --upload-file "$tgzfile" "https://up.sceptique.eu/$basefile.tgz" >> $tmpfile
+                  rm -f $tgzfile
+              else
+                  # transfer file
+                  curl --progress-bar --upload-file "$file" "https://up.sceptique.eu/$basefile" >> $tmpfile
+              fi
+          else
+              # transfer pipe
+              curl --progress-bar --upload-file "-" "https://up.sceptique.eu/$file" >> $tmpfile
+          fi
 
-         # cat output link
-         cat $tmpfile
-         echo
+          # cat output link
+          cat $tmpfile
+          echo
 
-         # cleanup
-         rm -f $tmpfile
-       }
+          # cleanup
+          rm -f $tmpfile
+      }
 
-       keys-load "not-ask"
+      keys-load "not-ask"
 
-       [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]] && exec startx
+      [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]] && exec startx
     '';
 
     initExtraBeforeCompInit = ''
