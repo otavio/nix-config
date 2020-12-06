@@ -151,6 +151,7 @@ in
     '';
 
     shellAliases = {
+      # Replace ls with exa.
       l = "exa -l";
       ls = "exa";
       ll = "exa -l";
@@ -158,6 +159,8 @@ in
       lla = "exa -la";
       llt = "exa -T";
       llfu = "exa -bghHliS --git";
+
+      # Paste from command line.
       tb = "nc termbin.com 9999";
 
       # Insecure SSH and SCP aliases. I use this to connect to temporary devices
