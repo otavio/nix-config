@@ -12,6 +12,7 @@
     cargo-release
     cargo-udeps
     cargo-watch
+    cargo-update
     rustup
   ];
 }
