@@ -477,6 +477,7 @@
 
     ;;; Rust specifics
     (setq lsp-rust-server 'rust-analyzer)
+    (setq lsp-rust-analyzer-server-command '("~/.cargo/bin/rust-analyzer"))
 
     :hook (;; reformat code and add missing (or remove old) imports
            (before-save . lsp-format-buffer)
