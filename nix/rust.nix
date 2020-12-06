@@ -12,7 +12,6 @@
     cargo-release
     cargo-udeps
     cargo-watch
-    rust-analyzer
     rustup
   ];
 }
