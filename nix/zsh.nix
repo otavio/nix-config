@@ -39,6 +39,12 @@ in
     exa
   ];
 
+  services.lorri.enable = true;
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   programs.bat.enable = true;
   programs.fzf = {
     enable = true;
