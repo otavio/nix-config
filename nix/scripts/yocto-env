@@ -6,12 +6,9 @@ Yocto Project Environment helper
 
 USAGE:
 
-  yocto-env <type> <version>
+  yocto-env <version> [--skip-pull]
 
 OPTIONS
-
-  type              Environment type to use. Available options are 'builder'
-                    and 'toolchain'
 
   version           Environment version to use. This maps to Ubuntu releases
                     and currently it provides the 14.04, 16.04, 18.04 and
@@ -21,17 +18,8 @@ EOF
 }
 
 case "$1" in
-    builder|toolchain)
-        type=$1
-        ;;
-    *)
-        usage
-        ;;
-esac
-
-case "$2" in
-    14.04|16.04|18.04|20.04)
-        version=$2
+    14.04*|16.04*|18.04*|20.04*)
+        version=$1
         ;;
     *)
         usage
@@ -39,7 +27,19 @@ case "$2" in
 esac
 
 USER=$(whoami)
-IMAGE=ossystems/yocto-$type:$version
+IMAGE=ossystems/yocto-env:$version
+
+case "$2" in
+    --skip-pull)
+        ;;
+    "")
+        docker pull $IMAGE
+        ;;
+    *)
+        usage
+        ;;
+esac
+
 
 docker run \
        --rm \
@@ -50,11 +50,13 @@ docker run \
        --device=/dev/kvm \
        --device=/dev/net/tun \
        -v /tmp/.X11-unix:/tmp/.X11-unix \
+       -v /nix:/nix \
        -v ${HOME}:${HOME} \
        -e DISPLAY=$DISPLAY \
        --env=HOST_UID=$(id -u) \
        --env=HOST_GID=$(id -g) \
        --env=USER=$USER \
-       --hostname docker \
+       --env=SHELL=$SHELL \
+       --hostname yocto-env \
        -w $PWD \
        $IMAGE run
