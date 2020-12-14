@@ -22,6 +22,8 @@
 
   hardware.cpu.intel.updateMicrocode = true;
 
+  powerManagement.cpuFreqGovernor = "performance";
+
   networking.hostName = "nano"; # Define your hostname.
 
   # The global useDHCP flag is deprecated, therefore explicitly set to false here.
