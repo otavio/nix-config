@@ -39,6 +39,12 @@
     keyMap = "br-latin1-us";
   };
 
+  # Enable fstrim (for SSD disks)
+  services.fstrim = {
+    enable = true;
+    interval = "weekly"; # the default
+  };
+
   services.openssh = {
     enable = true;
     forwardX11 = true;
