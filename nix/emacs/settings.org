@@ -524,6 +524,9 @@
   (use-package cargo
     :hook (rust-mode . cargo-minor-mode))
 
+  ;; Go specifics
+  (use-package go-mode)
+
 #+END_SRC
 * Git
 
