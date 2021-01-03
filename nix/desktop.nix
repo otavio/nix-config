@@ -22,6 +22,7 @@
     irssi
     libreoffice
     nixpkgs-fmt
+    nixpkgs-review
     pavucontrol
     scrcpy
     skypeforlinux
