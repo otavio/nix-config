@@ -31,6 +31,7 @@
     topgrade
     vlc
     zoom-us
+    zulip
 
     gnome3.gnome-keyring
   ];
