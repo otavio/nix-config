@@ -173,7 +173,7 @@ in
       # such as embedded devices under test or development so we don't need to
       # delete the fingerprint every time we reinstall them.
       issh = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null";
-      iscp = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null";
+      iscp = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null";
     };
 
     history = {
