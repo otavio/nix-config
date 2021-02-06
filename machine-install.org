@@ -15,25 +15,5 @@ nix-channel --update
 **** Compiler minimal
 
 #+begin_src shell :async :results output
-  rustup toolchain install nightly --profile=minimal --component rustfmt clippy
+  rustup toolchain install nightly --profile=minimal --component rustfmt clippy rust-src
 #+end_src
-
-**** Add development tools
-
-#+begin_src shell :async :results output
-  cargo install \
-        cargo-count \
-        cargo-lichking \
-        cargo-limit \
-        cargo-valgrind
-        cargo-wipe \
-        cargo-spellcheck
-#+end_src
-
-** Bluetooth installation
-
-#+BEGIN_SRC shell :async :results output
- sudo sed -i 's,#AutoEnable=*,AutoEnable=true,g' /etc/bluetooth/main.conf
- sudo systemctl restart bluetooth
-#+END_SRC
-

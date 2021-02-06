@@ -8,11 +8,17 @@
     cargo-bloat
     cargo-cache
     cargo-edit
+    cargo-limit
     cargo-outdated
+    cargo-readme
     cargo-release
     cargo-udeps
-    cargo-watch
     cargo-update
+    cargo-valgrind
+    cargo-watch
+    cargo-wipe
     rustup
+
+    rust-analyzer
   ];
 }
