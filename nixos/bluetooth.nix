@@ -4,6 +4,7 @@
   hardware.pulseaudio = {
     enable = true;
     package = pkgs.pulseaudioFull;
+
     extraModules = [ pkgs.pulseaudio-modules-bt ];
     extraConfig = ''
       load-module module-switch-on-connect
@@ -15,5 +16,6 @@
     powerOnBoot = true;
   };
 
-  services.blueman.enable = true;
+  nixpkgs.config.allowUnfree = true;
+  hardware.enableAllFirmware = true;
 }
