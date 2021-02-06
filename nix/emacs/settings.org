@@ -166,8 +166,6 @@
   (setq-default indent-tabs-mode nil
                 tab-width 4)
 
-  (electric-pair-mode 1)
-
   (setq require-final-newline t)
   (setq tab-always-indent 'complete)
 #+END_SRC
