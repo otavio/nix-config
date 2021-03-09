@@ -7,6 +7,7 @@
     cargo-audit
     cargo-bloat
     cargo-cache
+    cargo-cross
     cargo-edit
     cargo-limit
     cargo-outdated
