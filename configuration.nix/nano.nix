@@ -11,6 +11,7 @@
       ../nixos/base.nix
       ../nixos/bluetooth.nix
       ../nixos/desktop.nix
+      ../nixos/udev.nix
       ../nixos/x11.nix
     ];
 
