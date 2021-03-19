@@ -24,7 +24,7 @@
   home-manager.users.otavio = (import /home/otavio/.config/nixpkgs/home.nix { inherit pkgs config; });
   users.users.otavio = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [ "dialout" "wheel" "networkmanager" ];
     uid = 1000;
     shell = pkgs.zsh;
   };
