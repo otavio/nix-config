@@ -9,10 +9,13 @@
     cargo-cache
     cargo-cross
     cargo-edit
+    cargo-insta
     cargo-limit
+    cargo-msrv
     cargo-outdated
     cargo-readme
     cargo-release
+    cargo-rr
     cargo-udeps
     cargo-update
     cargo-valgrind
