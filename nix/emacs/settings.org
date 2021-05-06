@@ -145,7 +145,7 @@ Make Emacs use the $PATH set up by the user's shell
 
 #+BEGIN_SRC emacs-lisp
   (fset 'yes-or-no-p 'y-or-n-p)
-  (setq confirm-kill-emacs 'yes-or-no-p)
+  (setq confirm-kill-emacs nil)
 
   (require 'saveplace)
   (setq-default save-place t)
