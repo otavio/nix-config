@@ -323,6 +323,18 @@ Make Emacs use the $PATH set up by the user's shell
     (hi-lock-unface-buffer "\t"))
 #+END_SRC
 
+* Copy buffer name or full path with name
+
+#+begin_src emacs-lisp
+(defun os/copy-buffer-name ()
+  (interactive)
+  (kill-new (buffer-name)))
+
+(defun os/copy-buffer-full-name ()
+  (interactive)
+  (kill-new (buffer-file-name)))
+#+end_src
+
 * Smarter navigation to the beginning of a line
 - [[https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/][Reference]]
 #+BEGIN_SRC emacs-lisp
