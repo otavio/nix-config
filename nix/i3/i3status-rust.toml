@@ -14,13 +14,12 @@ alert = 10.0
 [[block]]
 block = "memory"
 display_type = "memory"
-format_mem = "{Mug}GB ({Mup}%)"
-format_swap = "{SUp}%"
+format_mem = "{mem_total_used_percents}"
+format_swap = "{swap_used_percents}"
 
 [[block]]
 block = "cpu"
 interval = 1
-format = "{barchart} {utilization}%"
 
 [[block]]
 block = "load"
@@ -28,17 +27,14 @@ interval = 1
 format = "{1m}"
 
 [[block]]
-block = "net"
-device = "wlp4s0"
-ssid = true
-ip = false
-speed_up = false
-graph_up = true
-interval = 5
+block = "networkmanager"
+on_click = "alacritty -e nmtui"
+interface_name_exclude = ["br\\-[0-9a-f]{12}", "docker\\d+"]
+interface_name_include = []
 
 [[block]]
 block = "sound"
-on_click = "pulsemixer --toggle-mute"
+format = "{output_description} {volume}"
 
 [[block]]
 block = "time"
