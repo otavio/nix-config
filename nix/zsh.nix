@@ -145,6 +145,12 @@ in
 
       keys-load "not-ask"
 
+      # Nix
+      if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+          . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+      fi
+      # End Nix
+
       [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
 
       [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]] && exec startx
