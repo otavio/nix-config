@@ -744,7 +744,7 @@ Project homepage: [[https://github.com/alphapapa/magit-todos][Github]]
       (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
       (add-to-list 'ispell-skip-region-alist '("~" "~"))
       (add-to-list 'ispell-skip-region-alist '("=" "="))
-      (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC")))
+      (add-to-list 'ispell-skip-region-alist '("^#\\+begin_src" . "^#\\+end_src")))
 
     :mode ("\\.org$" . org-mode)
     :bind (("C-c l" . org-store-link)
