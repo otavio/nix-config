@@ -603,10 +603,6 @@ point reaches the beginning or end of the buffer, stop there."
   (use-package helm-lsp
     :ensure t
     :commands helm-lsp-workspace-symbol)
-  (use-package company-lsp
-    :ensure t
-    :commands company-lsp
-    :config (push 'company-lsp company-backends))
 
   ;;; Rust specifics
   (use-package toml-mode)
