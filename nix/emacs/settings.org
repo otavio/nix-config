@@ -774,7 +774,8 @@ Project homepage: [[https://github.com/alphapapa/magit-todos][Github]]
                                      ("breakanywhere" "true")
                                      ("fontsize" "\\footnotesize")
                                      ("bgcolor" "white")
-                                     ("obeytabs" "true")))
+                                     ("obeytabs" "true")
+                                     ("tabsize" "2")))
 
     (org-babel-do-load-languages
      'org-babel-load-languages
