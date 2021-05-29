@@ -15,6 +15,7 @@ in
 
     emacs
     gitAndTools.delta
+    gitRepo
     htop
     keychain
     mtr
