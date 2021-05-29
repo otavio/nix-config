@@ -141,6 +141,13 @@ Make Emacs use the $PATH set up by the user's shell
   (use-package gnu-elpa-keyring-update)
 #+END_SRC
 
+* Direnv support
+
+#+begin_src emacs-lisp
+(use-package direnv
+  :config (direnv-mode))
+ #+end_src
+
 * General modifications
 
 #+BEGIN_SRC emacs-lisp
