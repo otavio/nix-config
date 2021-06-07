@@ -94,6 +94,9 @@ in
       }
 
       transfer() {
+          # Easier change of service in use
+          host=https://temp.sh
+
           curl --version 2>&1 > /dev/null
           if [ $? -ne 0 ]; then
               echo "Could not find curl."
@@ -124,15 +127,15 @@ in
                   # zip directory and transfer
                   tgzfile=$( mktemp -t transferXXX.tgz )
                   cd $(dirname $file) && tar czf $tgzfile $(basename $file)
-                  curl --progress-bar --upload-file "$tgzfile" "https://up.sceptique.eu/$basefile.tgz" >> $tmpfile
+                  curl --progress-bar --upload-file "$tgzfile" "$host/$basefile.tgz" >> $tmpfile
                   rm -f $tgzfile
               else
                   # transfer file
-                  curl --progress-bar --upload-file "$file" "https://up.sceptique.eu/$basefile" >> $tmpfile
+                  curl --progress-bar --upload-file "$file" "$host/$basefile" >> $tmpfile
               fi
           else
               # transfer pipe
-              curl --progress-bar --upload-file "-" "https://up.sceptique.eu/$file" >> $tmpfile
+              curl --progress-bar --upload-file "-" "$host/$file" >> $tmpfile
           fi
 
           # cat output link
