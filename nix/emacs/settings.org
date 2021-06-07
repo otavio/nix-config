@@ -606,6 +606,7 @@ point reaches the beginning or end of the buffer, stop there."
 
   ;;; Rust specifics
   (use-package toml-mode)
+  (use-package rust-mode)
 
   ;; Add keybindings for interacting with Cargo
   (use-package cargo
