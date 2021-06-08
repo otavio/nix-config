@@ -32,24 +32,20 @@ servers = (
   },
   { address = "silc.pspt.fi"; chatnet = "SILC"; port = "706"; },
   {
-    address = "irc.debian.org";
-    chatnet = "Debian";
-    port = "6667";
-    autoconnect = "yes";
-  },
-  {
-    address = "irc.freenode.net";
-    chatnet = "freenode";
-    port = "6667";
-    autoconnect = "yes";
-  },
-  {
     address = "localhost";
     chatnet = "Biltbee";
     port = "6667";
     autoconnect = "no";
   },
-  { address = "irc.pelotas.org"; chatnet = "Pelotas"; port = "6667"; }
+  { address = "irc.pelotas.org"; chatnet = "Pelotas"; port = "6667"; },
+  {
+    address = "irc.libera.chat";
+    chatnet = "liberachat";
+    port = "6697";
+    use_tls = "yes";
+    tls_verify = "yes";
+    autoconnect = "yes";
+  }
 );
 
 chatnets = {
@@ -82,7 +78,7 @@ chatnets = {
     max_msgs = "3";
     max_whois = "30";
   };
-  freenode = {
+  liberachat = {
     type = "IRC";
     nick = "otavio";
     username = "otavio";
@@ -134,25 +130,14 @@ chatnets = {
     max_msgs = "3";
   };
   SILC = { type = "SILC"; };
-  Debian = {
-    type = "IRC";
-    nick = "otavio";
-    username = "otavio";
-    realname = "Otavio Salvador <otavio.salvador@ossystems.com.br>";
-  };
   Biltbee = { type = "IRC"; };
   Pelotas = { type = "IRC"; };
 };
 
 channels = (
   {
-    name = "#ossystems-devel,#ossystems";
-    chatnet = "Debian";
-    autojoin = "yes";
-  },
-  {
     name = "#oe,#yocto,#etnaviv";
-    chatnet = "FreeNode";
+    chatnet = "LiberaChat";
     autojoin = "yes";
   }
 );
