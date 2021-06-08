@@ -68,6 +68,11 @@ in
 
       r() { nix run nixpkgs.$1 -c $@ }
 
+      irssi() {
+          export LIBERACHAT_PASSWORD=$(cat ~/.irssi/liberachat-password)
+          ${pkgs.irssi}/bin/irssi
+      }
+
       keys-load() {
           if [ -z "$1" ]; then
               unset SSH_AUTH_SOCK

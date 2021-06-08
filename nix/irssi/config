@@ -83,6 +83,7 @@ chatnets = {
     nick = "otavio";
     username = "otavio";
     realname = "Otavio Salvador <otavio.salvador@ossystems.com.br>";
+    autosendcmd = "wait 3000; /msg nickserv identify $LIBERACHAT_PASSWORD; /window close";
     max_kicks = "4";
     max_msgs = "1";
     max_modes = "4";
