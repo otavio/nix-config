@@ -10,7 +10,22 @@ in
     config = {
       modifier = mod;
 
-      fonts = [ "DejaVu Sans Mono 9, Font Awesome 5 Free" ];
+      bars = [
+        {
+          position = "bottom";
+          statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ${./i3/i3status-rust.toml}";
+          fonts = {
+            names = [ "FontAwesome" "Iosevka" ];
+            size = 9.0;
+          };
+        }
+      ];
+
+      fonts = {
+        names = [ "DejaVuSansMono" "Terminus" ];
+        style = "Bold Semi-Condensed";
+        size = 9.0;
+      };
 
       keybindings = lib.mkOptionDefault {
         "${mod}+Return" = "exec i3-sensible-terminal";
@@ -80,13 +95,6 @@ in
 
         "${mod}+Shift+r" = "mode resize";
       };
-
-      bars = [
-        {
-          position = "bottom";
-          statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ${./i3/i3status-rust.toml}";
-        }
-      ];
     };
     extraConfig = ''
       set $WS1 "1: shell "
