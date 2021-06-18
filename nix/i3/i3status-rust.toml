@@ -12,6 +12,11 @@ warning = 20.0
 alert = 10.0
 
 [[block]]
+block = "weather"
+format = "{weather} ({location}) {temp}, {wind} m/s {direction}"
+service = { name = "openweathermap", api_key = "0f9d6aa5c9af7b7249a0320d1032ddd2", city_id = "3454244", units = "metric" }
+
+[[block]]
 block = "memory"
 display_type = "memory"
 format_mem = "{mem_total_used_percents}"
