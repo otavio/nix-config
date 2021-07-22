@@ -90,6 +90,8 @@ in
         "${mod}+Shift+9" = "move container to workspace number 9";
         "${mod}+Shift+0" = "move container to workspace number 10";
 
+        "Print" = "exec flameshot gui";
+
         "${mod}+Shift+c" = "reload";
         "${mod}+Shift+e" = "exec i3-nagbar -t warning -m 'Do you want to exit i3?' -b 'Yes' 'i3-msg exit'";
 
