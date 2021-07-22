@@ -45,6 +45,9 @@
   services.fstrim.enable = true;
   services.fstrim.interval = "weekly";
 
+  # Enable thermald
+  services.thermald.enable = true;
+
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
