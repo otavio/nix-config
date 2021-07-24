@@ -42,7 +42,51 @@
   xdg.configFile."parcellite/parcelliterc".source = ../nix/parcellite/parcelliterc;
 
   programs.urxvt.enable = true;
-  home.file.".Xresources".source = ../nix/urxvt/Xresources;
+  xresources.extraConfig = ''
+    !! Colors, stolen from http://xcolors.net/dl/derp
+    *color0:   #111111
+    *color8:   #666666
+    *color1:   #d36265
+    *color9:   #ef8171
+    *color2:   #aece91
+    *color10:  #cfefb3
+    *color3:   #e7e18c
+    *color11:  #fff796
+    *color4:   #5297cf
+    *color12:  #74b8ef
+    *color5:   #963c59
+    *color13:  #b85e7b
+    *color6:   #5E7175
+    *color14:  #A3BABF
+    *color7:   #bebebe
+    *color15:  #ffffff
+
+    !! rxvt configuration
+    URxvt.termName: rxvt-unicode-256color
+    URxvt.foreground: white
+    URxvt.background: rgba:0000/0000/0000/dddd
+    URxvt.cursorColor: green
+    URxvt.depth: 32
+    URxvt.cursorBlink: False
+    URxvt*colorIT: #ff7f00
+    URxvt.scrollBar: False
+    URxvt.scrollTtyOutput: False
+    URxvt.scrollTtyKeypress: True
+    URxvt.scrollWithBuffer: True
+    URxvt.jumpScroll: True
+    URxvt.skipScroll: True
+    URxvt.saveLines: 5000
+    URxvt.urgentOnBell:  true
+    URxvt.font: xft:DejaVu Sans Mono-12,xft:DejaVu Sans Mono for Powerline-12
+    URxvt.letterSpace: -1
+    URxvt.iso14755: False
+    URxvt.perl-ext-common: default,-option-popup,-selection-popup,font-size,selection-to-clipboard,readline,url-select
+    URxvt.keysym.C-equal: perl:font-size:increase
+    URxvt.keysym.C-minus: perl:font-size:decrease
+    URxvt.keysym.C-i: perl:url-select:select_next
+    URxvt.url-select.launcher: firefox
+    URxvt.url-select.underline: true
+  '';
 
   programs.zathura.enable = true;
 
