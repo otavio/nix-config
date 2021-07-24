@@ -104,7 +104,7 @@ in
       set $WS3 "3: browser "
       set $WS8 "8: trivia "
 
-      assign [class="URxvt"] $WS1
+      assign [class="Alacritty"] $WS1
       assign [class="Emacs"] $WS2
 
       assign [class="Google-chrome"] $WS3

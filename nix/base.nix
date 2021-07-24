@@ -37,6 +37,7 @@ in
 
   home.sessionVariables = {
     EDITOR = "emacs -nw";
+    TERMINAL = "alacritty";
     TERM = "xterm-256color";
   };
 
