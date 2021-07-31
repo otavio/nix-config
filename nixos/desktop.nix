@@ -5,6 +5,7 @@
   hardware.opengl.driSupport = true;
 
   sound.enable = true;
+  hardware.pulseaudio.enable = true;
 
   programs.adb.enable = true;
   users.users.otavio.extraGroups = ["adbusers"];

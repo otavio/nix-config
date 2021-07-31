@@ -1,13 +1,14 @@
 { config, pkgs, ... }:
 
 {
-  services.pipewire = {
+  hardware.pulseaudio = {
     enable = true;
+    package = pkgs.pulseaudioFull;
 
-    # Compatibility shims, adjust according to your needs
-    alsa.enable = true;
-    pulse.enable = true;
-    jack.enable = true;
+    extraModules = [ pkgs.pulseaudio-modules-bt ];
+    extraConfig = ''
+      load-module module-switch-on-connect
+    '';
   };
 
   hardware.bluetooth = {
