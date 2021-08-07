@@ -238,6 +238,7 @@ Make Emacs use the $PATH set up by the user's shell
   (setq projectile-sort-order 'recentf
         projectile-use-git-grep t)
 
+  (projectile-mode +1)
   :config
   (define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
 
