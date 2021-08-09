@@ -35,6 +35,7 @@ in
     grml-zsh-config
     base16-shell
     bitbake-completion
+    zsh-completions
 
     exa
   ];
