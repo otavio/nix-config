@@ -31,6 +31,8 @@ in
     aspellDicts.en-computers
     aspellDicts.en-science
     aspellDicts.pt_BR
+
+    awscli
   ];
 
   programs.msmtp.enable = true;
