@@ -168,7 +168,6 @@ in
     '';
 
     initExtraBeforeCompInit = ''
-      autoload -U +X compinit && compinit
       autoload -U +X bashcompinit && bashcompinit
       fpath+=~/.config/zsh/zfunc
     '';
