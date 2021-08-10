@@ -1,0 +1,46 @@
+#!/bin/sh
+
+project_type=$1
+project_name=$2
+release=$3
+
+if [ -z $project_type ] || [ -z $project_name ] || [ -z $release ]; then
+    echo "Invalid usage. Please check if you're using this correctly:"
+    cat <<EOF
+$0 <project_type> <project_name> <release>
+EOF
+    exit 1
+fi
+
+tmuxp_profile="$HOME/.tmuxp/$project_name-$release.yaml"
+project_home="$HOME/src/$project_type/$project_name/$release"
+
+if [ ! -e "$tmuxp_profile" ]; then
+    cat > $tmuxp_profile << EOF
+session_name: $(echo $project_name-$release | tr '.' '-')
+start_directory: $project_home
+windows:
+- layout: even-horizontal
+  shell_command_before: alias cd='HOME=$project_home cd'
+  options:
+    automatic-rename: 'off'
+  panes:
+  - focus: 'true'
+    shell_command: yocto-env 20.04
+  - cd sources; eval \$EDITOR
+  - source setup-environment build; cd sources
+  start_directory: $project_home
+  window_name: build
+EOF
+else
+    echo "WARN: $tmuxp_profile already exists, reusing it."
+fi
+
+mkdir -p $project_home
+
+cat <<EOF
+Project home create. Go there using:
+
+cd $project_home
+EOF
+
