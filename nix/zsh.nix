@@ -62,6 +62,14 @@ in
     enableCompletion = true;
     enableVteIntegration = true;
     dotDir = ".config/zsh";
+    envExtra = ''
+      # Nix
+      if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+          . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+      fi
+      # End Nix
+    '';
+
     initExtra = ''
       source ${pkgs.grml-zsh-config}/etc/zsh/zshrc
       source ${base16-shell}/share/base16-shell/scripts/base16-default-dark.sh
@@ -153,12 +161,6 @@ in
       }
 
       keys-load "not-ask"
-
-      # Nix
-      if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-          . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-      fi
-      # End Nix
 
       [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
 
