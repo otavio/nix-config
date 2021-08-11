@@ -1,17 +1,39 @@
 Configuration repository
 =
 
-Channels
+Installation inside an existing Linux system
+===
 
+For Debian-based systems we need to have `rsync` and `zsh` before proceeding. Use:
 ```sh
-nix-channel --add https://github.com/nix-community/home-manager/archive/release-20.09.tar.gz home-manager
-nix-channel --add https://nixos.org/channels/nixos-20.09 nixos
+sudo apt install -y rsync zsh
+```
+
+The user must use `zsh` as shell so do it using:
+```sh
+sudo usermod -s /bin/zsh otavio
+```
+
+Install the daemon inside the existing operating system with:
+```sh
+curl -L https://nixos.org/nix/install | sh -s -- --daemon
+```
+
+Finally, clone this repository as:
+```sh
+mkdir -p ~/src
+git clone git@github.com:otavio/nix-config.git src/nix-config
+```
+
+Add the required channels to the environment, using:
+```sh
+nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
 nix-channel --update
 ```
 
-To install the Rust toolchain and configure it for my use, I use:
-
+Then install the `home-manager` to allow it to switch to the environment, using:
 ```sh
-rustup toolchain install nightly --profile=minimal --component rustfmt clippy
+nix-env -i home-manager
+home-manager switch
 ```
-
