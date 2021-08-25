@@ -9,6 +9,7 @@
       <home-manager/nixos>
 
       ../nixos/base.nix
+      ../nixos/zram-swap.nix
       ../nixos/bluetooth.nix
       ../nixos/desktop.nix
       ../nixos/udev.nix
