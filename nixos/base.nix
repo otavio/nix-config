@@ -31,6 +31,7 @@
 
   # In case if it's enabled, I should have access to use it.
   users.extraGroups.docker.members = [ "otavio" ];
+  users.extraGroups.vboxusers.members = [ "otavio" ];
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [

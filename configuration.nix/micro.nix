@@ -60,6 +60,8 @@
   networking.firewall.allowedTCPPorts = [ 22 ];
 
   virtualisation.docker.enable = true;
+  virtualisation.virtualbox.host.enable = true;
+  virtualisation.virtualbox.host.enableExtensionPack = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
