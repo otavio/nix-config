@@ -13,6 +13,7 @@ in
   home.packages = with pkgs; [
     local-scripts
 
+    cryptsetup
     emacs
     gitAndTools.delta
     gitRepo
