@@ -14,3 +14,6 @@
 /user-config/emacs/.emacs.d/eshell/history
 /user-config/emacs/.emacs.d/tramp
 /user-config/aspell/.aspell.br.prepl
+.gitsecret/keys/random_seed
+!*.secret
+secrets/irssi-liberachat-password

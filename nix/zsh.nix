@@ -78,7 +78,7 @@ in
       r() { nix run nixpkgs.$1 -c $@ }
 
       irssi() {
-          export LIBERACHAT_PASSWORD=$(cat ~/.irssi/liberachat-password)
+          export LIBERACHAT_PASSWORD=$(cat ~/src/nix-config/irssi-liberachat-password)
           ${pkgs.irssi}/bin/irssi
       }
 
