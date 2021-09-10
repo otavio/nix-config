@@ -25,7 +25,7 @@
 
   hardware.cpu.intel.updateMicrocode = true;
   hardware.video.hidpi.enable = false;
-  hardware.enableAllFirmware = true;
+  hardware.enableRedistributableFirmware = true;
 
   services.xserver = {
     xrandrHeads = [
@@ -79,6 +79,8 @@
 
   virtualisation.docker.enable = true;
   virtualisation.virtualbox.host.enable = true;
+
+  nixpkgs.config.allowUnfree = true;
   virtualisation.virtualbox.host.enableExtensionPack = true;
 
   # This value determines the NixOS release from which the default

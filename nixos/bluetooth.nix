@@ -54,7 +54,4 @@
     enable = true;
     powerOnBoot = true;
   };
-
-  nixpkgs.config.allowUnfree = true;
-  hardware.enableAllFirmware = true;
 }

@@ -12,6 +12,4 @@
       ../nix/zsh.nix
       ../nix/firefox.nix
     ];
-
-  nixpkgs.config.allowUnfree = true;
 }
