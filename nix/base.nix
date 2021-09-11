@@ -36,6 +36,7 @@ in
     awscli
   ];
 
+  services.gpg-agent.enable = true;
   programs.msmtp.enable = true;
 
   home.sessionVariables = {
