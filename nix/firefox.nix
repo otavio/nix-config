@@ -1,14 +1,9 @@
-{ pkgs, ... }:
-{
+{ pkgs, ... }: {
   programs.firefox = {
     enable = true;
 
     profiles = {
-      otavio = {
-        settings = {
-          "browser.ctrlTab.recentlyUsedOrder" = true;
-        };
-      };
+      otavio = { settings = { "browser.ctrlTab.recentlyUsedOrder" = true; }; };
     };
   };
 }

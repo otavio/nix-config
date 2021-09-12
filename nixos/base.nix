@@ -21,7 +21,8 @@
 
   security.sudo.wheelNeedsPassword = false;
 
-  home-manager.users.otavio = (import /home/otavio/.config/nixpkgs/home.nix { inherit pkgs config; });
+  home-manager.users.otavio =
+    (import /home/otavio/.config/nixpkgs/home.nix { inherit pkgs config; });
   users.users.otavio = {
     isNormalUser = true;
     extraGroups = [ "dialout" "wheel" "networkmanager" ];
@@ -36,11 +37,12 @@
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
     wget
-    gitRepo python3
+    gitRepo
+    python3
     git
     zile
-    nettools        # for ifconfig
-    psmisc          # for killall
+    nettools # for ifconfig
+    psmisc # for killall
     home-manager
   ];
 }

@@ -1,26 +1,21 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      /etc/nixos/hardware-configuration.nix
+  imports = [ # Include the results of the hardware scan.
+    /etc/nixos/hardware-configuration.nix
 
-       <home-manager/nixos>
+    <home-manager/nixos>
 
-      ../nixos/base.nix
-      ../nixos/builder.nix
-   ];
+    ../nixos/base.nix
+    ../nixos/builder.nix
+  ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
   boot.loader.grub.version = 2;
-  boot.loader.grub.devices = [
-    "/dev/sda"
-    "/dev/sdb"
-    "/dev/sdc"
-  ];
+  boot.loader.grub.devices = [ "/dev/sda" "/dev/sdb" "/dev/sdc" ];
 
   powerManagement.cpuFreqGovernor = "performance";
 

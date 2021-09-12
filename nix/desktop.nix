@@ -1,5 +1,4 @@
-{ config, pkgs, ... }:
-{
+{ config, pkgs, ... }: {
   xdg.enable = true;
 
   # We force the override so we workaround the error below:
@@ -38,7 +37,8 @@
   services.unclutter.enable = true;
 
   services.parcellite.enable = true;
-  xdg.configFile."parcellite/parcelliterc".source = ../nix/parcellite/parcelliterc;
+  xdg.configFile."parcellite/parcelliterc".source =
+    ../nix/parcellite/parcelliterc;
 
   programs.alacritty.enable = true;
 

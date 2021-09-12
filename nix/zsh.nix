@@ -10,9 +10,9 @@ let
     };
 
     installPhase = ''
-     mkdir -p $out/share/base16-shell
-     cp -r * $out/share/base16-shell/
-   '';
+      mkdir -p $out/share/base16-shell
+      cp -r * $out/share/base16-shell/
+    '';
   };
 
   bitbake-completion = pkgs.stdenv.mkDerivation {
@@ -25,12 +25,11 @@ let
     };
 
     installPhase = ''
-     mkdir -p $out/share/bitbake-completion
-     cp -r * $out/share/bitbake-completion/
-   '';
+      mkdir -p $out/share/bitbake-completion
+      cp -r * $out/share/bitbake-completion/
+    '';
   };
-in
-{
+in {
   home.packages = with pkgs; [
     grml-zsh-config
     base16-shell
@@ -161,7 +160,7 @@ in
 
           # cleanup
           rm -f $tmpfile
-      }
+             }
 
       keys-load "not-ask"
 

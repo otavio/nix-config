@@ -17,8 +17,6 @@
     font-awesome
     source-code-pro
 
-    (nerdfonts.override {
-      fonts = [ "FiraCode" "DroidSansMono" ];
-    })
+    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
   ];
 }

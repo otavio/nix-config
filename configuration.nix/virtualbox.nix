@@ -1,17 +1,16 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports =
-    [
-      # Include the results of the hardware scan.
-      /etc/nixos/hardware-configuration.nix
+  imports = [
+    # Include the results of the hardware scan.
+    /etc/nixos/hardware-configuration.nix
 
-      <home-manager/nixos>
+    <home-manager/nixos>
 
-      ../nixos/base.nix
-      ../nixos/bluetooth.nix
-      ../nixos/x11.nix
-    ];
+    ../nixos/base.nix
+    ../nixos/bluetooth.nix
+    ../nixos/x11.nix
+  ];
 
   boot = {
     loader.systemd-boot.enable = true;
@@ -22,10 +21,14 @@
 
   # Add some more video drivers to give X11 a shot at working in
   # VMware and QEMU.
-  services.xserver.videoDrivers = lib.mkOverride 40 [ "virtualbox" "vmware" "cirrus" "vesa" "modesetting" ];
-  services.xserver.resolutions = [ { x = 2560; y = 1080; } ];
+  services.xserver.videoDrivers =
+    lib.mkOverride 40 [ "virtualbox" "vmware" "cirrus" "vesa" "modesetting" ];
+  services.xserver.resolutions = [{
+    x = 2560;
+    y = 1080;
+  }];
   virtualisation.virtualbox.guest.enable = true;
-  
+
   networking.hostName = "vbox"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 

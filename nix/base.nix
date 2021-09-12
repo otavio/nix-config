@@ -4,12 +4,11 @@ let
     name = "local-scripts";
     src = ../nix/scripts;
     installPhase = ''
-     mkdir -p $out/bin
-     cp -r * $out/bin
-   '';
+      mkdir -p $out/bin
+      cp -r * $out/bin
+    '';
   };
-in
-{
+in {
   home.packages = with pkgs; [
     local-scripts
 
@@ -32,6 +31,8 @@ in
     aspellDicts.en-computers
     aspellDicts.en-science
     aspellDicts.pt_BR
+
+    nixfmt
 
     awscli
   ];

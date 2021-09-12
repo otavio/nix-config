@@ -1,20 +1,19 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports =
-    [
-      # Include the results of the hardware scan.
-      /etc/nixos/hardware-configuration.nix
+  imports = [
+    # Include the results of the hardware scan.
+    /etc/nixos/hardware-configuration.nix
 
-      <home-manager/nixos>
+    <home-manager/nixos>
 
-      ../nixos/base.nix
-      ../nixos/zram-swap.nix
-      ../nixos/bluetooth.nix
-      ../nixos/desktop.nix
-      ../nixos/udev.nix
-      ../nixos/x11.nix
-    ];
+    ../nixos/base.nix
+    ../nixos/zram-swap.nix
+    ../nixos/bluetooth.nix
+    ../nixos/desktop.nix
+    ../nixos/udev.nix
+    ../nixos/x11.nix
+  ];
 
   boot = {
     loader.systemd-boot.enable = true;

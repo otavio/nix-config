@@ -1,25 +1,23 @@
 { config, lib, pkgs, ... }:
-let
-  mod = "Mod4";
-in
-{
-  xsession.scriptPath = ".hm-xsession"; # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8
+let mod = "Mod4";
+in {
+  xsession.scriptPath =
+    ".hm-xsession"; # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8
 
   xsession.windowManager.i3 = {
     enable = true;
     config = {
       modifier = mod;
 
-      bars = [
-        {
-          position = "bottom";
-          statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ${./i3/i3status-rust.toml}";
-          fonts = {
-            names = [ "FontAwesome" "Iosevka" ];
-            size = 9.0;
-          };
-        }
-      ];
+      bars = [{
+        position = "bottom";
+        statusCommand =
+          "${pkgs.i3status-rust}/bin/i3status-rs ${./i3/i3status-rust.toml}";
+        fonts = {
+          names = [ "FontAwesome" "Iosevka" ];
+          size = 9.0;
+        };
+      }];
 
       fonts = {
         names = [ "DejaVuSansMono" "Terminus" ];
@@ -93,7 +91,8 @@ in
         "Print" = "exec flameshot gui";
 
         "${mod}+Shift+c" = "reload";
-        "${mod}+Shift+e" = "exec i3-nagbar -t warning -m 'Do you want to exit i3?' -b 'Yes' 'i3-msg exit'";
+        "${mod}+Shift+e" =
+          "exec i3-nagbar -t warning -m 'Do you want to exit i3?' -b 'Yes' 'i3-msg exit'";
 
         "${mod}+Shift+r" = "mode resize";
       };
@@ -128,10 +127,7 @@ in
     '';
   };
 
-  home.packages = with pkgs; [
-    i3
-    dmenu
-  ];
+  home.packages = with pkgs; [ i3 dmenu ];
 
   home.file.".xinitrc".source = ../nix/i3/xinitrc;
 }
