@@ -33,8 +33,6 @@
     vlc
     zoom-us
     zulip
-
-    gnome3.gnome-keyring
   ];
 
   services.unclutter.enable = true;
