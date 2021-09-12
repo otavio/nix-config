@@ -36,8 +36,6 @@ in
     base16-shell
     bitbake-completion
     zsh-completions
-
-    exa
   ];
 
   services.lorri.enable = true;
@@ -50,6 +48,11 @@ in
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  programs.exa = {
+    enable = true;
+    enableAliases = true;
   };
 
   home.file.".config/zsh/zfunc" = {
@@ -173,15 +176,6 @@ in
     '';
 
     shellAliases = {
-      # Replace ls with exa.
-      l = "exa -l";
-      ls = "exa";
-      ll = "exa -l";
-      lll = "exa -l | less";
-      lla = "exa -la";
-      llt = "exa -T";
-      llfu = "exa -bghHliS --git";
-
       # Paste from command line.
       tb = "nc termbin.com 9999";
 
