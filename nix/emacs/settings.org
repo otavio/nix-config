@@ -571,7 +571,7 @@ point reaches the beginning or end of the buffer, stop there."
   (setq lsp-rust-analyzer-display-parameter-hints t)
   (setq lsp-rust-analyzer-server-display-inlay-hints t)
 
-    ;;; Rust specifics
+  ;; Rust specifics
   (setq lsp-rust-server 'rust-analyzer)
   (setq lsp-rust-analyzer-server-command '("~/.cargo/bin/rust-analyzer"))
 
@@ -610,7 +610,7 @@ point reaches the beginning or end of the buffer, stop there."
   :ensure t
   :commands helm-lsp-workspace-symbol)
 
-  ;;; Rust specifics
+;; Rust specifics
 (use-package toml-mode)
 (use-package rust-mode)
 
