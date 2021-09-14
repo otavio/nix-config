@@ -583,6 +583,7 @@ point reaches the beginning or end of the buffer, stop there."
          (go-mode . lsp)
          (c-mode . lsp)
          (c++-mode . lsp)
+         (nix-mode . lsp)
 
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
@@ -620,6 +621,14 @@ point reaches the beginning or end of the buffer, stop there."
 ;; Go specifics
 (use-package go-mode)
 
+;; Nix specifics
+(use-package nix-mode
+  :defer t
+    :mode "\\.nix\\'"
+    :init
+    (progn
+      (when nixos-format-on-save
+        (add-hook 'before-save-hook 'nix-format-before-save))))
 #+end_src
 * Git
 
@@ -1248,15 +1257,6 @@ http://xemacs.sourceforge.net/Documentation/packages/html/mmm_toc.html#SEC_Conte
   :defer t
   :config
   (setq olivetti-body-width 100))
-#+end_src
-
-* Nix
-
-[[https://github.com/NixOS/nix-mode][nix-mode]]: An Emacs major mode for editing Nix expressions.
-
-#+begin_src emacs-lisp
-(use-package nix-mode
-  :mode "\\.nix\\'")
 #+end_src
 
 * Jenkins - [[https://github.com/rmuslimov/jenkins.el][Project Homepage]]
