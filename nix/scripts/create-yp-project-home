@@ -27,7 +27,7 @@ windows:
   panes:
   - focus: 'true'
     shell_command: yocto-env 20.04
-  - cd sources; eval \$EDITOR
+  - cd sources; sleep 3; eval \$EDITOR
   - source setup-environment build; cd sources
   start_directory: $project_home
   window_name: build
