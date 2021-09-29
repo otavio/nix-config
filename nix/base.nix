@@ -34,7 +34,7 @@ in {
 
     nixfmt
 
-    awscli
+    awscli2
   ];
 
   services.gpg-agent.enable = true;
