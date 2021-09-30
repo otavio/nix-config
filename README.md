@@ -34,6 +34,6 @@ nix-channel --update
 
 Then install the `home-manager` to allow it to switch to the environment, using:
 ```sh
-nix-env -i home-manager
+nix-shell '<home-manager>' -A install
 home-manager switch
 ```
