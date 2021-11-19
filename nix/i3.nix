@@ -113,6 +113,7 @@ in {
       assign [class="skype"] 10
       assign [class="slack"] 10
       assign [class="discord"] 10
+      assign [class="telegram-desktop"] 10
 
       for_window [class="floating"] floating enable;
       for_window [workspace=10] layout tabbed;
@@ -122,6 +123,7 @@ in {
       exec skypeforlinux
       exec Discord
       exec slack
+      exec telegram-desktop
       exec emacs
       exec i3-sensible-terminal
     '';

@@ -20,6 +20,7 @@
     discord
     gthumb
     irssi
+    tdesktop
     libreoffice
     nixpkgs-fmt
     nixpkgs-review
