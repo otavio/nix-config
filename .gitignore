@@ -16,4 +16,5 @@
 /user-config/aspell/.aspell.br.prepl
 .gitsecret/keys/random_seed
 !*.secret
-secrets/irssi-liberachat-password
+/secrets/irssi-liberachat-password
+/secrets/gitaliases

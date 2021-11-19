@@ -85,7 +85,7 @@
 #	smtpencryption = tls
 #	smtpuser = otavio.salvador@gmail.com
 	multiedit = false
-	aliasesfile = /home/otavio/.gitaliases
+	aliasesfile = ~/src/nix-config/secrets/gitaliases
 	aliasfiletype = mutt
 
 [gitreview]
