@@ -15,6 +15,11 @@
   nix.gc.automatic = true;
   nix.optimise.automatic = true;
 
+  # We need to allow use of those experimental features.
+  nix.extraOptions = ''
+    experimental-features = nix-command
+  '';
+
   time.timeZone = "America/Sao_Paulo";
 
   programs.zsh.enable = true;
