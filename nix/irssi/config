@@ -46,6 +46,14 @@ servers = (
     tls_verify = "yes";
     autoconnect = "yes";
   }
+  {
+    address = "irc.oftc.net";
+    chatnet = "oftc";
+    port = "6697";
+    use_tls = "yes";
+    tls_verify = "yes";
+    autoconnect = "yes";
+  }
 );
 
 chatnets = {
@@ -79,6 +87,17 @@ chatnets = {
     max_whois = "30";
   };
   liberachat = {
+    type = "IRC";
+    nick = "otavio";
+    username = "otavio";
+    realname = "Otavio Salvador <otavio.salvador@ossystems.com.br>";
+    autosendcmd = "wait 3000; /msg nickserv identify $LIBERACHAT_PASSWORD; /window close";
+    max_kicks = "4";
+    max_msgs = "1";
+    max_modes = "4";
+    max_whois = "1";
+  };
+  oftc = {
     type = "IRC";
     nick = "otavio";
     username = "otavio";
@@ -139,6 +158,12 @@ channels = (
   {
     name = "#oe,#yocto,#etnaviv";
     chatnet = "LiberaChat";
+    autojoin = "yes";
+  }
+channels = (
+  {
+    name = "#oe,#yocto,#etnaviv";
+    chatnet = "OFTC";
     autojoin = "yes";
   }
 );
