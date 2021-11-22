@@ -77,6 +77,10 @@ in {
       source ${base16-shell}/share/base16-shell/scripts/base16-default-dark.sh
       source ${bitbake-completion}/share/bitbake-completion/bitbake_completion
 
+      # Workaround to 'flakes problems related to # and zsh'
+      # See: https://github.com/NixOS/nix/issues/4686
+      unsetopt extendedGlob
+
       r() { nix run nixpkgs.$1 -c $@ }
 
       irssi() {

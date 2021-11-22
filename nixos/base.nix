@@ -17,7 +17,7 @@
 
   # We need to allow use of those experimental features.
   nix.extraOptions = ''
-    experimental-features = nix-command
+    experimental-features = nix-command flakes
   '';
 
   time.timeZone = "America/Sao_Paulo";
