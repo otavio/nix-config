@@ -75,9 +75,12 @@ in {
       # End Nix
     '';
 
-    initExtra = ''
+    initExtraFirst = ''
       source ${pkgs.grml-zsh-config}/etc/zsh/zshrc
       source ${base16-shell}/share/base16-shell/scripts/base16-default-dark.sh
+    '';
+
+    initExtra = ''
       source ${bitbake-completion}/share/bitbake-completion/bitbake_completion
 
       # Workaround to 'flakes problems related to # and zsh'
