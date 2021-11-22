@@ -46,7 +46,8 @@ in {
   programs.bat.enable = true;
   programs.fzf = {
     enable = true;
-    enableZshIntegration = true;
+
+    tmux.enableShellIntegration = true;
   };
 
   programs.exa = {
@@ -63,6 +64,8 @@ in {
     enable = true;
     enableCompletion = true;
     enableVteIntegration = true;
+    enableSyntaxHighlighting = true;
+
     dotDir = ".config/zsh";
     envExtra = ''
       # Nix
