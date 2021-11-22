@@ -57,4 +57,8 @@
     source = ../nix/irssi;
     recursive = true;
   };
+
+  # Browser settings
+  programs.firefox.enable = true;
+  programs.firefox.profiles.otavio.settings = { "browser.ctrlTab.recentlyUsedOrder" = true; };
 }
