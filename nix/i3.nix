@@ -108,6 +108,7 @@ in {
 
       assign [class="Google-chrome"] $WS3
       assign [class="Firefox"] $WS3
+      assign [class="Brave"] $WS3
       assign [class="chromium"] $WS3
 
       assign [class="skype"] 10
@@ -119,8 +120,8 @@ in {
       for_window [workspace=10] layout tabbed;
 
       # Start applications
-      exec firefox
       exec pa-applet
+      exec brave
       exec skypeforlinux
       exec Discord
       exec slack
