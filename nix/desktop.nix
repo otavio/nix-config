@@ -28,7 +28,6 @@
     scrcpy
     skypeforlinux
     slack
-    teams
     topgrade
     vlc
     zoom-us
