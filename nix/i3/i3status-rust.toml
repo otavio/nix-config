@@ -38,10 +38,6 @@ interface_name_exclude = ["br\\-[0-9a-f]{12}", "docker\\d+"]
 interface_name_include = []
 
 [[block]]
-block = "sound"
-format = "{output_description} {volume}"
-
-[[block]]
 block = "time"
 interval = 60
 format = "%a %m/%d %I:%M"

@@ -120,6 +120,7 @@ in {
 
       # Start applications
       exec firefox
+      exec pa-applet
       exec skypeforlinux
       exec Discord
       exec slack
@@ -129,7 +130,7 @@ in {
     '';
   };
 
-  home.packages = with pkgs; [ i3 dmenu ];
+  home.packages = with pkgs; [ i3 dmenu pa_applet ];
 
   home.file.".xinitrc".source = ../nix/i3/xinitrc;
 }
