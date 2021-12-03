@@ -14,6 +14,7 @@ in {
 
     cryptsetup
     emacs
+    git-review
     gitAndTools.delta
     gitRepo
     htop
