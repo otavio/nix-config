@@ -18,3 +18,4 @@
 !*.secret
 /secrets/irssi-liberachat-password
 /secrets/gitaliases
+/.direnv/
