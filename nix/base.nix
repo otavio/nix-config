@@ -14,9 +14,11 @@ in {
 
     cryptsetup
     emacs
+    gh
     git-review
     gitAndTools.delta
     gitRepo
+    gping
     htop
     keychain
     mtr
