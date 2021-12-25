@@ -88,7 +88,9 @@ in {
       # See: https://github.com/NixOS/nix/issues/4686
       unsetopt extendedGlob
 
-      r() { nix run nixpkgs.$1 -c $@ }
+      # Fix bad color choice for comment style
+      # See: https://github.com/zsh-users/zsh-syntax-highlighting/issues/510
+      export ZSH_HIGHLIGHT_STYLES[comment]=fg=8,bold
 
       irssi() {
           export LIBERACHAT_PASSWORD=$(cat ~/src/nix-config/secrets/irssi-liberachat-password)
