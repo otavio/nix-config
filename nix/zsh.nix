@@ -74,6 +74,8 @@ in
       if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
           . '/nix/var/nix/profiles/default/etc/profile.d/nix.sh'
       fi
+
+      export NIX_PATH=$HOME/.nix-defexpr/channels:$NIX_PATH
       # End Nix
     '';
 
