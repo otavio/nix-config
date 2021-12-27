@@ -10,6 +10,7 @@ let
   };
 in
 {
+  programs.home-manager.enable = true;
   home.packages = with pkgs; [
     local-scripts
 
