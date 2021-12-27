@@ -29,7 +29,8 @@ let
       cp -r * $out/share/bitbake-completion/
     '';
   };
-in {
+in
+{
   home.packages = with pkgs; [
     grml-zsh-config
     base16-shell

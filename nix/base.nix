@@ -8,7 +8,8 @@ let
       cp -r * $out/bin
     '';
   };
-in {
+in
+{
   home.packages = with pkgs; [
     local-scripts
 
