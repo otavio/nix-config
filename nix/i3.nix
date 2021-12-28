@@ -27,9 +27,9 @@ in
       };
 
       keybindings = lib.mkOptionDefault {
-        "${mod}+Return" = "exec i3-sensible-terminal";
+        "${mod}+Return" = "exec i3-sensible-terminal --class=term";
         "${mod}+x" = "kill";
-        "${mod}+r" = "exec dmenu_run";
+        "${mod}+r" = "exec --no-startup-id i3-sensible-terminal -t 'fzf-menu' --class 'fzf-menu' -e fzf-menu";
 
         "${mod}+l" = "focus left";
         "${mod}+k" = "focus down";
@@ -104,7 +104,7 @@ in
       set $WS3 "3: browser "
       set $WS8 "8: trivia "
 
-      assign [class="Alacritty"] $WS1
+      assign [class="Alacritty" instance="term"] $WS1
       assign [class="Emacs"] $WS2
 
       assign [class="Google-chrome"] $WS3
@@ -118,6 +118,7 @@ in
       assign [class="telegram-desktop"] 10
 
       for_window [class="floating"] floating enable;
+      for_window [title="fzf-menu"] border none sticky enable floating enable focus
       for_window [workspace=10] layout tabbed;
 
       # Start applications
@@ -128,11 +129,11 @@ in
       exec slack
       exec telegram-desktop
       exec emacsclient -c -a "emacs"
-      exec i3-sensible-terminal
+      exec i3-sensible-terminal --class=term
     '';
   };
 
-  home.packages = with pkgs; [ i3 dmenu pa_applet ];
+  home.packages = with pkgs; [ fzf i3 pa_applet ];
 
   home.file.".xinitrc".source = ../nix/i3/xinitrc;
 }

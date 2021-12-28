@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+
+print -rl -- ${(ko)commands} \
+    | fzf --print-query \
+    | tail -n 1 \
+    | (nohup ${SHELL:-"/bin/sh"} &) >/dev/null 2>&1
