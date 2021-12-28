@@ -615,14 +615,14 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package go-mode)
 
 ;; Nix specifics
+(use-package nixpkgs-fmt)
 (use-package nix-mode
   :defer t
-    :mode "\\.nix\\'"
-    :init
-    (progn
-      (when nixos-format-on-save
-        (add-hook 'before-save-hook 'nix-format-before-save))))
+  :mode "\\.nix\\'"
+  :init
+  (add-hook 'nix-mode-hook 'nixpkgs-fmt-on-save-mode))
 #+end_src
+
 * Git
 
 ** Magit - [[https://github.com/magit/magit][It's Magit! A Git porcelain inside Emacs]]
