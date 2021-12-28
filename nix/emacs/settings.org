@@ -184,7 +184,7 @@ Make Emacs use the $PATH set up by the user's shell
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-c i")
                 (lambda()(interactive)
-                  (org-babel-load-file "~/.emacs.d/README.org")))
+                  (org-babel-load-file "~/.emacs.d/settings.org")))
 #+end_src
 
 * Encoding
