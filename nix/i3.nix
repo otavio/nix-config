@@ -127,7 +127,7 @@ in
       exec Discord
       exec slack
       exec telegram-desktop
-      exec emacs
+      exec emacsclient -c -a "emacs"
       exec i3-sensible-terminal
     '';
   };

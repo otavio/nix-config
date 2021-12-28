@@ -62,13 +62,6 @@ Make Emacs use the $PATH set up by the user's shell
 * Theme and fonts
 
 #+begin_src emacs-lisp
-
-(if (system-is-laptop)
-    (set-frame-font "Source Code Pro-11" nil t))
-
-(if (system-is-desktop)
-    (set-frame-font "Source Code Pro-12" nil t))
-
 (use-package doom-themes
   :config
   ;; Global settings (defaults)

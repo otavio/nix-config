@@ -95,6 +95,11 @@ in
       # See: https://github.com/zsh-users/zsh-syntax-highlighting/issues/510
       export ZSH_HIGHLIGHT_STYLES[comment]=fg=8,bold
 
+      # Use emacsclient as default editor.
+      export ALTERNATE_EDITOR=""
+      export EDITOR="emacsclient -t"                  # $EDITOR opens in terminal
+      export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
+
       irssi() {
           export LIBERACHAT_PASSWORD=$(cat ~/src/nix-config/secrets/irssi-liberachat-password)
           ${pkgs.irssi}/bin/irssi
@@ -199,6 +204,9 @@ in
       # delete the fingerprint every time we reinstall them.
       issh = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null";
       iscp = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null";
+
+      # Allow opening the emacsclient using regular command.
+      emacs = "emacsclient -c -a emacs";
     };
 
     history = {

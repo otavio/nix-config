@@ -15,7 +15,6 @@ in
     local-scripts
 
     cryptsetup
-    emacs
     gh
     git-review
     gitAndTools.delta
@@ -44,6 +43,9 @@ in
 
   services.gpg-agent.enable = true;
   programs.msmtp.enable = true;
+
+  services.emacs.enable = true;
+  programs.emacs.enable = true;
 
   home.sessionVariables = {
     EDITOR = "emacs -nw";
