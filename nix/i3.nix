@@ -9,7 +9,7 @@ let
   shellWs = "1: shell ";
   editorWs = "2: editor ";
   browserWs = "3: browser ";
-  triviaWs = "8: trivia ";
+  triviaWs = "10: trivia ";
 in
 {
   # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8
@@ -30,7 +30,7 @@ in
           { class = "chromium"; }
         ];
 
-        "10" = [
+        "${triviaWs}" = [
           { class = "skype"; }
           { class = "slack"; }
           { class = "discord"; }
@@ -71,19 +71,19 @@ in
         "${modifier}+1" = "workspace number ${shellWs}";
         "${modifier}+2" = "workspace number ${editorWs}";
         "${modifier}+3" = "workspace number ${browserWs}";
-        "${modifier}+8" = "workspace number ${triviaWs}";
+        "${modifier}+0" = "workspace number ${triviaWs}";
 
         "${modifier}+Shift+1" = "move container to workspace number ${shellWs}";
         "${modifier}+Shift+2" = "move container to workspace number ${editorWs}";
         "${modifier}+Shift+3" = "move container to workspace number ${browserWs}";
-        "${modifier}+Shift+8" = "move container to workspace number ${triviaWs}";
+        "${modifier}+Shift+0" = "move container to workspace number ${triviaWs}";
 
         "Print" = "exec flameshot gui";
       };
 
       window.commands = [
         {
-          criteria = { workspace = "10"; };
+          criteria = { workspace = "${triviaWs}"; };
           command = "layout tabbed";
         }
 
