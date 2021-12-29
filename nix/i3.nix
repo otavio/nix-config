@@ -121,6 +121,8 @@ in
       for_window [title="fzf-menu"] border none sticky enable floating enable focus
       for_window [workspace=10] layout tabbed;
 
+      focus_follows_mouse no
+
       # Start applications
       exec pa-applet
       exec brave
