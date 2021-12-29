@@ -1,19 +1,46 @@
 { config, lib, pkgs, ... }:
-let mod = "Mod4";
+let
+  modifier = "Mod4";
+
+  editor = "emacsclient -c -a 'emacs'";
+  terminal = "i3-sensible-terminal --class=term";
+  menu = "i3-sensible-terminal -t 'fzf-menu' --class 'fzf-menu' -e fzf-menu";
+
+  shellWs = "1: shell ";
+  editorWs = "2: editor ";
+  browserWs = "3: browser ";
+  triviaWs = "8: trivia ";
 in
 {
-  xsession.scriptPath =
-    ".hm-xsession"; # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8
+  # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8
+  xsession.scriptPath = ".hm-xsession";
 
   xsession.windowManager.i3 = {
     enable = true;
     config = {
-      modifier = mod;
+      inherit modifier terminal menu;
+
+      assigns = {
+        "${shellWs}" = [{ class = "Alacritty"; instance = "term"; }];
+        "${editorWs}" = [{ class = "Emacs"; }];
+        "${browserWs}" = [
+          { class = "Google-chrome"; }
+          { class = "Firefox"; }
+          { class = "Brave"; }
+          { class = "chromium"; }
+        ];
+
+        "10" = [
+          { class = "skype"; }
+          { class = "slack"; }
+          { class = "discord"; }
+          { class = "telegram-desktop"; }
+        ];
+      };
 
       bars = [{
         position = "bottom";
-        statusCommand =
-          "${pkgs.i3status-rust}/bin/i3status-rs ${./i3/i3status-rust.toml}";
+        statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ${./i3/i3status-rust.toml}";
         fonts = {
           names = [ "FontAwesome" "Iosevka" ];
           size = 9.0;
@@ -26,113 +53,63 @@ in
         size = 9.0;
       };
 
+      focus.followMouse = false;
+
       keybindings = lib.mkOptionDefault {
-        "${mod}+Return" = "exec i3-sensible-terminal --class=term";
-        "${mod}+x" = "kill";
-        "${mod}+r" = "exec --no-startup-id i3-sensible-terminal -t 'fzf-menu' --class 'fzf-menu' -e fzf-menu";
+        "${modifier}+x" = "kill";
 
-        "${mod}+l" = "focus left";
-        "${mod}+k" = "focus down";
-        "${mod}+j" = "focus up";
-        "${mod}+semicolon" = "focus right";
+        "${modifier}+l" = "focus left";
+        "${modifier}+k" = "focus down";
+        "${modifier}+j" = "focus up";
+        "${modifier}+semicolon" = "focus right";
 
-        "${mod}+Left" = "focus left";
-        "${mod}+Down" = "focus down";
-        "${mod}+Up" = "focus up";
-        "${mod}+Right" = "focus right";
+        "${modifier}+Shift+l" = "move left";
+        "${modifier}+Shift+k" = "move down";
+        "${modifier}+Shift+j" = "move up";
+        "${modifier}+Shift+semicolon" = "move right";
 
-        "${mod}+Shift+l" = "move left";
-        "${mod}+Shift+k" = "move down";
-        "${mod}+Shift+j" = "move up";
-        "${mod}+Shift+semicolon" = "move right";
+        "${modifier}+1" = "workspace number ${shellWs}";
+        "${modifier}+2" = "workspace number ${editorWs}";
+        "${modifier}+3" = "workspace number ${browserWs}";
+        "${modifier}+8" = "workspace number ${triviaWs}";
 
-        "${mod}+Shift+Left" = "move left";
-        "${mod}+Shift+Down" = "move down";
-        "${mod}+Shift+Up" = "move up";
-        "${mod}+Shift+Right" = "move right";
-
-        "${mod}+h" = "split h";
-        "${mod}+v" = "split v";
-        "${mod}+f" = "fullscreen toggle";
-
-        "${mod}+s" = "layout stacking";
-        "${mod}+w" = "layout tabbed";
-        "${mod}+e" = "layout toggle split";
-
-        "${mod}+Shift+space" = "floating toggle";
-        "${mod}+space" = "focus mode_toggle";
-
-        "${mod}+a" = "focus parent";
-
-        "${mod}+Shift+minus" = "move scratchpad";
-        "${mod}+minus" = "scratchpad show";
-
-        "${mod}+1" = "workspace number $WS1";
-        "${mod}+2" = "workspace number $WS2";
-        "${mod}+3" = "workspace number $WS3";
-        "${mod}+4" = "workspace number 4";
-        "${mod}+5" = "workspace number 5";
-        "${mod}+6" = "workspace number 6";
-        "${mod}+7" = "workspace number 7";
-        "${mod}+8" = "workspace number $WS8";
-        "${mod}+9" = "workspace number 9";
-        "${mod}+0" = "workspace number 10";
-
-        "${mod}+Shift+1" = "move container to workspace number $WS1";
-        "${mod}+Shift+2" = "move container to workspace number $WS2";
-        "${mod}+Shift+3" = "move container to workspace number $WS3";
-        "${mod}+Shift+4" = "move container to workspace number 4";
-        "${mod}+Shift+5" = "move container to workspace number 5";
-        "${mod}+Shift+6" = "move container to workspace number 6";
-        "${mod}+Shift+7" = "move container to workspace number 7";
-        "${mod}+Shift+8" = "move container to workspace number $WS8";
-        "${mod}+Shift+9" = "move container to workspace number 9";
-        "${mod}+Shift+0" = "move container to workspace number 10";
+        "${modifier}+Shift+1" = "move container to workspace number ${shellWs}";
+        "${modifier}+Shift+2" = "move container to workspace number ${editorWs}";
+        "${modifier}+Shift+3" = "move container to workspace number ${browserWs}";
+        "${modifier}+Shift+8" = "move container to workspace number ${triviaWs}";
 
         "Print" = "exec flameshot gui";
-
-        "${mod}+Shift+c" = "reload";
-        "${mod}+Shift+e" =
-          "exec i3-nagbar -t warning -m 'Do you want to exit i3?' -b 'Yes' 'i3-msg exit'";
-
-        "${mod}+Shift+r" = "mode resize";
       };
+
+      window.commands = [
+        {
+          criteria = { workspace = "10"; };
+          command = "layout tabbed";
+        }
+
+        {
+          criteria = { class = "floating"; };
+          command = "floating enable";
+        }
+
+        {
+          criteria = { title = "fzf-menu"; };
+          command = "border none sticky enable floating enable focus";
+        }
+      ];
+
+      startup = [
+        { command = editor; notification = true; }
+        { command = terminal; notification = true; }
+
+        { command = "pa-applet"; notification = true; }
+        { command = "brave"; notification = true; }
+        { command = "skypeforlinux"; notification = true; }
+        { command = "Discord"; notification = true; }
+        { command = "slack"; notification = true; }
+        { command = "telegram-desktop"; notification = true; }
+      ];
     };
-    extraConfig = ''
-      set $WS1 "1: shell "
-      set $WS2 "2: editor "
-      set $WS3 "3: browser "
-      set $WS8 "8: trivia "
-
-      assign [class="Alacritty" instance="term"] $WS1
-      assign [class="Emacs"] $WS2
-
-      assign [class="Google-chrome"] $WS3
-      assign [class="Firefox"] $WS3
-      assign [class="Brave"] $WS3
-      assign [class="chromium"] $WS3
-
-      assign [class="skype"] 10
-      assign [class="slack"] 10
-      assign [class="discord"] 10
-      assign [class="telegram-desktop"] 10
-
-      for_window [class="floating"] floating enable;
-      for_window [title="fzf-menu"] border none sticky enable floating enable focus
-      for_window [workspace=10] layout tabbed;
-
-      focus_follows_mouse no
-
-      # Start applications
-      exec pa-applet
-      exec brave
-      exec skypeforlinux
-      exec Discord
-      exec slack
-      exec telegram-desktop
-      exec emacsclient -c -a "emacs"
-      exec i3-sensible-terminal --class=term
-    '';
   };
 
   home.packages = with pkgs; [ emacs-all-the-icons-fonts fzf i3 pa_applet ];
