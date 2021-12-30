@@ -23,7 +23,7 @@
 [gui]
 	fontui	 = -family terminus -size 9 -weight normal -slant roman -underline 0 -overstrike 0
 	fontdiff = -family terminus -size 9 -weight normal -slant roman -underline 0 -overstrike 0
-	editor = emacs
+	editor = emacsclient -t -c -a "emacs"
 
 [merge]
 	summary = true
