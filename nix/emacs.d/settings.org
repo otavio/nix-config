@@ -109,16 +109,6 @@ GPG keys inside the Emacs. To load the environment variables, we can call
 
 #+end_src
 
-** Use a thin window divider in terminal
-
-#+begin_src emacs-lisp
-(set-face-inverse-video-p 'vertical-border nil)
-(set-face-background 'vertical-border (face-background 'default))
-(set-display-table-slot standard-display-table
-                        'vertical-border
-                        (make-glyph-code ?┃))
-#+end_src
-
 ** Reference:
 - https://stackoverflow.com/questions/18210631/how-to-change-the-character-composing-the-emacs-vertical-border
 
