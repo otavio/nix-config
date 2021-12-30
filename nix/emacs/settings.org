@@ -41,6 +41,18 @@ Make Emacs use the $PATH set up by the user's shell
   (exec-path-from-shell-copy-env "EMACS_JENKINS_USERNAME"))
 #+end_src
 
+* keychain-environment - [[https://github.com/tarsius/keychain-environment][Project Homepage]]
+
+Allow loading the ~keychain~ environment variables so we can use the SSH and GNU
+GPG keys inside the Emacs. To load the environment variables, we can call
+~keychain-refresh-environment~.
+
+#+begin_src emacs-lisp
+(use-package keychain-environment
+  :init
+  (keychain-refresh-environment))
+#+end_src
+
 * System names
 
 #+begin_src emacs-lisp
