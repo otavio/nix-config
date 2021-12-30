@@ -15,6 +15,9 @@
   nix.gc.automatic = true;
   nix.optimise.automatic = true;
 
+  # Users allowed to managed binary caches.
+  nix.trustedUsers = [ "root" "otavio" ];
+
   # We need to allow use of those experimental features.
   nix.extraOptions = ''
     experimental-features = nix-command flakes
@@ -41,6 +44,7 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
+    cachix
     wget
     gitRepo
     python3
