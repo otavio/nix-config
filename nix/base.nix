@@ -19,6 +19,7 @@ in
     git-review
     git-secret
     gitAndTools.delta
+    gitFull
     gitRepo
     gping
     htop
