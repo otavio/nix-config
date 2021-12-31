@@ -83,7 +83,7 @@ in
         "Print" = "exec flameshot gui";
 
         # Hide dunst notification.
-        "Control+space" = "exec ${dunstCloseNotification}";
+        "Control+Shift+space" = "exec ${dunstCloseNotification}";
       };
 
       window.commands = [
