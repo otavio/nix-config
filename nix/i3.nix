@@ -6,6 +6,8 @@ let
   terminal = "i3-sensible-terminal --class=term";
   menu = "i3-sensible-terminal -t 'fzf-menu' --class 'fzf-menu' -e fzf-menu";
 
+  dunstCloseNotification = "dunstctl close";
+
   shellWs = "1: shell ";
   editorWs = "2: editor ";
   browserWs = "3: browser ";
@@ -79,6 +81,9 @@ in
         "${modifier}+Shift+0" = "move container to workspace number ${triviaWs}";
 
         "Print" = "exec flameshot gui";
+
+        # Hide dunst notification.
+        "Control+space" = "exec ${dunstCloseNotification}";
       };
 
       window.commands = [
