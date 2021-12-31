@@ -17,6 +17,7 @@ in
     cryptsetup
     gh
     git-review
+    git-secret
     gitAndTools.delta
     gitRepo
     gping

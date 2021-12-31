@@ -5,3 +5,4 @@
 /secrets/gitaliases
 /.direnv/
 /nix/emacs.d/flycheck_init.el
+secrets/msmtp-gmail
