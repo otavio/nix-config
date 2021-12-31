@@ -26,7 +26,11 @@ let
     });
 in
 {
-  home.packages = [ emacsWithPackages ];
+  home.packages = with nixpkgs; [
+    emacs-all-the-icons-fonts
+
+    emacsWithPackages
+  ];
 
   home.sessionVariables.EDITOR = "emacs -nw";
   home.file.".emacs.d" = {

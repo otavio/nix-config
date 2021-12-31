@@ -117,7 +117,7 @@ in
     };
   };
 
-  home.packages = with pkgs; [ emacs-all-the-icons-fonts fzf i3 pa_applet ];
+  home.packages = with pkgs; [ fzf i3 pa_applet ];
 
   home.file.".xinitrc".source = ../nix/i3/xinitrc;
 }
