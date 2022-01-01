@@ -33,9 +33,16 @@ in
   ];
 
   home.sessionVariables.EDITOR = "emacs -nw";
-  home.file.".emacs.d" = {
-    source = ../nix/emacs.d;
-    recursive = true;
+  home.file = {
+    ".emacs.d/init.el".text = "(org-babel-load-file \"~/.emacs.d/settings.org\")";
+
+    ".emacs.d/settings.org" = {
+      source = ../nix/emacs.d/settings.org;
+
+      # We need to ensure we regenerate the Emacs Lisp file for the changes be
+      # applied in next start.
+      onChange = "rm ~/.emacs.d/settings.el";
+    };
   };
 
   services.emacs = {

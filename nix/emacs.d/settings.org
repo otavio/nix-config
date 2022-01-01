@@ -148,6 +148,10 @@ GPG keys inside the Emacs. To load the environment variables, we can call
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq confirm-kill-emacs nil)
 
+;;; Disable saving custom file as it ends causing problem for us saving our
+;;; settings on Git.
+(setq custom-file "/dev/null")
+
 (require 'saveplace)
 (setq-default save-place t)
 (setq save-place-file (concat user-emacs-directory "places"))
