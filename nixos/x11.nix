@@ -17,6 +17,9 @@
     font-awesome
     source-code-pro
 
+    jetbrains-mono
+    iosevka
+
     (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
   ];
 }
