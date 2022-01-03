@@ -39,9 +39,14 @@ in
     ".emacs.d/settings.org" = {
       source = ../nix/emacs.d/settings.org;
 
-      # We need to ensure we regenerate the Emacs Lisp file for the changes be
-      # applied in next start.
-      onChange = "rm ~/.emacs.d/settings.el";
+      onChange = ''
+        # We need to ensure we regenerate the Emacs Lisp file for the changes be
+        # applied in next start.
+        rm ~/.emacs.d/settings.el
+
+        # Remove the ELPA downloaded files so we don't leave old ones.
+        rm -rf ~/.emacs.d/elpa
+      '';
     };
   };
 
