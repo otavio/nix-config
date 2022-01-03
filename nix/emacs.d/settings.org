@@ -107,6 +107,8 @@
     - [[#browse-kill-ring][Browse Kill Ring]]
     - [[#highlight-symbol][Highlight Symbol]]
     - [[#spelling][Spelling]]
+    - [[#allow-answering-y-or-n-for-yes--or-no-questions][Allow answering y or n for yes  or no questions]]
+    - [[#dont-confirm-to-kill-emacs][Don't confirm to kill Emacs]]
 - [[#runtime-performance][Runtime Performance]]
 - [[#extra-functions][Extra Functions]]
 - [[#inspiration][Inspiration]]
@@ -2022,6 +2024,22 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
     (text-mode . flyspell-mode)
     (org-mode . flyspell-mode)
     (prog-mode . flyspell-prog-mode))
+
+#+end_src
+
+*** Allow answering ~y~ or ~n~ for ~yes~  or ~no~ questions
+
+#+begin_src emacs-lisp
+
+  (fset 'yes-or-no-p 'y-or-n-p)
+
+#+end_src
+
+*** Don't confirm to kill Emacs
+
+#+begin_src emacs-lisp
+
+  (setq confirm-kill-emacs nil)
 
 #+end_src
 
