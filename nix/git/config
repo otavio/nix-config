@@ -56,7 +56,6 @@
 
 [format]
 	numbered = auto
-	headers = "Organization: O.S. Systems Software LTDA.\n"
 #	coverletter = auto
 
 [url "git://git.debian.org/"]
