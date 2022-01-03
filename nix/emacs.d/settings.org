@@ -352,9 +352,16 @@ Alternate themes:
 
 #+begin_src emacs-lisp
 
-  (use-package spacegray-theme :defer t)
   (use-package doom-themes :defer t)
-  (load-theme 'doom-snazzy t)
+
+  (defun reload-theme (frame)
+    (with-selected-frame frame
+      (if (display-graphic-p)
+          (load-theme 'doom-snazzy t)
+        (load-theme 'doom-spacegrey t))))
+
+  (add-hook 'after-make-frame-functions #'reload-theme)
+
   (doom-themes-visual-bell-config)
 
 #+end_src
