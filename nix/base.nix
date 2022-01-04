@@ -8,6 +8,32 @@ let
       cp -r * $out/bin
     '';
   };
+
+  patman = pkgs.python3.pkgs.buildPythonApplication rec {
+    pname = "patman";
+    version = "2021.10";
+
+    src = pkgs.fetchFromGitHub {
+      repo = "u-boot";
+      owner = "u-boot";
+      rev = "v${version}";
+      sha256 = "sha256-2CcIHGbm0HPmY63Xsjaf/Yy78JbRPNhmvZmRJAyla2U=";
+    };
+
+    patches = ./../patches/patman-expand-user-home-when-looking-for-the-alias-f.patch;
+
+    sourceRoot = "source/tools/patman";
+
+    makeWrapperArgs = [ "--prefix PATH : ${pkgs.gitFull}/bin" ];
+
+    buildInputs = [ pkgs.git ];
+
+    postInstall = ''
+      cp README $out/bin
+    '';
+
+    doCheck = false;
+  };
 in
 {
   programs.home-manager.enable = true;
@@ -26,6 +52,7 @@ in
     keychain
     mtr
     nnn
+    patman
     tmux
     tmuxp
     topgrade
