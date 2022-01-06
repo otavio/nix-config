@@ -1323,8 +1323,8 @@ It's nice to have a table of contents section for long literate configuration fi
     (setq os/daily-note-filename "%<%Y-%m-%d>.org"
           os/daily-note-header "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n")
     :custom
-    (org-roam-directory "~/Notes/Roam/")
-    (org-roam-dailies-directory "Journal/")
+    (org-roam-directory "~/notes/roam/")
+    (org-roam-dailies-directory "dailies")
     (org-roam-completion-everywhere t)
     (org-roam-capture-templates
      '(("d" "default" plain "%?"
