@@ -787,7 +787,8 @@ Default to an indentation size of 4 spaces since it's the norm for pretty much e
                 ("C-p" . vertico-previous)
                 ("C-g" . vertico-exit)
                 :map minibuffer-local-map
-                ("M-h" . os/minibuffer-backward-kill))
+                ("M-h" . os/minibuffer-backward-kill)
+                ("M-<backspace>" . os/minibuffer-backward-kill))
     :custom
     (vertico-cycle t)
     :custom-face
