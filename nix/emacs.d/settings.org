@@ -1418,12 +1418,14 @@ This is an interesting extension to Magit that shows a TODOs section in your git
 *** Git Gutter - [[https://github.com/emacsorphanage/git-gutter][Emacs port of GitGutter which is Sublime Text Plugin]]
 
 #+begin_src emacs-lisp
+
   (use-package git-gutter
     :diminish git-gutter-mode
     :hook
     (after-init . global-git-gutter-mode)
     :config
     (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows))
+
 #+end_src
 
 *** Create URLs for files and commits in GitHub/Bitbucket/GitLab/... repositories
