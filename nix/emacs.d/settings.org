@@ -356,14 +356,7 @@ Alternate themes:
 
   (use-package doom-themes :defer t)
 
-  (defun reload-theme (frame)
-    (with-selected-frame frame
-      (if (display-graphic-p)
-          (load-theme 'doom-snazzy t)
-        (load-theme 'doom-spacegrey t))))
-
-  (add-hook 'after-make-frame-functions #'reload-theme)
-
+  (load-theme 'doom-material-dark t)
   (doom-themes-visual-bell-config)
 
 #+end_src
