@@ -77,7 +77,8 @@
   networking.firewall.allowedTCPPorts = [ 22 ];
 
   virtualisation.docker.enable = true;
-  virtualisation.virtualbox.host.enable = true;
+  virtualisation.libvirtd.enable = true;
+  environment.systemPackages = with pkgs; [ virt-manager virt-viewer ];
 
   nixpkgs.config.allowUnfree = true;
   virtualisation.virtualbox.host.enableExtensionPack = true;
