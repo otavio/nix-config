@@ -3,8 +3,8 @@ let
   emacs-overlay = import (pkgs.fetchFromGitHub {
     owner = "nix-community";
     repo = "emacs-overlay";
-    rev = "17e7812904d8c081a27e77f71d31aee916cf0662";
-    sha256 = "sha256-dGXlHwxGw2ight883p21ZWRtNqeIrJIH0gyzZ/8syjM=";
+    rev = "ac37134112367f3e40c1ddea13802ba054c694b1";
+    sha256 = "sha256-7BHzJKkcaOFRiHTCqTL5ROIisqM8K2bEb59/XUKEbhY=";
   });
 
   nixpkgs = import <nixpkgs> {
