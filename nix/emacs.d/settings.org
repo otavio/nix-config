@@ -272,6 +272,9 @@ Clean up Emacs' user interface, make it more minimal.
   (blink-cursor-mode t)
   (setq-default cursor-type 'hbar)
 
+  ;; Enable highlight of current line
+  (hl-line-mode)
+
 #+end_src
 
 Improve scrolling.
