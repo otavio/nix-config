@@ -102,6 +102,7 @@
     - [[#smart-parens][Smart Parens]]
     - [[#rainbow-delimiters][Rainbow Delimiters]]
     - [[#rainbow-mode][Rainbow Mode]]
+    - [[#string-inflection][String Inflection]]
     - [[#tramp][TRAMP]]
       - [[#docker-support][Docker support]]
     - [[#browse-kill-ring][Browse Kill Ring]]
@@ -1972,6 +1973,16 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
            web-mode
            typescript-mode
            js2-mode))
+
+#+end_src
+
+*** String Inflection
+
+#+begin_src emacs-lisp
+
+  (use-package string-inflection
+    :ensure t
+    :bind ("C-M-j" . string-inflection-all-cycle))
 
 #+end_src
 
