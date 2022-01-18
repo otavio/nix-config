@@ -21,7 +21,15 @@
   # We need to allow use of those experimental features.
   nix.extraOptions = ''
     experimental-features = nix-command flakes
+
+    # derivations must persist garbage collection
+    keep-outputs = true
+    keep-derivations = true
   '';
+
+  environment.pathsToLink = [
+    "/share/nix-direnv"
+  ];
 
   time.timeZone = "America/Sao_Paulo";
 
