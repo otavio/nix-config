@@ -49,6 +49,21 @@
   # Enable thermald
   services.thermald.enable = true;
 
+  # Rotate screen as for proper use in GPD Pocket
+  services.xserver = {
+    videoDrivers = [ "intel" ];
+    useGlamor = true;
+    xrandrHeads = [
+      {
+        output = "DSI1";
+        primary = true;
+        monitorConfig = ''
+          Option "Rotate" "right"
+        '';
+      }
+    ];
+  };
+
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
