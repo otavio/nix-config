@@ -1,0 +1,1047 @@
+#compdef emi-cli
+
+autoload -U is-at-least
+
+_emi-cli() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    if is-at-least 5.2; then
+        _arguments_options=(-s -S -C)
+    else
+        _arguments_options=(-s -C)
+    fi
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_emi-cli_commands" \
+"*::: :->emi-cli" \
+&& ret=0
+    case $state in
+    (emi-cli)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:emi-cli-command-$line[1]:"
+        case $line[1] in
+            (users)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_emi-cli__users_commands" \
+"*::: :->users" \
+&& ret=0
+case $state in
+    (users)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:emi-cli-users-command-$line[1]:"
+        case $line[1] in
+            (login)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(new)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(update-password)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(admin)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(registers)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_emi-cli__registers_commands" \
+"*::: :->registers" \
+&& ret=0
+case $state in
+    (registers)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:emi-cli-registers-command-$line[1]:"
+        case $line[1] in
+            (import)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':product-id:_files' \
+':file-path:_files' \
+&& ret=0
+;;
+(list)
+_arguments "${_arguments_options[@]}" \
+'--page-size=[Request at most n register(s)]' \
+'--page=[Skip first n register(s)]' \
+'--project=[Filter by project name]' \
+'--product=[Filter by product name]' \
+'--status=[Filter register by status \[aborted, assigned, failed, successful, unassigned\]]' \
+'--version=[Filter by version]' \
+'--model=[Filter by model]' \
+'--serial=[Filter by matching serial]' \
+'--created-by=[Filter by user'\''s ID]' \
+'--sha256sum=[Filter by package'\''s sha256sum pattern]' \
+'--package-version=[Filter by package'\''s version pattern]' \
+'--controller=[Filter by controller'\''s location]' \
+'--newer-than=[Filter by registers creation date \['\''%Y-%m-%d %H:%M'\''\]]' \
+'--older-than=[Filter by registers creation date \['\''%Y'\''\]]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+&& ret=0
+;;
+(get)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':register-id:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(logs)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_emi-cli__logs_commands" \
+"*::: :->logs" \
+&& ret=0
+case $state in
+    (logs)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:emi-cli-logs-command-$line[1]:"
+        case $line[1] in
+            (list)
+_arguments "${_arguments_options[@]}" \
+'--page-size=[Request at most n log(s)]' \
+'--page=[Skip first n log(s)]' \
+'--project=[Filter by project name]' \
+'--product=[Filter by product name]' \
+'--sha256sum=[Filter by sha256sum of package]' \
+'--package-version=[Filter by the package version]' \
+'--controller=[Filter by controller'\''s location]' \
+'--status=[Filter by log status \[Aborted, Failed, Successful\]]' \
+'--newer-than=[Filter by log'\''s completion date]' \
+'--older-than=[Filter by log'\''s completion date \['\''%Y-%m-%d %H:%M'\''\]]' \
+'--reviewed=[Filter by reviewed status \['\''%Y-%m-%d %H:%M'\''\]]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(get)
+_arguments "${_arguments_options[@]}" \
+'--display=[Select the type of the display \[raw, screen, detailed\]]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':log-id:_files' \
+&& ret=0
+;;
+(reviewed)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':log-id:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(controllers)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_emi-cli__controllers_commands" \
+"*::: :->controllers" \
+&& ret=0
+case $state in
+    (controllers)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:emi-cli-controllers-command-$line[1]:"
+        case $line[1] in
+            (list)
+_arguments "${_arguments_options[@]}" \
+'--page-size=[the size of the page]' \
+'--page=[the number of the page]' \
+'--project=[filter by project name]' \
+'--product=[filter by product name]' \
+'--active=[filter controller by it'\''s status \[yes, no\]]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(register)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':location:_files' \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" \
+'-l+[]' \
+'--location=[]' \
+'-a+[]' \
+'--active=[]' \
+'-q+[]' \
+'--queue-size=[]' \
+'-p+[]' \
+'--product-id=[]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':controller-uuid:_files' \
+&& ret=0
+;;
+(unassociate)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':controller-uuid:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(robots)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_emi-cli__robots_commands" \
+"*::: :->robots" \
+&& ret=0
+case $state in
+    (robots)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:emi-cli-robots-command-$line[1]:"
+        case $line[1] in
+            (list)
+_arguments "${_arguments_options[@]}" \
+'--page-size=[the size of the page]' \
+'--page=[the number of the page]' \
+'--description=[filter by robots description text]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(register)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':description:_files' \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" \
+'-d+[]' \
+'--description=[]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':robot-uuid:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(settings)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_emi-cli__settings_commands" \
+"*::: :->settings" \
+&& ret=0
+case $state in
+    (settings)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:emi-cli-settings-command-$line[1]:"
+        case $line[1] in
+            (get)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(set)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':server:_files' \
+&& ret=0
+;;
+(store-server)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':server:_files' \
+&& ret=0
+;;
+(select-server)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':option -- Index of the server stored:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(projects)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_emi-cli__projects_commands" \
+"*::: :->projects" \
+&& ret=0
+case $state in
+    (projects)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:emi-cli-projects-command-$line[1]:"
+        case $line[1] in
+            (list)
+_arguments "${_arguments_options[@]}" \
+'--page-size=[Request at most n project(s)]' \
+'--page=[Skip first n project(s)]' \
+'-n+[Filter by project name]' \
+'--name=[Filter by project name]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(create)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':name:_files' \
+':parser-type:_files' \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" \
+'-n+[]' \
+'--name=[]' \
+'--active-package=[]' \
+'--parser=[]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':project-id:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(products)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_emi-cli__products_commands" \
+"*::: :->products" \
+&& ret=0
+case $state in
+    (products)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:emi-cli-products-command-$line[1]:"
+        case $line[1] in
+            (list)
+_arguments "${_arguments_options[@]}" \
+'--size=[Request at most n product(s)]' \
+'--page=[Skip first n product(s)]' \
+'-n+[Filter by name]' \
+'--name=[Filter by name]' \
+'-a+[Filter by alias name]' \
+'--alias=[Filter by alias name]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':project-id:_files' \
+&& ret=0
+;;
+(register)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':project-id:_files' \
+':name:_files' \
+':alias:_files' \
+'::valid-models:_files' \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" \
+'--add-valid-model=[]' \
+'--remove-valid-model=[]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':project-id:_files' \
+':product-id:_files' \
+'::name:_files' \
+'::alias:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(packages)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_emi-cli__packages_commands" \
+"*::: :->packages" \
+&& ret=0
+case $state in
+    (packages)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:emi-cli-packages-command-$line[1]:"
+        case $line[1] in
+            (create)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':file-path:_files' \
+':project-id:_files' \
+':inner-version:_files' \
+':version:_files' \
+':changelog:_files' \
+&& ret=0
+;;
+(list)
+_arguments "${_arguments_options[@]}" \
+'--page-size=[Request at most n package(s)]' \
+'--page=[Skip first n package(s)]' \
+'--sha256sum=[Filter by package'\''s sha256sum]' \
+'--project=[Filter by project'\''s name]' \
+'-v+[Filter by package'\''s version]' \
+'--version=[Filter by package'\''s version]' \
+'--inner-version=[Filter by package'\''s inner version]' \
+'--changelog=[Filter by package'\''s changelog]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':project-id:_files' \
+':sha256sum:_files' \
+'::changelog:_files' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(completions)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+'::shell -- Shell to generate the completions:_files' \
+&& ret=0
+;;
+(interactive)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+}
+
+(( $+functions[_emi-cli_commands] )) ||
+_emi-cli_commands() {
+    local commands; commands=(
+        "users:Handle users operations" \
+"registers:Manages manufacture registers with the cloud" \
+"logs:Manages production logs" \
+"controllers:Manages Controllers information" \
+"robots:Manages Rebot agents information" \
+"settings:Manages CLI settings" \
+"projects:Manages project(s) settings" \
+"products:Manages product(s) settings" \
+"packages:Manages project(s) settings" \
+"completions:Generate completion for Shell" \
+"interactive:Interactive mode" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'emi-cli commands' commands "$@"
+}
+(( $+functions[_emi-cli__users__admin_commands] )) ||
+_emi-cli__users__admin_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli users admin commands' commands "$@"
+}
+(( $+functions[_emi-cli__completions_commands] )) ||
+_emi-cli__completions_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli completions commands' commands "$@"
+}
+(( $+functions[_emi-cli__controllers_commands] )) ||
+_emi-cli__controllers_commands() {
+    local commands; commands=(
+        "list:List controllers" \
+"register:Register a new controller to the cloud" \
+"update:Updates information of a controller" \
+"unassociate:Disassociate the controller from any product" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'emi-cli controllers commands' commands "$@"
+}
+(( $+functions[_emi-cli__packages__create_commands] )) ||
+_emi-cli__packages__create_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli packages create commands' commands "$@"
+}
+(( $+functions[_emi-cli__projects__create_commands] )) ||
+_emi-cli__projects__create_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli projects create commands' commands "$@"
+}
+(( $+functions[_emi-cli__logs__get_commands] )) ||
+_emi-cli__logs__get_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli logs get commands' commands "$@"
+}
+(( $+functions[_emi-cli__registers__get_commands] )) ||
+_emi-cli__registers__get_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli registers get commands' commands "$@"
+}
+(( $+functions[_emi-cli__settings__get_commands] )) ||
+_emi-cli__settings__get_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli settings get commands' commands "$@"
+}
+(( $+functions[_emi-cli__controllers__help_commands] )) ||
+_emi-cli__controllers__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli controllers help commands' commands "$@"
+}
+(( $+functions[_emi-cli__help_commands] )) ||
+_emi-cli__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli help commands' commands "$@"
+}
+(( $+functions[_emi-cli__logs__help_commands] )) ||
+_emi-cli__logs__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli logs help commands' commands "$@"
+}
+(( $+functions[_emi-cli__packages__help_commands] )) ||
+_emi-cli__packages__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli packages help commands' commands "$@"
+}
+(( $+functions[_emi-cli__products__help_commands] )) ||
+_emi-cli__products__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli products help commands' commands "$@"
+}
+(( $+functions[_emi-cli__projects__help_commands] )) ||
+_emi-cli__projects__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli projects help commands' commands "$@"
+}
+(( $+functions[_emi-cli__registers__help_commands] )) ||
+_emi-cli__registers__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli registers help commands' commands "$@"
+}
+(( $+functions[_emi-cli__robots__help_commands] )) ||
+_emi-cli__robots__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli robots help commands' commands "$@"
+}
+(( $+functions[_emi-cli__settings__help_commands] )) ||
+_emi-cli__settings__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli settings help commands' commands "$@"
+}
+(( $+functions[_emi-cli__users__help_commands] )) ||
+_emi-cli__users__help_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli users help commands' commands "$@"
+}
+(( $+functions[_emi-cli__registers__import_commands] )) ||
+_emi-cli__registers__import_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli registers import commands' commands "$@"
+}
+(( $+functions[_emi-cli__interactive_commands] )) ||
+_emi-cli__interactive_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli interactive commands' commands "$@"
+}
+(( $+functions[_emi-cli__controllers__list_commands] )) ||
+_emi-cli__controllers__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli controllers list commands' commands "$@"
+}
+(( $+functions[_emi-cli__logs__list_commands] )) ||
+_emi-cli__logs__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli logs list commands' commands "$@"
+}
+(( $+functions[_emi-cli__packages__list_commands] )) ||
+_emi-cli__packages__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli packages list commands' commands "$@"
+}
+(( $+functions[_emi-cli__products__list_commands] )) ||
+_emi-cli__products__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli products list commands' commands "$@"
+}
+(( $+functions[_emi-cli__projects__list_commands] )) ||
+_emi-cli__projects__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli projects list commands' commands "$@"
+}
+(( $+functions[_emi-cli__registers__list_commands] )) ||
+_emi-cli__registers__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli registers list commands' commands "$@"
+}
+(( $+functions[_emi-cli__robots__list_commands] )) ||
+_emi-cli__robots__list_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli robots list commands' commands "$@"
+}
+(( $+functions[_emi-cli__users__login_commands] )) ||
+_emi-cli__users__login_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli users login commands' commands "$@"
+}
+(( $+functions[_emi-cli__logs_commands] )) ||
+_emi-cli__logs_commands() {
+    local commands; commands=(
+        "list:List the log entries" \
+"get:Get the complete log information" \
+"reviewed:Set a log to be reviewed" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'emi-cli logs commands' commands "$@"
+}
+(( $+functions[_emi-cli__users__new_commands] )) ||
+_emi-cli__users__new_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli users new commands' commands "$@"
+}
+(( $+functions[_emi-cli__packages_commands] )) ||
+_emi-cli__packages_commands() {
+    local commands; commands=(
+        "create:Create a new package" \
+"list:List the package(s)" \
+"update:Update the information of the package" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'emi-cli packages commands' commands "$@"
+}
+(( $+functions[_emi-cli__products_commands] )) ||
+_emi-cli__products_commands() {
+    local commands; commands=(
+        "list:List the product(s)" \
+"register:Register a new product" \
+"update:Update the information of the product" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'emi-cli products commands' commands "$@"
+}
+(( $+functions[_emi-cli__projects_commands] )) ||
+_emi-cli__projects_commands() {
+    local commands; commands=(
+        "list:List the project(s)" \
+"create:Create a new project" \
+"update:Update the information of the project" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'emi-cli projects commands' commands "$@"
+}
+(( $+functions[_emi-cli__controllers__register_commands] )) ||
+_emi-cli__controllers__register_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli controllers register commands' commands "$@"
+}
+(( $+functions[_emi-cli__products__register_commands] )) ||
+_emi-cli__products__register_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli products register commands' commands "$@"
+}
+(( $+functions[_emi-cli__robots__register_commands] )) ||
+_emi-cli__robots__register_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli robots register commands' commands "$@"
+}
+(( $+functions[_emi-cli__registers_commands] )) ||
+_emi-cli__registers_commands() {
+    local commands; commands=(
+        "import:Import register(s)" \
+"list:List manufacture registers" \
+"get:Show a single register" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'emi-cli registers commands' commands "$@"
+}
+(( $+functions[_emi-cli__logs__reviewed_commands] )) ||
+_emi-cli__logs__reviewed_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli logs reviewed commands' commands "$@"
+}
+(( $+functions[_emi-cli__robots_commands] )) ||
+_emi-cli__robots_commands() {
+    local commands; commands=(
+        "list:List robots" \
+"register:Register a new robot to the cloud" \
+"update:Updates information of a robot" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'emi-cli robots commands' commands "$@"
+}
+(( $+functions[_emi-cli__settings__select-server_commands] )) ||
+_emi-cli__settings__select-server_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli settings select-server commands' commands "$@"
+}
+(( $+functions[_emi-cli__settings__set_commands] )) ||
+_emi-cli__settings__set_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli settings set commands' commands "$@"
+}
+(( $+functions[_emi-cli__settings_commands] )) ||
+_emi-cli__settings_commands() {
+    local commands; commands=(
+        "get:List current configuration" \
+"set:Update current configuration" \
+"store-server:Store a server" \
+"select-server:Select a server" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'emi-cli settings commands' commands "$@"
+}
+(( $+functions[_emi-cli__settings__store-server_commands] )) ||
+_emi-cli__settings__store-server_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli settings store-server commands' commands "$@"
+}
+(( $+functions[_emi-cli__controllers__unassociate_commands] )) ||
+_emi-cli__controllers__unassociate_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli controllers unassociate commands' commands "$@"
+}
+(( $+functions[_emi-cli__controllers__update_commands] )) ||
+_emi-cli__controllers__update_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli controllers update commands' commands "$@"
+}
+(( $+functions[_emi-cli__packages__update_commands] )) ||
+_emi-cli__packages__update_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli packages update commands' commands "$@"
+}
+(( $+functions[_emi-cli__products__update_commands] )) ||
+_emi-cli__products__update_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli products update commands' commands "$@"
+}
+(( $+functions[_emi-cli__projects__update_commands] )) ||
+_emi-cli__projects__update_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli projects update commands' commands "$@"
+}
+(( $+functions[_emi-cli__robots__update_commands] )) ||
+_emi-cli__robots__update_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli robots update commands' commands "$@"
+}
+(( $+functions[_emi-cli__users__update-password_commands] )) ||
+_emi-cli__users__update-password_commands() {
+    local commands; commands=(
+        
+    )
+    _describe -t commands 'emi-cli users update-password commands' commands "$@"
+}
+(( $+functions[_emi-cli__users_commands] )) ||
+_emi-cli__users_commands() {
+    local commands; commands=(
+        "login:Login into the system" \
+"new:Creates a new user on disabled state" \
+"update-password:Updates password for current user" \
+"admin:Admin only operations" \
+"help:Prints this message or the help of the given subcommand(s)" \
+    )
+    _describe -t commands 'emi-cli users commands' commands "$@"
+}
+
+_emi-cli "$@"
