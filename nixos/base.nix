@@ -16,7 +16,7 @@
   nix.optimise.automatic = true;
 
   # Users allowed to managed binary caches.
-  nix.trustedUsers = [ "root" "otavio" ];
+  nix.settings.trusted-users = [ "root" "otavio" ];
 
   # We need to allow use of those experimental features.
   nix.extraOptions = ''
