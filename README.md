@@ -4,9 +4,9 @@ Configuration repository
 Installation inside an existing Linux system
 ===
 
-For Debian-based systems we need to have `rsync` and `zsh` before proceeding. Use:
+For Debian-based systems we need to have `curl`, `rsync` and `zsh` before proceeding. Use:
 ```sh
-sudo apt install -y rsync zsh
+sudo apt install -y curl rsync zsh
 ```
 
 The user must use `zsh` as shell so do it using:
