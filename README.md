@@ -39,7 +39,7 @@ Then install the `home-manager` to allow it to switch to the environment, using:
 export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
 
 # Install home-manager in the profile
-nix-env '<home-manager>' -iA home-manager
+nix-shell '<home-manager>' -A install
 
 # Do the actual switch
 home-manager switch
