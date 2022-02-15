@@ -42,7 +42,7 @@ in
       onChange = ''
         # We need to ensure we regenerate the Emacs Lisp file for the changes be
         # applied in next start.
-        rm ~/.emacs.d/settings.el
+        rm -f ~/.emacs.d/settings.el
 
         # Remove the ELPA downloaded files so we don't leave old ones.
         rm -rf ~/.emacs.d/elpa
