@@ -22,7 +22,7 @@ curl -L https://nixos.org/nix/install | sh -s -- --daemon
 Finally, clone this repository as:
 ```sh
 mkdir -p ~/src
-git clone git@github.com:otavio/nix-config.git src/nix-config
+git clone https://github.com/otavio/nix-config.git src/nix-config
 ```
 
 Add the required channels to the environment, using:
