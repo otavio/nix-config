@@ -1,0 +1,61 @@
+#+TITLE: Otavio Salvador's Nix Configuration
+
+* Table of Contents
+:PROPERTIES:
+:TOC:      :include all :ignore (this)
+:END:
+:CONTENTS:
+- [[#installation-inside-an-existing-linux-system][Installation inside an existing Linux system]]
+:END:
+  :CUSTOM_ID: configuration-repository
+  :END:
+* Installation inside an existing Linux system
+
+For Debian-based systems we need to have =curl=, =rsync= and =zsh=
+before proceeding. Use:
+
+#+begin_src sh
+  sudo apt install -y curl rsync zsh
+#+end_src
+
+The user must use =zsh= as shell so do it using:
+
+#+begin_src sh
+  sudo usermod -s /bin/zsh otavio
+#+end_src
+
+Install the daemon inside the existing operating system with:
+
+#+begin_src sh
+  curl -L https://nixos.org/nix/install | sh -s -- --daemon
+#+end_src
+
+Finally, clone this repository as:
+
+#+begin_src sh
+  mkdir -p ~/src
+  git clone https://github.com/otavio/nix-config.git src/nix-config
+#+end_src
+
+Add the required channels to the environment, using:
+
+#+begin_src sh
+  nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+  nix-channel --add https://channels.nixos.org/nixpkgs-unstable nixpkgs
+  nix-channel --update
+#+end_src
+
+Then install the =home-manager= to allow it to switch to the
+environment, using:
+
+#+begin_src sh
+  # On non-NixOS systems, we need to export NIX_PATH manually,
+  # see: https://github.com/NixOS/nix/issues/2033
+  export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
+
+  # Install home-manager in the profile
+  nix-shell '<home-manager>' -A install
+
+  # Do the actual switch
+  home-manager switch
+#+end_src
