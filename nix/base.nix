@@ -65,6 +65,7 @@ in
     aspellDicts.en-science
     aspellDicts.pt_BR
 
+    manix
     nixfmt
 
     awscli2
