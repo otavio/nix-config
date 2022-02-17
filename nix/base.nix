@@ -90,4 +90,6 @@ in
     ".tmuxp" = { source = ../nix/tmux/tmuxp; recursive = true; };
     ".yocto/site.conf".source = ../nix/yocto/site.conf;
   };
+
+  xdg.configFile."topgrade.toml".source = ../nix/topgrade/topgrade.toml;
 }

@@ -28,7 +28,6 @@
     scrcpy
     skypeforlinux
     slack
-    topgrade
     vlc
     zoom-us
     zulip
@@ -43,8 +42,6 @@
   programs.alacritty.enable = true;
 
   programs.zathura.enable = true;
-
-  xdg.configFile."topgrade.toml".source = ../nix/topgrade/topgrade.toml;
 
   services.dunst.enable = true;
   xdg.configFile."dunst/dunstrc".source = ../nix/dunst/dunstrc;
