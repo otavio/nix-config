@@ -81,7 +81,6 @@ in
   };
 
   home.file = {
-    ".aspell.conf".source = ../nix/aspell/aspell.conf;
     ".emacs.d" = { source = ../nix/emacs.d; recursive = true; };
     ".gitconfig".source = ../nix/git/config;
     ".msmtprc".source = ../nix/msmtp/msmtprc;
