@@ -1163,6 +1163,7 @@ It's nice to have a table of contents section for long literate configuration fi
 #+begin_src emacs-lisp
 
   (use-package org-make-toc
+    :defer t
     :hook (org-mode . org-make-toc-mode))
 
 #+end_src
