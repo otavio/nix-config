@@ -1827,8 +1827,7 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
 #+begin_src emacs-lisp
 
   (use-package rust-mode
-    :mode "\\.rs\\'"
-    :init (setq rust-format-on-save t))
+    :mode "\\.rs\\'")
 
   (use-package cargo
     :hook (rust-mode . cargo-minor-mode))
