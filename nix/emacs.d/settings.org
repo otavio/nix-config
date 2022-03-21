@@ -1471,9 +1471,10 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
   (use-package lsp-mode
     :ensure t
     :diminish lsp-mode
+    :init
+    (setq lsp-keymap-prefix "C-c l")
     :config
-    (setq lsp-keymap-prefix "C-c l"
-          lsp-enable-file-watchers nil
+    (setq lsp-enable-file-watchers nil
           lsp-prefer-flymake nil
           lsp-prefer-capf t
           lsp-rust-clippy-preference "on"
