@@ -259,6 +259,7 @@ Clean up Emacs' user interface, make it more minimal.
 
   ;; Thanks, but no thanks
   (setq inhibit-startup-message t)
+  (setq inhibit-startup-buffer-menu t)
 
   (scroll-bar-mode -1) ;; Disable visible scrollbar
   (tool-bar-mode -1)   ;; Disable the toolbar
@@ -266,6 +267,9 @@ Clean up Emacs' user interface, make it more minimal.
   (set-fringe-mode 10) ;; Give some breathing room
 
   (menu-bar-mode -1)   ;; Disable the menu bar
+
+  ;; Avoid resizing the frames automatically
+  (setq frame-inhibit-implied-resize t)
 
   ;; Set up the visible bell
   (setq visible-bell t)
