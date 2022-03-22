@@ -230,6 +230,7 @@ The [[https://elpa.gnu.org/packages/undo-tree.html][undo-tree]] provided by this
     (progn
       (setq undo-tree-visualizer-timestamps t)
       (setq undo-tree-visualizer-diff t)
+      (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
       (global-undo-tree-mode)))
 
 #+end_src
