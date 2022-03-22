@@ -2,14 +2,5 @@
 
 basedir=$(dirname $(readlink -f $0))
 
-if [ $# != 1 ]; then
-    echo "ERROR: Please pass the configuration to use for this machine."
-    echo "The following configurations are available:"
-    echo
-
-    ls $basedir/configuration.nix/*.nix -1 | sed 's,^.*/\(.*\).nix,  - \1,g'
-    exit 1
-fi
-
-rm -f /etc/nixos/configuration.nix
-cp -sv $(readlink -f $basedir/configuration.nix/$1).nix /etc/nixos/configuration.nix
+rm -f /etc/nixos/*
+cp -sv $(readlink -f $basedir/flake.nix) /etc/nixos/

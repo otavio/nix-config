@@ -37,20 +37,20 @@
 
   services.parcellite.enable = true;
   xdg.configFile."parcellite/parcelliterc".source =
-    ../nix/parcellite/parcelliterc;
+    ./parcellite/parcelliterc;
 
   programs.alacritty.enable = true;
 
   programs.zathura.enable = true;
 
   services.dunst.enable = true;
-  xdg.configFile."dunst/dunstrc".source = ../nix/dunst/dunstrc;
-  xdg.configFile."dunst/skype".source = ../nix/dunst/skype;
+  xdg.configFile."dunst/dunstrc".source = ./dunst/dunstrc;
+  xdg.configFile."dunst/skype".source = ./dunst/skype;
 
   services.flameshot.enable = true;
 
   home.file.".irssi" = {
-    source = ../nix/irssi;
+    source = ./irssi;
     recursive = true;
   };
 

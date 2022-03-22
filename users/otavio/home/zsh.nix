@@ -55,7 +55,7 @@ in
   };
 
   home.file.".config/zsh/zfunc" = {
-    source = ../nix/zsh/zfunc;
+    source = ./zsh/zfunc;
     recursive = true;
   };
 

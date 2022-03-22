@@ -9,13 +9,14 @@
 :END:
   :CUSTOM_ID: configuration-repository
   :END:
+
 * Installation inside an existing Linux system
 
-For Debian-based systems we need to have =curl=, =rsync= and =zsh=
+For Debian-based systems we need to have =curl=, =rsync=, =zsh=, =xz-utils= and =git-core=
 before proceeding. Use:
 
 #+begin_src sh
-  sudo apt install -y curl rsync zsh
+  sudo apt install -y curl rsync zsh xz-utils git-core
 #+end_src
 
 The user must use =zsh= as shell so do it using:
@@ -28,34 +29,21 @@ Install the daemon inside the existing operating system with:
 
 #+begin_src sh
   curl -L https://nixos.org/nix/install | sh -s -- --daemon
+
+  # Enable Nix Flakes support
+  mkdir -p ~/.config/nix
+  echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf
 #+end_src
 
 Finally, clone this repository as:
 
 #+begin_src sh
   mkdir -p ~/src
-  git clone https://github.com/otavio/nix-config.git src/nix-config
+  git clone https://github.com/otavio/nix-config.git ~/src/nix-config
 #+end_src
 
 Add the required channels to the environment, using:
 
 #+begin_src sh
-  nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-  nix-channel --add https://channels.nixos.org/nixpkgs-unstable nixpkgs
-  nix-channel --update
-#+end_src
-
-Then install the =home-manager= to allow it to switch to the
-environment, using:
-
-#+begin_src sh
-  # On non-NixOS systems, we need to export NIX_PATH manually,
-  # see: https://github.com/NixOS/nix/issues/2033
-  export NIX_PATH=$HOME/.nix-defexpr/channels${NIX_PATH:+:}$NIX_PATH
-
-  # Install home-manager in the profile
-  nix-shell '<home-manager>' -A install
-
-  # Do the actual switch
-  home-manager switch
+  home-manager switch --flake .#otavio
 #+end_src

@@ -1,17 +1,6 @@
 { config, pkgs, ... }:
 let
-  emacs-overlay = import (pkgs.fetchFromGitHub {
-    owner = "nix-community";
-    repo = "emacs-overlay";
-    rev = "beffadfb0345078ab3d630e9ca6e0aaf061d3aa5";
-    sha256 = "sha256-UxMJVmI5juZVxUnbLSB/O1tvL8JJz9IaVJYqQB3Dszs=";
-  });
-
-  nixpkgs = import <nixpkgs> {
-    overlays = [ emacs-overlay ];
-  };
-
-  emacsWithPackages = (nixpkgs.emacsWithPackagesFromUsePackage
+  emacsWithPackages = (pkgs.emacsWithPackagesFromUsePackage
     {
       config = ./emacs.d/settings.org;
 
@@ -26,7 +15,7 @@ let
     });
 in
 {
-  home.packages = with nixpkgs; [
+  home.packages = with pkgs; [
     emacs-all-the-icons-fonts
 
     emacsWithPackages
@@ -37,7 +26,7 @@ in
     ".emacs.d/init.el".text = "(org-babel-load-file \"~/.emacs.d/settings.org\")";
 
     ".emacs.d/settings.org" = {
-      source = ../nix/emacs.d/settings.org;
+      source = ./emacs.d/settings.org;
 
       onChange = ''
         # We need to ensure we regenerate the Emacs Lisp file for the changes be
