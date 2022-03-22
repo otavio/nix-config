@@ -1568,10 +1568,10 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
     `((
        ;; fakeroot python do_foo() {
        ("\\b\\(include\\|require\\|inherit\\|python\\|addtask\\|export\\|fakeroot\\|unset\\)\\b" . font-lock-keyword-face)
-       ;; do_install_append() {
-       ("^\\(fakeroot *\\)?\\(python *\\)?\\([a-zA-Z0-9\-_+.${}/~]+\\) *( *) *{" 3 font-lock-function-name-face)
+       ;; do_install:append() {
+       ("^\\(fakeroot *\\)?\\(python *\\)?\\([a-zA-Z0-9\-_+.${}:/~]+\\) *( *) *{" 3 font-lock-function-name-face)
        ;; do_deploy[depends] ??=
-       ("^\\(export *\\)?\\([a-zA-Z0-9\-_+.${}/~]+\\(\\[[a-zA-Z0-9\-_+.${}/~]+\\]\\)?\\) *\\(=\\|\\?=\\|\\?\\?=\\|:=\\|+=\\|=+\\|.=\\|=.\\)" 2 font-lock-variable-name-face)
+       ("^\\(export *\\)?\\([a-zA-Z0-9\-_+.${}:/~]+\\(\\[[a-zA-Z0-9\-_+.${}:/~]+\\]\\)?\\) *\\(=\\|\\?=\\|\\?\\?=\\|:=\\|+=\\|=+\\|.=\\|=.\\)" 2 font-lock-variable-name-face)
        )))
 
   (define-derived-mode bitbake-mode shell-script-mode
