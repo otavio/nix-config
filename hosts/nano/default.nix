@@ -13,6 +13,11 @@
     ../common/x11.nix
   ];
 
+  boot = {
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+  };
+
   hardware.cpu.intel.updateMicrocode = true;
   hardware.video.hidpi.enable = false;
 
