@@ -13,8 +13,13 @@
     ../common/x11.nix
   ];
 
-  boot.kernelParams = [ "video=HDMI-A-1:2560x1080" ];
-  boot.extraModulePackages = [ config.boot.kernelPackages.rtl88x2bu ];
+  boot = {
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+
+    kernelParams = [ "video=HDMI-A-1:2560x1080" ];
+    extraModulePackages = [ config.boot.kernelPackages.rtl88x2bu ];
+  };
 
   hardware.cpu.intel.updateMicrocode = true;
   hardware.video.hidpi.enable = false;
@@ -38,6 +43,8 @@
 
   services.resolved.enable = true;
   networking.useDHCP = false;
+  networking.domain = "casa.salvador";
+
   networking.networkmanager = {
     enable = true;
     dns = "systemd-resolved";
@@ -82,7 +89,6 @@
   environment.systemPackages = with pkgs; [ virt-manager virt-viewer ];
 
   deployment = {
-    targetHost = "micro.casa.salvador";
     targetUser = "otavio";
     allowLocalDeployment = true;
   };

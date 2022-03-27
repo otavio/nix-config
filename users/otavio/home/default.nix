@@ -1,5 +1,6 @@
 { config
 , graphical
+, hostname
 , ...
 }:
 
@@ -10,7 +11,7 @@
       ./git.nix
       ./emacs.nix
       ./zsh.nix
-    ] ++ (if graphical then [
+    ] ++ (if graphical && hostname != "poirot" then [
       ./desktop.nix
       ./go.nix
       ./gtk.nix

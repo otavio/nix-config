@@ -2,12 +2,14 @@ keys:
   - &admin_otavio b7f7f218a0541d2a0bedbe8beb70fef3cdfc6e4f
   - &host_micro age1wnsj3p3w4yrw98v2tqup9jqe9w3r8gpcxh4nsh2828txpxx5xusqwcf5qg
   - &host_nano age196rtqfrvsu4x7e39aknntd7ne5fl20ggk3yuz2v0tm09wmavzeusj46fsm
+  - &host_poirot age1u9ug8zm5jkrz52np2jrmhuqehlzntpckkd843vvvex9uec2f29xs60yfg6
 creation_rules:
   - path_regex: secrets/[^/]+\.yaml$
     key_groups:
     - age:
       - *host_micro
       - *host_nano
+      - *host_poirot
       pgp:
       - *admin_otavio
   - path_regex: secrets/admins/[^/]+\.yaml$

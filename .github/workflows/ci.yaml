@@ -24,6 +24,7 @@ jobs:
         nixosConfiguration:
           - micro
           - nano
+          - poirot
     steps:
     - run: sudo apt-get clean
     - uses: actions/checkout@v3

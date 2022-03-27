@@ -65,6 +65,13 @@
           system = "x86_64-linux";
           users = [ "otavio" ];
         };
+
+        # My wife device
+        poirot = lib.mkSystem {
+          hostname = "poirot";
+          system = "x86_64-linux";
+          users = [ "bruna" "otavio" ];
+        };
       };
 
       homeConfigurations = {
