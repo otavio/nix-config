@@ -5,10 +5,82 @@
 :TOC:      :include all :ignore (this)
 :END:
 :CONTENTS:
+- [[#installing-nixos-on-a-newexisting-device][Installing NixOS on a new/existing device]]
+  - [[#generating-the-nixos-installer-with-ssh-and-networkmanager-support][Generating the NixOS Installer with SSH and NetworkManager support]]
+  - [[#doing-the-partitioning-of-disk][Doing the partitioning of disk]]
+  - [[#generate-the-configurationnix---optional][Generate the configuration.nix - optional]]
+  - [[#install-the-device-using-the-desired-configuration][Install the device using the desired configuration]]
 - [[#installation-inside-an-existing-linux-system][Installation inside an existing Linux system]]
 :END:
   :CUSTOM_ID: configuration-repository
   :END:
+
+* Installing NixOS on a new/existing device
+
+** Generating the NixOS Installer with SSH and NetworkManager support
+
+To generate the installer you can run:
+
+#+begin_src sh
+
+  nix build .#mkInstallerIso
+
+#+end_src
+
+** Doing the partitioning of disk
+
+The installer allow SSH connection and has the authorized keys based on ~otavio~ user. Currently, I've been using following steps to format the disk:
+
+#+begin_src sh
+
+  device=/dev/xxx
+  deviceNixOSPart=${device}1
+  deviceEFIPart=${device}2
+
+  parted ${device} -- mklabel gpt
+  parted ${device} -- mkpart primary 512MiB 100%
+  parted ${device} -- mkpart ESP fat32 1MiB 512MiB
+  parted ${device} -- set 2 esp on
+
+  mkdosfs -F32 ${deviceEFIPart} -n EFI
+
+  mkfs.btrfs ${deviceNixOSPart}
+  mount -t btrfs ${deviceNixOSPart} /mnt
+
+  btrfs subvolume create /mnt/nixos
+  btrfs subvolume create /mnt/home
+  btrfs subvolume snapshot -r /mnt/nixos /mnt/nixos-blank
+
+  umount /mnt
+  mount -o subvol=nixos,compress=zstd,discard,noatime,autodefrag ${deviceNixOSPart} /mnt
+
+  mkdir /mnt/home
+  mount -o subvol=home,compress=zstd,discard,noatime,autodefrag ${deviceNixOSPart} /mnt/home
+
+  mkdir /mnt/efi
+  mount ${deviceEFIPart} /mnt/efi
+
+#+end_src
+
+** Generate the =configuration.nix= - optional
+
+Once the partitioning is done, we may generate the =hardware-configuration.nix= if it is a new device. We than copy it to our machine definition.
+
+#+begin_src sh
+
+  nixos-generate-config --root /mnt/
+
+#+end_src
+
+** Install the device using the desired configuration
+
+The installation of the machine can be done using the machine's flake. For it use:
+
+#+begin_src text
+
+  nixos-install --flake https://github.com/otavio/nix-config#<machine>
+
+#+end_src
 
 * Installation inside an existing Linux system
 

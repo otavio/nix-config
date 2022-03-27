@@ -58,6 +58,16 @@
           graphical = false;
         };
       };
+
+      # Generate the custom installer with:
+      # $: nix build .#mkInstallerIso
+      mkInstallerIso = (lib.mkSystem {
+        hostname = "installer";
+        system = "x86_64-linux";
+        users = [ "otavio" ];
+
+        graphical = false;
+      }).config.system.build.isoImage;
     } // inputs.utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
         pkgs = import inputs.nixpkgs { inherit system overlays; };
