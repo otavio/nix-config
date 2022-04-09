@@ -32,9 +32,6 @@ let
 in
 {
   home.packages = with pkgs; [
-    grml-zsh-config
-    base16-shell
-    bitbake-completion
     zsh-completions
   ];
 
