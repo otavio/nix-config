@@ -80,7 +80,6 @@
       - [[#wks-mode][wks-mode]]
       - [[#references][References]]
     - [[#cc][C/C++]]
-    - [[#cmake][CMake]]
     - [[#device-tree][Device Tree]]
     - [[#dockerfile][Dockerfile]]
     - [[#emacs-lisp][Emacs Lisp]]
@@ -1686,15 +1685,6 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
   (c-add-style "linux-kernel" linux-kernel)
 
 #+end_src
-*** CMake
-
-#+begin_src emacs-lisp
-
-  (use-package cmake-mode
-    :mode ("CmakeLists\\.txt'" "\\.cmake\\'"))
-
-#+end_src
-
 *** Device Tree
 
 #+begin_src emacs-lisp
