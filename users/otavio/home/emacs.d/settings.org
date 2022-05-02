@@ -1206,16 +1206,14 @@ It's nice to have a table of contents section for long literate configuration fi
     (setq header-line-format " ")
     (org-appear-mode -1)
     (org-display-inline-images)
-    (os/org-present-prepare-slide)
-    (os/kill-panel))
+    (os/org-present-prepare-slide))
 
   (defun os/org-present-quit-hook ()
     (setq-local face-remapping-alist '((default variable-pitch default)))
     (setq header-line-format nil)
     (org-present-small)
     (org-remove-inline-images)
-    (org-appear-mode 1)
-    (os/start-panel))
+    (org-appear-mode 1))
 
   (defun os/org-present-prev ()
     (interactive)
