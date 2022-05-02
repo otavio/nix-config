@@ -52,12 +52,24 @@ in
       warn-dirty = false
     '';
 
+    nixPath = [
+      "nixpkgs=/etc/nix/channels/nixpkgs"
+      "home-manager=/etc/nix/channels/home-manager"
+    ];
+
     gc = {
       automatic = true;
       dates = "daily";
     };
 
     optimise.automatic = true;
+  };
+
+  environment = {
+    etc = {
+      "nix/channels/nixpkgs".source = inputs.nixpkgs;
+      "nix/channels/home-manager".source = inputs.home-manager;
+    };
   };
 
   services.openssh = {
