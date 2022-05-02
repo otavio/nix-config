@@ -1,4 +1,11 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }:
+let
+  irssiWrapper = pkgs.writeScriptBin "irssi" ''
+    export LIBERACHAT_PASSWORD=$(sops --decrypt --extract '["irssi-nickserv"]' $HOME/nix-config/secrets/secrets.yaml)
+    ${pkgs.irssi}/bin/irssi
+  '';
+in
+{
   xdg.enable = true;
 
   # We force the override so we workaround the error below:
@@ -19,7 +26,7 @@
     anydesk
     discord
     gthumb
-    irssi
+    irssiWrapper
     tdesktop
     libreoffice
     nixpkgs-fmt

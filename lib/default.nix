@@ -17,6 +17,8 @@ in
       };
 
       modules = [
+        inputs.sops-nix.nixosModules.sops
+
         ../hosts/${hostname}
         {
           networking.hostName = hostname;

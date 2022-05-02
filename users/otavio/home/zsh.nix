@@ -97,11 +97,6 @@ in
       export EDITOR="emacsclient -t"                  # $EDITOR opens in terminal
       export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 
-      irssi() {
-          export LIBERACHAT_PASSWORD=$(cat ~/src/nix-config/secrets/irssi-liberachat-password)
-          ${pkgs.irssi}/bin/irssi
-      }
-
       keys-load() {
           if [ -z "$1" ]; then
               unset SSH_AUTH_SOCK

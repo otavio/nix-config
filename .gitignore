@@ -1,8 +1,3 @@
 *~
-.gitsecret/keys/random_seed
-!*.secret
-/secrets/irssi-liberachat-password
-/secrets/gitaliases
 /.direnv/
 /nix/emacs.d/flycheck_init.el
-secrets/msmtp-gmail

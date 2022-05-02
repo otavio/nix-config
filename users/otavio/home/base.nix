@@ -62,7 +62,7 @@ in
   home.file = {
     ".emacs.d" = { source = ./emacs.d; recursive = true; };
     ".gitconfig".source = ./git/config;
-    ".msmtprc".source = ./msmtp/msmtprc;
+    ".gitaliases".source = ./git/aliases;
     ".patman".source = ./git/patman;
     ".tmux.conf".source = ./tmux/tmux.conf;
     ".tmuxp" = { source = ./tmux/tmuxp; recursive = true; };
