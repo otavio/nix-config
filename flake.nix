@@ -63,7 +63,7 @@
         pkgs = import inputs.nixpkgs { inherit system overlays; };
       in
       {
-        devShell = pkgs.mkShell {
+        devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [ sops home-manager ];
         };
 
