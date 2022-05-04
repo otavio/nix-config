@@ -39,6 +39,7 @@
   };
 
   # In case if it's enabled, I should have access to use it.
+  users.extraGroups.audio.members = [ "otavio" ];
   users.extraGroups.networkmanager.members = [ "otavio" ];
   users.extraGroups.docker.members = [ "otavio" ];
   users.extraGroups.libvirtd.members = [ "otavio" ];
