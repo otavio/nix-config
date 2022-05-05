@@ -81,8 +81,5 @@ in
 
   security.sudo.wheelNeedsPassword = false;
 
-  # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 22 ];
-
   sops.defaultSopsFile = ../../secrets/secrets.yaml;
 }
