@@ -25,6 +25,27 @@
 
   networking.networkmanager.enable = true;
 
+  # Enable WireGuard
+  sops.secrets.nano-wireguard-private-key = { };
+  networking.wireguard.interfaces = {
+    wg0 = {
+      ips = [ "10.10.1.2/32" ];
+      privateKeyFile = config.sops.secrets.nano-wireguard-private-key.path;
+
+      peers = [
+        {
+          publicKey = "3cJEElR2e9ClzNHHqDkNgqulOsw3u5OdKnKj3bd4K1c=";
+          allowedIPs = [
+            "10.4.0.0/16"
+            "10.5.0.0/16"
+          ];
+          endpoint = "ossystems.ddns.net:51820";
+          persistentKeepalive = 25;
+        }
+      ];
+    };
+  };
+
   # Enable fstrim (for SSD disks)
   services.fstrim.enable = true;
   services.fstrim.interval = "weekly";
@@ -45,6 +66,8 @@
         '';
       }
     ];
+
+    dpi = 140;
   };
 
   deployment = {
@@ -53,3 +76,4 @@
     allowLocalDeployment = true;
   };
 }
+

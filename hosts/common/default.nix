@@ -10,7 +10,7 @@ in
   time.timeZone = "America/Sao_Paulo";
 
   console = {
-    font = "Lat2-Terminus16";
+    font = mkDefault "Lat2-Terminus16";
     keyMap = mkDefault "br-latin1-us";
   };
 
