@@ -1,8 +1,28 @@
 { inputs, overlays }:
 let
-  inherit (builtins) listToAttrs map;
+  inherit (builtins) listToAttrs map mapAttrs;
 in
 {
+  mkColmenaFromNixOSConfigurations = nixosConfigurations:
+    {
+      meta = {
+        nixpkgs = import inputs.nixpkgs {
+          system = "x86_64-linux";
+          inherit overlays;
+        };
+
+        specialArgs = {
+          inherit inputs;
+        };
+      };
+    } // mapAttrs
+      (name: value:
+        {
+          nixpkgs.system = value.config.nixpkgs.system;
+          imports = value._module.args.modules;
+        })
+      (nixosConfigurations);
+
   mkSystem =
     { hostname
     , system
@@ -15,6 +35,8 @@ in
       specialArgs = {
         inherit inputs system hostname;
       };
+
+      extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
 
       modules = [
         inputs.sops-nix.nixosModules.sops
@@ -49,7 +71,7 @@ in
                   users);
 
             extraSpecialArgs = {
-              inherit inputs system graphical;
+              inherit inputs system graphical hostname;
             };
           };
         }
@@ -63,6 +85,7 @@ in
     { username
     , system
     , graphical ? false
+    , hostname ? "unknown"
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
       inherit username system;

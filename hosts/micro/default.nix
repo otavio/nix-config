@@ -52,4 +52,10 @@
   virtualisation.docker.enable = true;
   virtualisation.libvirtd.enable = true;
   environment.systemPackages = with pkgs; [ virt-manager virt-viewer ];
+
+  deployment = {
+    targetHost = "micro.casa.salvador";
+    targetUser = "otavio";
+    allowLocalDeployment = true;
+  };
 }

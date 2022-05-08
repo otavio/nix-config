@@ -23,14 +23,23 @@
       url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    colmena = {
+      url = "github:zhaofengli/colmena";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.stable.follows = "nixpkgs";
+      inputs.utils.follows = "utils";
+    };
   };
 
-  outputs = { ... }@inputs:
+  outputs = { self, ... }@inputs:
     let
       overlays = with inputs; [
         (import ./overlays)
 
         emacs-overlay.overlay
+        colmena.overlay
+        sops-nix.overlay
       ];
 
       lib = import ./lib { inherit inputs overlays; };
@@ -68,13 +77,19 @@
 
         graphical = false;
       }).config.system.build.isoImage;
+
+      colmena = lib.mkColmenaFromNixOSConfigurations self.nixosConfigurations;
     } // inputs.utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
         pkgs = import inputs.nixpkgs { inherit system overlays; };
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [ sops home-manager ];
+          buildInputs = with pkgs; [
+            colmena
+            home-manager
+            sops
+          ];
         };
 
         checks = {

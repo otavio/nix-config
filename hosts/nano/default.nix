@@ -46,4 +46,10 @@
       }
     ];
   };
+
+  deployment = {
+    targetHost = "nano.casa.salvador";
+    targetUser = "otavio";
+    allowLocalDeployment = true;
+  };
 }
