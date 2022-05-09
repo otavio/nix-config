@@ -48,7 +48,7 @@ in
       bars = [
         {
           position = "bottom";
-          statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ${./i3/i3status-rust.toml}";
+          statusCommand = "${config.programs.i3status-rust.package}/bin/i3status-rs ${config.home.homeDirectory}/.config/i3status-rust/config-bottom.toml";
           fonts = {
             names = [ "FontAwesome" "Iosevka" ];
             size = 9.0;
@@ -151,6 +151,75 @@ in
         { command = "skypeforlinux"; notification = true; }
         { command = "slack"; notification = true; }
       ];
+    };
+  };
+
+  programs.i3status-rust = {
+    enable = true;
+
+    bars = {
+      bottom = {
+        theme = "modern";
+        icons = "awesome5";
+        blocks = [
+          {
+            block = "disk_space";
+            path = "/";
+            alias = "/";
+            info_type = "available";
+            unit = "GB";
+            interval = 20;
+            warning = 20.0;
+            alert = 10.0;
+          }
+          {
+            block = "weather";
+            format = "{weather} ({location}) {temp}, {wind} m/s {direction}";
+            service = {
+              name = "openweathermap";
+              api_key = "0f9d6aa5c9af7b7249a0320d1032ddd2";
+              city_id = "3454244";
+              units = "metric";
+            };
+          }
+
+          {
+            block = "memory";
+            display_type = "memory";
+            format_mem = "{mem_total_used_percents}";
+            format_swap = "{swap_used_percents}";
+          }
+
+          {
+            block = "cpu";
+            interval = 1;
+          }
+          {
+            block = "load";
+            interval = 1;
+            format = "{1m}";
+          }
+          {
+            block = "networkmanager";
+            on_click = "alacritty -e nmtui";
+            interface_name_exclude = [ "br\\-[0-9a-f]{12}" "docker\\d+" ];
+            interface_name_include = [ ];
+          }
+          {
+            block = "time";
+            interval = 60;
+            format = "%a %m/%d %I:%M";
+          }
+        ] ++ pkgs.lib.lists.optionals (hostname == "nano") [
+          {
+            block = "battery";
+            interval = 10;
+            device = "/sys/class/power_supply/max170xx_battery";
+            format = "{percentage} {time}";
+            hide_missing = true;
+          }
+        ];
+      };
     };
   };
 
