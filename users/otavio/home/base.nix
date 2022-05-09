@@ -28,7 +28,6 @@ in
     patman
     tmux
     tmuxp
-    topgrade
     tree
     xclip
 
@@ -69,5 +68,21 @@ in
     ".yocto/site.conf".source = ./yocto/site.conf;
   };
 
-  xdg.configFile."topgrade.toml".source = ./topgrade/topgrade.toml;
+  programs.topgrade = {
+    enable = true;
+    settings = {
+      assume_yes = true;
+      disable = [
+        "emacs"
+        "home_manager"
+        "flutter"
+        "node"
+      ];
+      set_title = false;
+      cleanup = true;
+      pre_commands = {
+        "nix-config" = "cd ~/src/nix-config && git pull --rebase --autostash";
+      };
+    };
+  };
 }
