@@ -7,6 +7,7 @@
   imports =
     [
       ./base.nix
+      ./git.nix
       ./emacs.nix
       ./zsh.nix
     ] ++ (if graphical then [

@@ -15,17 +15,11 @@ in
     local-scripts
 
     cryptsetup
-    gh
-    git-review
-    git-secret
-    gitAndTools.delta
-    gitRepo
     gping
     htop
     keychain
     mtr
     nnn
-    patman
     tmux
     tmuxp
     tree
@@ -33,7 +27,6 @@ in
 
     axel
     wget
-    git
     nettools # for ifconfig
     psmisc # for killall
 
@@ -60,9 +53,6 @@ in
 
   home.file = {
     ".emacs.d" = { source = ./emacs.d; recursive = true; };
-    ".gitconfig".source = ./git/config;
-    ".gitaliases".source = ./git/aliases;
-    ".patman".source = ./git/patman;
     ".tmux.conf".source = ./tmux/tmux.conf;
     ".tmuxp" = { source = ./tmux/tmuxp; recursive = true; };
     ".yocto/site.conf".source = ./yocto/site.conf;
