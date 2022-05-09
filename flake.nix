@@ -38,7 +38,6 @@
         (import ./overlays)
 
         emacs-overlay.overlay
-        colmena.overlay
         sops-nix.overlay
       ];
 
