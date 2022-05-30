@@ -17,6 +17,7 @@
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "utils";
     };
 
     utils = {
