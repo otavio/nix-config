@@ -1782,11 +1782,6 @@ Configure TypeScript and JavaScript language modes
     (add-hook 'js2-mode-hook #'os/set-js-indentation)
     (add-hook 'json-mode-hook #'os/set-js-indentation))
 
-  (use-package apheleia
-    :config
-    (apheleia-global-mode +1))
-
-
   ;; (use-package prettier-js
   ;;   :hook ((js2-mode . prettier-js-mode)
   ;;          (typescript-mode . prettier-js-mode))
