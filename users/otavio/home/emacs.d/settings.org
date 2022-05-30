@@ -1705,7 +1705,9 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
   (use-package nix-mode
     :hook (nix-mode . lsp-deferred)
     :init
-    (add-hook 'nix-mode-hook 'nixpkgs-fmt-on-save-mode))
+    (add-hook 'nix-mode-hook 'nixpkgs-fmt-on-save-mode)
+    :config
+    (setq nix-nixfmt-bin "nixpkgs-fmt"))
 
 #+end_src
 
