@@ -7,6 +7,10 @@
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
+
+      # used for tests only so we can ignore it.
+      inputs.nixpkgs-21_11.follows = "nixpkgs";
+      inputs.nixpkgs-22_05.follows = "nixpkgs";
     };
 
     home-manager = {
