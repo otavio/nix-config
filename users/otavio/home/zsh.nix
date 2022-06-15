@@ -106,7 +106,7 @@ in
                   echo done || echo ERROR
 
               echo Carregando chave SSH ...
-              DISPLAY="" keychain --agents gpg,ssh id_rsa EB70FEF3CDFC6E4F 306736ED8C77E0D5
+              DISPLAY="" keychain --agents gpg,ssh id_rsa id_ed25519 EB70FEF3CDFC6E4F 306736ED8C77E0D5
           fi
 
           [ -f $HOME/.keychain/$(hostname)-sh ] && source $HOME/.keychain/$(hostname)-sh
