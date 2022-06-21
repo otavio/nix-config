@@ -145,7 +145,8 @@ Set up ELPA, MELPA, and Org package repositories and load =use-package= to manag
 
   (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                            ("org" . "https://orgmode.org/elpa/")
-                           ("elpa" . "https://elpa.gnu.org/packages/")))
+                           ("elpa" . "https://elpa.gnu.org/packages/")
+                           ("onpa" . "https://olanilsson.bitbucket.io/packages/")))
 
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
@@ -1538,7 +1539,7 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
 
 #+begin_src emacs-lisp
 
-  (use-package bitbake-mode
+  (use-package bitbake-modes
     :defer t)
 
 #+end_src
