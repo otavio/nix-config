@@ -442,7 +442,8 @@ The [[https://github.com/myrjola/diminish.el][diminish]] package hides pesky min
     :hook (doom-modeline-mode . minions-mode))
 
   (use-package doom-modeline
-    :hook (after-init . doom-modeline-init)
+    :ensure t
+    :init (doom-modeline-mode 1)
     :custom-face
     (mode-line ((t (:height 0.85))))
     (mode-line-inactive ((t (:height 0.85))))
