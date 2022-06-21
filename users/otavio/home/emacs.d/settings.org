@@ -1060,8 +1060,7 @@ Set up Org Mode with a baseline configuration.  The following sections will add 
 
     (org-babel-do-load-languages
      'org-babel-load-languages
-     '((emacs-lisp . t)
-       (ledger . t)))
+     '((emacs-lisp . t)))
 
     (push '("conf-unix" . conf-unix) org-src-lang-modes)
 
