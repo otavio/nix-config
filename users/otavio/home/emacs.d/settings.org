@@ -810,7 +810,7 @@ Default to an indentation size of 4 spaces since it's the norm for pretty much e
     :custom
     (corfu-cycle t)
     :init
-    (corfu-global-mode))
+    (global-corfu-mode))
 
 #+end_src
 
