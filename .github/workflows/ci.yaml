@@ -33,3 +33,19 @@ jobs:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
     - run: nix -Lv build ".#nixosConfigurations.${{ matrix.nixosConfiguration }}.config.system.build.toplevel"
+
+  nix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        homeConfiguration:
+          - otavio
+    steps:
+    - run: sudo apt-get clean
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v16
+    - uses: cachix/cachix-action@v10
+      with:
+        name: otavio-nix-config
+        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+    - run: nix -Lv build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"

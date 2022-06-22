@@ -87,8 +87,11 @@ in
     , graphical ? false
     , hostname ? "unknown"
     }:
+    let
+      pkgs = import inputs.nixpkgs { inherit overlays system; };
+    in
     inputs.home-manager.lib.homeManagerConfiguration {
-      inherit username system;
+      inherit username system pkgs;
 
       extraSpecialArgs = {
         inherit inputs system graphical;
