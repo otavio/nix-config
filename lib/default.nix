@@ -117,7 +117,5 @@ in
           systemd.user.startServices = "sd-switch";
         }
       ];
-
-      stateVersion = "22.05";
     };
 }
