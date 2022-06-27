@@ -91,19 +91,20 @@ in
       pkgs = import inputs.nixpkgs { inherit overlays system; };
     in
     inputs.home-manager.lib.homeManagerConfiguration {
-      inherit username system pkgs;
+      inherit pkgs;
 
       extraSpecialArgs = {
         inherit inputs system graphical;
       };
 
-      homeDirectory = "/home/${username}";
-
-      configuration = ../users/${username}/home;
-
-      extraModules = [
+      modules = [
         # Base configuration
         {
+          home = {
+            username = username;
+            homeDirectory = "/home/${username}";
+          };
+
           nixpkgs = {
             inherit overlays;
             config.allowUnfree = true;
@@ -116,6 +117,8 @@ in
 
           systemd.user.startServices = "sd-switch";
         }
+
+        ../users/${username}/home
       ];
     };
 }
