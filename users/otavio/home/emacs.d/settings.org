@@ -1489,10 +1489,7 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
           lsp-rust-server 'rust-analyzer
           lsp-rust-analyzer-server-command '("~/.cargo/bin/rust-analyzer"))
 
-    :hook (;; reformat code and add missing (or remove old) imports
-           (before-save . lsp-format-buffer)
-           (before-save . lsp-organize-imports)
-           ;; modes
+    :hook (;; modes
            (rust-mode . lsp)
            (go-mode . lsp)
            (c-mode . lsp)
