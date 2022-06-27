@@ -69,7 +69,7 @@
   - [[#git][Git]]
     - [[#magit---its-magit-a-git-porcelain-inside-emacs][Magit - It's Magit! A Git porcelain inside Emacs]]
       - [[#show-todo-items-in-current-changing-files][Show TODO items in current changing files]]
-    - [[#git-gutter---emacs-port-of-gitgutter-which-is-sublime-text-plugin][Git Gutter - Emacs port of GitGutter which is Sublime Text Plugin]]
+    - [[#diff-hl---emacs-package-for-highlighting-uncommitted-changes][diff-hl - Emacs package for highlighting uncommitted changes]]
     - [[#create-urls-for-files-and-commits-in-githubbitbucketgitlab-repositories][Create URLs for files and commits in GitHub/Bitbucket/GitLab/... repositories]]
   - [[#projectile][Projectile]]
   - [[#languages][Languages]]
@@ -1415,16 +1415,19 @@ This is an interesting extension to Magit that shows a TODOs section in your git
 
 #+end_src
 
-*** Git Gutter - [[https://github.com/emacsorphanage/git-gutter][Emacs port of GitGutter which is Sublime Text Plugin]]
+*** diff-hl - [[https://github.com/dgutov/diff-hl][Emacs package for highlighting uncommitted changes]]
 
 #+begin_src emacs-lisp
 
-  (use-package git-gutter
-    :diminish git-gutter-mode
-    :hook
-    (after-init . global-git-gutter-mode)
+  (use-package diff-hl
+    :hook ((after-init         . global-diff-hl-mode)
+           (dired-mode         . diff-hl-dired-mode-unless-remote)
+           (magit-pre-refresh  . diff-hl-magit-pre-refresh)
+           (magit-post-refresh . diff-hl-magit-post-refresh))
     :config
-    (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows))
+    ;; When Emacs runs in terminal, show the indicators in margin instead.
+    (unless (display-graphic-p)
+      (diff-hl-margin-mode)))
 
 #+end_src
 
