@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 let
   local-scripts = pkgs.stdenv.mkDerivation {
     name = "local-scripts";
@@ -10,6 +10,10 @@ let
   };
 in
 {
+  imports = [ inputs.nix-colors.homeManagerModule ];
+
+  colorScheme = inputs.nix-colors.colorSchemes.default-dark;
+
   programs.home-manager.enable = true;
 
   home.stateVersion = "22.11";

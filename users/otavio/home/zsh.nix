@@ -1,20 +1,5 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 let
-  base16-shell = pkgs.stdenv.mkDerivation {
-    name = "base16-shell";
-    src = pkgs.fetchFromGitHub {
-      owner = "base16-project";
-      repo = "base16-shell";
-      rev = "41848241532fd60cdda222cc8f7b2bbead9fb50d";
-      sha256 = "sha256-rkgH8J6RgI3ej04z4gPFHMabaBRZKeaXIHhk0HxXMHo=";
-    };
-
-    installPhase = ''
-      mkdir -p $out/share/base16-shell
-      cp -r * $out/share/base16-shell/
-    '';
-  };
-
   bitbake-completion = pkgs.stdenv.mkDerivation {
     name = "bitbake-completion";
     src = pkgs.fetchFromGitHub {
@@ -29,6 +14,8 @@ let
       cp -r * $out/share/bitbake-completion/
     '';
   };
+
+  inherit (inputs.nix-colors.lib-contrib { inherit pkgs; }) shellThemeFromScheme;
 in
 {
   home.packages = with pkgs; [
@@ -110,12 +97,7 @@ in
                                              nix-shell-indicator kube-ps1-indicator \
                                              percent
 
-      # Base16 Shell
-      BASE16_SHELL_PATH="${base16-shell}/share/base16-shell"
-      [ -n "$PS1" ] && \
-          [ -s "$BASE16_SHELL_PATH/profile_helper.sh" ] && \
-              source "$BASE16_SHELL_PATH/profile_helper.sh"
-      [ -n "$PS1" ] && set_theme ayu-dark
+      source ${shellThemeFromScheme { scheme = config.colorScheme; }}
     '';
 
     initExtra = ''
