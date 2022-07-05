@@ -3,7 +3,7 @@ let
   base16-shell = pkgs.stdenv.mkDerivation {
     name = "base16-shell";
     src = pkgs.fetchFromGitHub {
-      owner = "chriskempson";
+      owner = "base16-project";
       repo = "base16-shell";
       rev = "ce8e1e540367ea83cc3e01eec7b2a11783b3f9e1";
       sha256 = "1yj36k64zz65lxh28bb5rb5skwlinixxz6qwkwaf845ajvm45j1q";
