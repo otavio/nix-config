@@ -5,8 +5,8 @@ let
     src = pkgs.fetchFromGitHub {
       owner = "base16-project";
       repo = "base16-shell";
-      rev = "ce8e1e540367ea83cc3e01eec7b2a11783b3f9e1";
-      sha256 = "1yj36k64zz65lxh28bb5rb5skwlinixxz6qwkwaf845ajvm45j1q";
+      rev = "1af738dbb8fb6dbfd0402502ed47937ef4ebd461";
+      sha256 = "sha256-ZlZpMvoljpfeTuOfTrF9qEnoGnkpxGjznd54y+deYwA=";
     };
 
     installPhase = ''
@@ -78,7 +78,12 @@ in
 
     initExtraFirst = ''
       source ${pkgs.grml-zsh-config}/etc/zsh/zshrc
-      source ${base16-shell}/share/base16-shell/scripts/base16-default-dark.sh
+
+      # Base16 Shell
+      BASE16_SHELL_PATH="${base16-shell}/share/base16-shell"
+      [ -n "$PS1" ] && \
+          [ -s "$BASE16_SHELL_PATH/profile_helper.sh" ] && \
+              source "$BASE16_SHELL_PATH/profile_helper.sh"
     '';
 
     initExtra = ''
