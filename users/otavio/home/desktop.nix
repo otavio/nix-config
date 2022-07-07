@@ -46,7 +46,12 @@ in
   xdg.configFile."parcellite/parcelliterc".source =
     ./parcellite/parcelliterc;
 
-  programs.alacritty.enable = true;
+  programs.alacritty = {
+    enable = true;
+    settings = {
+      env.term = "xterm-256color";
+    };
+  };
 
   programs.zathura.enable = true;
 
