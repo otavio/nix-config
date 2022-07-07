@@ -8,7 +8,6 @@
   home.packages = with pkgs; [
     git-review
     git-secret
-    gitAndTools.delta
     gitRepo
     gh
     patman
@@ -28,7 +27,10 @@
       signoff-rebase = "!GIT_SEQUENCE_EDITOR='sed -i -re s/^pick/e/' sh -c 'git rebase -i $1 && while git rebase --continue; do git commit --amend --signoff --no-edit; done' -";
     };
 
-    delta.enable = true;
+    delta = {
+      enable = true;
+      options.syntax-theme = "base16-256";
+    };
 
     ignores = [ ".direnv" ];
 
