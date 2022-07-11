@@ -156,13 +156,12 @@ chatnets = {
 
 channels = (
   {
-    name = "#oe,#yocto,#etnaviv";
+    name = "#oe,#yocto";
     chatnet = "LiberaChat";
     autojoin = "yes";
-  }
-channels = (
+  };
   {
-    name = "#oe,#yocto,#etnaviv";
+    name = "#etnaviv";
     chatnet = "OFTC";
     autojoin = "yes";
   }
