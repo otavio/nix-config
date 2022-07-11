@@ -1,7 +1,9 @@
 session_name: local
 windows:
-  - window_name: irssi
+  - layout: even-horizontal
+    window_name: irssi
     window_index: 9
     focus: true
     panes:
       - irssi
+      -
