@@ -80,11 +80,11 @@ in
       source ${pkgs.grml-zsh-config}/etc/zsh/zshrc
 
       # Base16 Shell
-      BASE16_THEME_DEFAULT=ayu-dark
       BASE16_SHELL_PATH="${base16-shell}/share/base16-shell"
       [ -n "$PS1" ] && \
           [ -s "$BASE16_SHELL_PATH/profile_helper.sh" ] && \
               source "$BASE16_SHELL_PATH/profile_helper.sh"
+      [ -n "$PS1" ] && set_theme ayu-dark
     '';
 
     initExtra = ''
