@@ -95,6 +95,7 @@ in
 
       # Fix bad color choice for comment style
       # See: https://github.com/zsh-users/zsh-syntax-highlighting/issues/510
+      typeset -gA ZSH_HIGHLIGHT_STYLES
       export ZSH_HIGHLIGHT_STYLES[comment]=fg=8,bold
 
       # Use emacsclient as default editor.
