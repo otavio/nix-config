@@ -14,6 +14,7 @@
   ];
 
   boot.kernelParams = [ "video=HDMI-A-1:2560x1080" ];
+  boot.extraModulePackages = [ config.boot.kernelPackages.rtl88x2bu ];
 
   hardware.cpu.intel.updateMicrocode = true;
   hardware.video.hidpi.enable = false;
