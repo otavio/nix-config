@@ -36,9 +36,13 @@
     }];
   };
 
+  services.resolved.enable = true;
   networking.useDHCP = false;
+  networking.networkmanager = {
+    enable = true;
+    dns = "systemd-resolved";
+  };
 
-  networking.networkmanager.enable = true;
 
   # Enable fstrim (for SSD disks)
   services.fstrim.enable = true;
