@@ -23,6 +23,7 @@
   networking.networkmanager = {
     enable = true;
     dns = "systemd-resolved";
+    wifi.backend = "iwd";
   };
 
   # Enable WireGuard
