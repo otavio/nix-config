@@ -44,12 +44,12 @@
     wifi.backend = "iwd";
   };
 
-  # Enable WireGuard
-  sops.secrets.micro-wireguard-private-key = { };
+  # Enable Fireguard
+  sops.secrets."wireguard/micro/private-key" = { };
   networking.wireguard.interfaces = {
     wg0 = {
       ips = [ "10.10.1.3/32" ];
-      privateKeyFile = config.sops.secrets.micro-wireguard-private-key.path;
+      privateKeyFile = config.sops.secrets."wireguard/micro/private-key".path;
       peers = [
         {
           publicKey = "3cJEElR2e9ClzNHHqDkNgqulOsw3u5OdKnKj3bd4K1c=";

@@ -27,11 +27,11 @@
   };
 
   # Enable WireGuard
-  sops.secrets.nano-wireguard-private-key = { };
+  sops.secrets."wireguard/nano/private-key" = { };
   networking.wireguard.interfaces = {
     wg0 = {
       ips = [ "10.10.1.2/32" ];
-      privateKeyFile = config.sops.secrets.nano-wireguard-private-key.path;
+      privateKeyFile = config.sops.secrets."wireguard/nano/private-key".path;
 
       peers = [
         {
