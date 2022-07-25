@@ -42,8 +42,14 @@
           ];
           endpoint = "ossystems.ddns.net:51820";
           persistentKeepalive = 25;
+          dynamicEndpointRefreshSeconds = 30;
         }
       ];
+      postSetup = ''
+        resolvectl dns    wg0 10.5.1.254
+        resolvectl domain wg0 "~lab.ossystems"
+        resolvectl dnssec wg0 false
+      '';
     };
   };
 
