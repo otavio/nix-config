@@ -18,7 +18,7 @@
     source-code-pro
 
     jetbrains-mono
-    iosevka
+    iosevka-bin
 
     (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
   ];
