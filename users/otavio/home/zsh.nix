@@ -99,10 +99,10 @@ in
       typeset -gA ZSH_HIGHLIGHT_STYLES
       export ZSH_HIGHLIGHT_STYLES[comment]=fg=8,bold
 
-      # Use emacsclient as default editor.
+      # Use emacs as default editor.
       export ALTERNATE_EDITOR=""
-      export EDITOR="emacsclient -t"                  # $EDITOR opens in terminal
-      export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
+      export EDITOR="emacs -nw" # $EDITOR opens in terminal
+      export VISUAL="emacs"     # $VISUAL opens in GUI mode
 
       keys-load() {
           if [ -z "$1" ]; then
@@ -203,9 +203,6 @@ in
       # delete the fingerprint every time we reinstall them.
       issh = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null";
       iscp = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null";
-
-      # Allow opening the emacsclient using regular command.
-      emacs = "emacsclient -c -a emacs";
     };
 
     history = {

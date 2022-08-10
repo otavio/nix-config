@@ -7,7 +7,7 @@
 let
   modifier = "Mod4";
 
-  editor = "emacsclient -c -a 'emacs'";
+  editor = "emacs -nw";
   terminal = "i3-sensible-terminal --class=term";
   menu = "i3-sensible-terminal -t 'fzf-menu' --class 'fzf-menu' -e fzf-menu";
 

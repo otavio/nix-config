@@ -39,8 +39,5 @@ in
     };
   };
 
-  services.emacs = {
-    enable = true;
-    package = emacsWithPackages;
-  };
+  services.emacs.package = emacsWithPackages;
 }
