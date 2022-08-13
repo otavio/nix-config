@@ -28,16 +28,12 @@ in
     gthumb
     irssiWrapper
     tdesktop
-    libreoffice
     nixpkgs-fmt
     nixpkgs-review
     pavucontrol
     scrcpy
     skypeforlinux
     slack
-    vlc
-    zoom-us
-    zulip
   ];
 
   services.unclutter.enable = true;
