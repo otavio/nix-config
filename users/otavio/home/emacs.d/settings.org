@@ -91,6 +91,7 @@
     - [[#qt][Qt]]
     - [[#rust][Rust]]
     - [[#systemd][SystemD]]
+    - [[#terraform][Terraform]]
     - [[#toml][TOML]]
     - [[#typescript-and-javascript][TypeScript and JavaScript]]
     - [[#yaml][YAML]]
@@ -1762,6 +1763,14 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
 
   (use-package systemd
     :mode ("\\.automount\\'\\|\\.busname\\'\\|\\.mount\\'\\|\\.service\\'\\|\\.slice\\'\\|\\.socket\\'\\|\\.target\\'\\|\\.timer\\'\\|\\.link\\'\\|\\.netdev\\'\\|\\.network\\'\\|\\.override\\.conf.*\\'" . systemd-mode))
+
+#+end_src
+
+*** Terraform
+
+#+begin_src emacs-lisp
+
+  (use-package terraform-mode)
 
 #+end_src
 
