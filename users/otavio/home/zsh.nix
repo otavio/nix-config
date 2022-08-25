@@ -98,8 +98,17 @@ in
           REPLY=''${IN_NIX_SHELL+"(nix-shell)"}
       }
       grml_theme_add_token nix-shell-indicator -f nix_shell_prompt '%F{magenta}' '%f'
+
+      source ${pkgs.kube-ps1}/share/kube-ps1/kube-ps1.sh
+      kube_ps1_prompt() {
+        command -v kubectl >/dev/null && kubeon || kubeoff
+        REPLY=''$(kube_ps1)
+      }
+      grml_theme_add_token kube-ps1-indicator -f kube_ps1_prompt "" '%f'
+
       zstyle ':prompt:grml:left:setup' items rc change-root user at host path vcs \
-                                             nix-shell-indicator percent
+                                             nix-shell-indicator kube-ps1-indicator \
+                                             percent
 
       # Base16 Shell
       BASE16_SHELL_PATH="${base16-shell}/share/base16-shell"
