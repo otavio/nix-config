@@ -12,13 +12,13 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
+    utils.url = "github:numtide/flake-utils";
 
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
 
       # used for tests only so we can ignore it.
-      inputs.nixpkgs-21_11.follows = "nixpkgs";
       inputs.nixpkgs-22_05.follows = "nixpkgs";
     };
 
@@ -31,11 +31,6 @@
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "utils";
-    };
-
-    utils = {
-      url = "github:numtide/flake-utils";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     colmena = {
