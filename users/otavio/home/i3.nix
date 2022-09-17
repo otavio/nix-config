@@ -230,7 +230,7 @@ in
     };
   };
 
-  home.packages = with pkgs; [ fzf i3 pa_applet ];
+  home.packages = with pkgs; [ fzf i3 pa-applet ];
 
   home.file.".xinitrc".source = ./i3/xinitrc;
 }
