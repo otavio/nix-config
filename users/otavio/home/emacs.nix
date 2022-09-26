@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  emacsWithPackages = (pkgs.emacsWithPackagesFromUsePackage
+  emacsWithPackages = pkgs.emacsWithPackagesFromUsePackage
     {
       config = ./emacs.d/settings.org;
 
@@ -12,7 +12,7 @@ let
       # will include all code blocks missing the `:tangle` argument,
       # defaulting it to `yes`.
       alwaysTangle = true;
-    });
+    };
 in
 {
   home.packages = with pkgs; [

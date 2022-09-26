@@ -27,7 +27,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Kubernetes prompt for bash and zsh";
-    homepage = src.meta.homepage;
+    inherit (src.meta) homepage;
     license = licenses.asl20;
     platforms = platforms.unix;
     maintainers = with maintainers; [ otavio ];

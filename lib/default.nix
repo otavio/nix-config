@@ -21,7 +21,7 @@ in
           nixpkgs.system = value.config.nixpkgs.system;
           imports = value._module.args.modules;
         })
-      (nixosConfigurations);
+      nixosConfigurations;
 
   mkSystem =
     { hostname
@@ -55,7 +55,7 @@ in
           # Add each input as a registry
           nix.registry = inputs.nixpkgs.lib.mapAttrs'
             (n: v:
-              inputs.nixpkgs.lib.nameValuePair (n) ({ flake = v; }))
+              inputs.nixpkgs.lib.nameValuePair n { flake = v; })
             inputs;
         }
 
@@ -67,7 +67,7 @@ in
             users =
               listToAttrs
                 (map
-                  (u: { name = u; value = (import ../users/${ u}/home); })
+                  (u: { name = u; value = import ../users/${ u}/home; })
                   users);
 
             extraSpecialArgs = {
@@ -101,7 +101,7 @@ in
         # Base configuration
         {
           home = {
-            username = username;
+            inherit username;
             homeDirectory = "/home/${username}";
           };
 
