@@ -40,7 +40,7 @@ in
         "${triviaWs}" = [
           { class = "skype"; }
           { class = "slack"; }
-          { class = "ArmCord"; }
+          { class = "discord"; }
           { class = "telegram-desktop"; }
         ];
       };
@@ -142,7 +142,7 @@ in
 
       startup = [
         { command = "pa-applet"; notification = true; }
-        { command = "armcord"; notification = true; }
+        { command = "Discord"; notification = true; }
         { command = "telegram-desktop"; notification = true; }
       ] ++ pkgs.lib.lists.optionals (hostname == "micro") [
         { command = editor; notification = true; }

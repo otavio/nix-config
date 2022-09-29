@@ -24,7 +24,7 @@ in
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
     anydesk
-    armcord
+    discord
     gthumb
     irssiWrapper
     tdesktop
