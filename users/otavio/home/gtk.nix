@@ -8,7 +8,7 @@
     font.name = "Ubuntu 12";
     iconTheme = {
       name = "Adwaita";
-      package = pkgs.gnome3.adwaita-icon-theme;
+      package = pkgs.gnome.adwaita-icon-theme;
     };
 
     gtk2.extraConfig = ''
