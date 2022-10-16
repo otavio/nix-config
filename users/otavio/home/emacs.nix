@@ -1,18 +1,21 @@
 { config, pkgs, ... }:
 let
-  emacsWithPackages = pkgs.emacsWithPackagesFromUsePackage
-    {
-      config = ./emacs.d/settings.org;
+  emacsWithPackages = pkgs.emacsWithPackagesFromUsePackage {
+    config = ./emacs.d/settings.org;
 
-      # `use-package-always-ensure` to `t` in your config.
-      alwaysEnsure = true;
+    # `use-package-always-ensure` to `t` in your config.
+    alwaysEnsure = true;
 
-      # For Org mode babel files, by default only code blocks with
-      # `:tangle yes` are considered. Setting `alwaysTangle` to `true`
-      # will include all code blocks missing the `:tangle` argument,
-      # defaulting it to `yes`.
-      alwaysTangle = true;
+    # For Org mode babel files, by default only code blocks with
+    # `:tangle yes` are considered. Setting `alwaysTangle` to `true`
+    # will include all code blocks missing the `:tangle` argument,
+    # defaulting it to `yes`.
+    alwaysTangle = true;
+
+    override = epkgs: epkgs // {
+      nix-mode = epkgs.nongnuPackages.nix-mode;
     };
+  };
 in
 {
   home.packages = with pkgs; [
