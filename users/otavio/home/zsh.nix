@@ -211,7 +211,7 @@ in
 
           # cleanup
           rm -f $tmpfile
-             }
+      }
 
       keys-load "not-ask"
 
