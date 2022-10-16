@@ -73,6 +73,7 @@
     - [[#create-urls-for-files-and-commits-in-githubbitbucketgitlab-repositories][Create URLs for files and commits in GitHub/Bitbucket/GitLab/... repositories]]
   - [[#yafolding---yet-another-folding-extension-for-emacs][Yafolding - Yet another folding extension for Emacs]]
   - [[#wgrep---writable-grep-buffer-and-apply-the-changes-to-files][wgrep - Writable grep buffer and apply the changes to files]]
+  - [[#mmm][MMM]]
   - [[#projectile][Projectile]]
   - [[#languages][Languages]]
     - [[#language-server-support][Language Server Support]]
@@ -1471,6 +1472,13 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
     :commands (wgrep-change-to-wgrep-mode))
 
 #+end_src
+
+** MMM
+
+#+begin_src emacs-lisp
+(use-package mmm-mode)
+#+end_src
+
 ** Projectile
 
 #+begin_src emacs-lisp
