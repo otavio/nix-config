@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v17
+    - uses: cachix/install-nix-action@v18
       with:
         extra_nix_config: |
           access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
@@ -27,7 +27,7 @@ jobs:
     steps:
     - run: sudo apt-get clean
     - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v16
+    - uses: cachix/install-nix-action@v18
     - uses: cachix/cachix-action@v10
       with:
         name: otavio-nix-config
@@ -43,7 +43,7 @@ jobs:
     steps:
     - run: sudo apt-get clean
     - uses: actions/checkout@v3
-    - uses: cachix/install-nix-action@v16
+    - uses: cachix/install-nix-action@v18
     - uses: cachix/cachix-action@v10
       with:
         name: otavio-nix-config
