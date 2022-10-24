@@ -28,7 +28,7 @@ in
       inherit modifier terminal menu;
 
       assigns = {
-        "${shellWs}" = [{ class = "Alacritty"; instance = "term"; }];
+        "${shellWs}" = [{ class = "term"; instance = "term"; }];
         "${editorWs}" = [{ class = "Emacs"; }];
         "${browserWs}" = [
           { class = "Google-chrome"; }
