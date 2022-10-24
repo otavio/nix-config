@@ -16,7 +16,6 @@
       ./gtk.nix
       ./i3.nix
       ./nix.nix
-      ./rust.nix
     ] else [ ]);
 
   # Symlink nix-config to .config/nixpkgs, so i can use `home-manager switch`
