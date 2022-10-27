@@ -1518,6 +1518,7 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
           lsp-rust-analyzer-server-display-inlay-hints t
           lsp-rust-clippy-preference "on")
 
+    (advice-add 'lsp :before #'direnv-update-environment)
 
     :hook (;; modes
            (rust-mode . lsp)
