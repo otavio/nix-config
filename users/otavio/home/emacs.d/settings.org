@@ -1516,10 +1516,8 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
           lsp-rust-analyzer-display-chaining-hints t
           lsp-rust-analyzer-display-parameter-hints t
           lsp-rust-analyzer-server-display-inlay-hints t
+          lsp-rust-clippy-preference "on")
 
-          ;; Rust specifics
-          lsp-rust-server 'rust-analyzer
-          lsp-rust-analyzer-server-command '("~/.cargo/bin/rust-analyzer"))
 
     :hook (;; modes
            (rust-mode . lsp)
