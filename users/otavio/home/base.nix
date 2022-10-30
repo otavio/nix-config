@@ -69,6 +69,7 @@ in
         "emacs"
         "home_manager"
         "flutter"
+        "nix"
         "node"
       ];
       set_title = false;
