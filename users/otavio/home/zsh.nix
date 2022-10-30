@@ -162,7 +162,7 @@ in
 
       transfer() {
           # Easier change of service in use
-          host=https://transfer.sh
+          host=https://oshi.at
 
           curl --version 2>&1 > /dev/null
           if [ $? -ne 0 ]; then
