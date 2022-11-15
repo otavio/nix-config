@@ -35,27 +35,24 @@ The installer allow SSH connection and has the authorized keys based on ~otavio~
 
   device=/dev/xxx
   deviceNixOSPart=${device}1
-  deviceEFIPart=${device}2
+  deviceEFIPart=${device}3
+  deviceBootSize=512MiB
 
-  parted ${device} -- mklabel gpt
-  parted ${device} -- mkpart primary 512MiB 100%
-  parted ${device} -- mkpart ESP fat32 1MiB 512MiB
-  parted ${device} -- set 2 esp on
+  parted --script ${device} -- \
+         mklabel gpt \
+         mkpart ESP fat32 8MiB ${deviceBootSize} \
+         set 1 boot on \
+         mkpart no-fs 0 1024KiB \
+         set 2 bios_grub on \
+         mkpart primary ext4 ${deviceBootSize} -1
 
   mkdosfs -F32 ${deviceEFIPart} -n EFI
 
   mkfs.btrfs ${deviceNixOSPart}
   mount -t btrfs ${deviceNixOSPart} /mnt
 
-  btrfs subvolume create /mnt/nixos
-  btrfs subvolume create /mnt/home
-  btrfs subvolume snapshot -r /mnt/nixos /mnt/nixos-blank
-
   umount /mnt
   mount -o subvol=nixos,compress=zstd,discard,noatime,autodefrag ${deviceNixOSPart} /mnt
-
-  mkdir /mnt/home
-  mount -o subvol=home,compress=zstd,discard,noatime,autodefrag ${deviceNixOSPart} /mnt/home
 
   mkdir /mnt/efi
   mount ${deviceEFIPart} /mnt/efi
@@ -78,7 +75,7 @@ The installation of the machine can be done using the machine's flake. For it us
 
 #+begin_src text
 
-  nixos-install --flake https://github.com/otavio/nix-config#<machine>
+  nixos-install --flake github:otavio/nix-config#<machine>
 
 #+end_src
 
