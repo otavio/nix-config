@@ -135,6 +135,10 @@ in
       export EDITOR="emacs -nw" # $EDITOR opens in terminal
       export VISUAL="emacs"     # $VISUAL opens in GUI mode
 
+      what-is-my-ip() {
+          echo "My IP: $(curl -s ifconfig.me)"
+      }
+
       keys-load() {
           if [ -z "$1" ]; then
               unset SSH_AUTH_SOCK
