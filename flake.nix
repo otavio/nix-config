@@ -12,7 +12,7 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    utils.url = "github:numtide/flake-utils";
+    flake-utils.url = "github:numtide/flake-utils";
 
     sops-nix = {
       url = "github:Mic92/sops-nix";
@@ -30,14 +30,14 @@
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "utils";
+      inputs.flake-utils.follows = "flake-utils";
     };
 
     colmena = {
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.stable.follows = "nixpkgs";
-      inputs.utils.follows = "utils";
+      inputs.flake-utils.follows = "flake-utils";
     };
   };
 
@@ -94,7 +94,7 @@
       }).config.system.build.isoImage;
 
       colmena = lib.mkColmenaFromNixOSConfigurations self.nixosConfigurations;
-    } // inputs.utils.lib.eachSystem [ "x86_64-linux" ] (system:
+    } // inputs.flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
         pkgs = import inputs.nixpkgs { inherit system overlays; };
       in
