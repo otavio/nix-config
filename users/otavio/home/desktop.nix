@@ -30,6 +30,7 @@ in
     tdesktop
     nixpkgs-fmt
     nixpkgs-review
+    obsidian
     pavucontrol
     scrcpy
     skypeforlinux
