@@ -37,6 +37,7 @@
     ignores = [ ".direnv" ];
 
     extraConfig = {
+      github.user = "otavio";
       pull = { rebase = true; };
       rebase = {
         autoStash = true;

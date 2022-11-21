@@ -1266,6 +1266,9 @@ Configuration for various programming languages and dev tools that I use.
     (add-hook 'git-commit-mode-hook (lambda () (setq fill-column 72)))
     (setq magit-diff-refine-hunk t)
     (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+  (use-package forge
+    :after magit)
 #+end_src
 
 **** Show TODO items in current changing files
