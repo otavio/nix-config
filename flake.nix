@@ -19,7 +19,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
 
       # used for tests only so we can ignore it.
-      inputs.nixpkgs-22_05.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
     home-manager = {
