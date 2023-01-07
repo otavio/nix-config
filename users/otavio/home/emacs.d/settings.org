@@ -88,6 +88,7 @@
     - [[#json][JSON]]
     - [[#markdown][Markdown]]
     - [[#nix][Nix]]
+    - [[#python][Python]]
     - [[#qt][Qt]]
     - [[#rust][Rust]]
     - [[#systemd][SystemD]]
@@ -1600,6 +1601,23 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
     (add-hook 'nix-mode-hook 'nixpkgs-fmt-on-save-mode)
     :config
     (setq nix-nixfmt-bin "nixpkgs-fmt"))
+
+#+end_src
+
+*** Python
+
+#+begin_src emacs-lisp
+
+  ;;; Indentation for python
+  (setq electric-indent-functions
+        '((lambda (inserted-char)
+            (when (eq major-mode 'python-mode)
+              ;; Do not auto-indent after inserting any empty line
+              (when (save-excursion
+                      (previous-line)
+                      (beginning-of-line)
+                      (looking-at "^\s*$"))
+                'no-indent)))))
 
 #+end_src
 
