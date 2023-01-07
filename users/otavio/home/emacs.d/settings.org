@@ -1432,7 +1432,11 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
 #+begin_src emacs-lisp
 
   (use-package bitbake-modes
-    :defer t)
+    :defer t
+    :custom-face
+    (bitbake-python-function-face ((t (:background "color-19"))))
+    (bitbake-python-task-face ((t (:background "color-19"))))
+    (bitbake-shell-function-face ((t (:background "color-19")))))
 
 #+end_src
 
