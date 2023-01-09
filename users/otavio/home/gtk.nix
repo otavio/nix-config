@@ -13,7 +13,7 @@
 
     gtk2.extraConfig = ''
       gtk-key-theme-name = "Emacs"
-      gtk-cursor-theme-name = capitaine-cursors;
+      gtk-cursor-theme-name = capitaine-cursors
 
       binding "vbe-text-entry-bindings" {
         unbind "<ctrl>b"
