@@ -142,14 +142,14 @@ in
 
       startup = [
         { command = "pa-applet"; notification = true; }
-        { command = "Discord"; notification = true; }
-        { command = "telegram-desktop"; notification = true; }
       ] ++ pkgs.lib.lists.optionals (hostname == "micro") [
+        { command = "Discord"; notification = true; }
         { command = editor; notification = true; }
         { command = terminal; notification = true; }
         { command = "brave"; notification = true; }
         { command = "skypeforlinux"; notification = true; }
         { command = "slack"; notification = true; }
+        { command = "telegram-desktop"; notification = true; }
       ];
     };
   };
