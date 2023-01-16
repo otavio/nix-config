@@ -82,8 +82,8 @@
   };
 
   deployment = {
-    targetHost = "nano.casa.salvador";
     targetUser = "otavio";
+    targetHost = "10.4.0.117";
     allowLocalDeployment = true;
   };
 }
