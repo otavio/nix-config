@@ -67,6 +67,8 @@
       # EPSON L495
       epkowa
     ];
+
+    netConf = "10.4.0.13";
   };
 
   services.printing = {
