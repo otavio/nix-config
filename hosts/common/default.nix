@@ -72,9 +72,11 @@ in
 
   services.openssh = {
     enable = true;
-    passwordAuthentication = false;
-    permitRootLogin = "no";
     forwardX11 = true;
+    settings = {
+      PasswordAuthentication = false;
+      PermitRootLogin = "no";
+    };
   };
 
   security.sudo.wheelNeedsPassword = false;
