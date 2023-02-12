@@ -72,10 +72,10 @@ in
 
   services.openssh = {
     enable = true;
-    forwardX11 = true;
     settings = {
       PasswordAuthentication = false;
       PermitRootLogin = "no";
+      X11Forwarding = true;
     };
   };
 
