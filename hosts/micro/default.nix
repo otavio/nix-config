@@ -19,6 +19,10 @@
 
     kernelParams = [ "video=HDMI-A-1:2560x1080" ];
     extraModulePackages = [ config.boot.kernelPackages.rtl88x2bu ];
+    extraModprobeConfig = ''
+      blacklist rtw88_8822bu
+      options 88x2bu rtw_drv_log_level = 1 rtw_led_ctrl=1 rtw_vht_enable=1 rtw_switch_usb_mode=0
+    '';
   };
 
   hardware.cpu.intel.updateMicrocode = true;
