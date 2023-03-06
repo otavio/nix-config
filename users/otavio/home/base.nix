@@ -67,12 +67,14 @@ in
       assume_yes = true;
       disable = [
         "emacs"
-        "home_manager"
         "flutter"
+        "home_manager"
         "nix"
         "node"
+        "pip3"
       ];
       set_title = false;
+      skip_notify = true;
       cleanup = true;
       pre_commands = {
         "nix-config" = "cd ~/src/nix-config && git pull --rebase --autostash";
