@@ -14,6 +14,11 @@
     nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
 
+    devenv = {
+      url = "github:cachix/devenv";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -99,12 +104,18 @@
         pkgs = import inputs.nixpkgs { inherit system overlays; };
       in
       {
-        devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            colmena
-            home-manager
-            sops
-            statix
+        devShells.default = inputs.devenv.lib.mkShell {
+          inherit inputs pkgs;
+
+          modules = [
+            {
+              packages = with pkgs; [
+                colmena
+                home-manager
+                sops
+                statix
+              ];
+            }
           ];
         };
 
