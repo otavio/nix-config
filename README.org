@@ -101,7 +101,7 @@ Install the daemon inside the existing operating system with:
 
   # Enable Nix Flakes support
   mkdir -p ~/.config/nix
-  echo 'experimental-features = nix-command flakes' > ~/.config/nix/nix.conf
+  echo 'experimental-features = nix-command flakes repl-flake' > ~/.config/nix/nix.conf
 #+end_src
 
 Finally, clone this repository as:
