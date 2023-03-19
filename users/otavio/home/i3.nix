@@ -170,18 +170,8 @@ in
         icons = "awesome5";
         blocks = [
           {
-            block = "disk_space";
-            path = "/";
-            alias = "/";
-            info_type = "available";
-            unit = "GB";
-            interval = 20;
-            warning = 20.0;
-            alert = 10.0;
-          }
-          {
             block = "weather";
-            format = "{weather} ({location}) {temp}, {wind} m/s {direction}";
+            format = " $icon $weather ($location) $temp, $wind m/s $direction ";
             service = {
               name = "openweathermap";
               api_key = "0f9d6aa5c9af7b7249a0320d1032ddd2";
@@ -189,41 +179,58 @@ in
               units = "metric";
             };
           }
-
+          {
+            block = "net";
+            format = " $icon {$signal_strength $ssid $frequency|Wired connection} IP: $ip {/ $ipv6|} ";
+            click = [{ button = "left"; cmd = "alacritty -e nmtui"; }];
+          }
+          {
+            block = "net";
+            format = " $icon WireGuard VPN ";
+            missing_format = "";
+            device = "wg0";
+          }
+          {
+            block = "bluetooth";
+            mac = "9C:28:B3:A3:75:0A";
+            disconnected_format = " $icon $name ";
+            format = " $icon $name{ $percentage|} ";
+          }
+          {
+            block = "disk_space";
+            path = "/";
+            info_type = "available";
+            alert_unit = "GB";
+            interval = 20;
+            warning = 20.0;
+            alert = 10.0;
+            format = " $icon root: $available.eng(w:2) ";
+          }
           {
             block = "memory";
-            display_type = "memory";
-            format_mem = "{mem_total_used_percents}";
-            format_swap = "{swap_used_percents}";
+            format = " $icon $mem_total_used_percents.eng(w:2) ";
+            format_alt = " $icon_swap $swap_used_percents.eng(w:2) ";
           }
 
           {
             block = "cpu";
-            interval = 1;
           }
           {
             block = "load";
             interval = 1;
-            format = "{1m}";
-          }
-          {
-            block = "networkmanager";
-            on_click = "alacritty -e nmtui";
-            interface_name_exclude = [ "br\\-[0-9a-f]{12}" "docker\\d+" ];
-            interface_name_include = [ ];
+            format = " $icon 1min avg: $1m.eng(w:4) ";
           }
           {
             block = "time";
             interval = 60;
-            format = "%a %m/%d %I:%M";
+            format = " $timestamp.datetime(f:'%a %d/%m %R') ";
           }
-        ] ++ pkgs.lib.lists.optionals (hostname == "nano") [
           {
             block = "battery";
             interval = 10;
             device = "/sys/class/power_supply/max170xx_battery";
-            format = "{percentage} {time}";
-            hide_missing = true;
+            format = " $icon $percentage ";
+            missing_format = "";
           }
         ];
       };
