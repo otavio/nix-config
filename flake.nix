@@ -52,7 +52,7 @@
         (import ./overlays)
 
         emacs-overlay.overlay
-        sops-nix.overlay
+        sops-nix.overlays.default
       ];
 
       lib = import ./lib { inherit inputs overlays; };
