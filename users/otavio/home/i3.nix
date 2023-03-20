@@ -227,6 +227,12 @@ in
             format = " $icon $percentage ";
             missing_format = "";
           }
+          {
+            block = "bluetooth";
+            mac = "9C:28:B3:A3:75:0A";
+            disconnected_format = " $icon $name ";
+            format = " $icon $name{ $percentage|} ";
+          }
         ];
       };
     };
