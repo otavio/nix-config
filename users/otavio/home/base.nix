@@ -48,6 +48,27 @@ in
   services.gpg-agent.enable = true;
   programs.gpg.enable = true;
   programs.msmtp.enable = true;
+  programs.ssh = {
+    enable = true;
+
+    controlMaster = "auto";
+    hashKnownHosts = false;
+
+    extraConfig = ''
+      Host code.ossystems.com.br
+           HostkeyAlgorithms +ssh-rsa
+           PubkeyAcceptedAlgorithms +ssh-rsa
+
+      Host *.lab.ossystems
+           ForwardAgent yes
+           ForwardX11 yes
+           ForwardX11Trusted yes
+
+      Host bitbucket.org
+           User git
+           IdentityFile ~/.ssh/devel-tools-dsa
+    '';
+  };
 
   home.sessionVariables = {
     TERMINAL = "alacritty";
