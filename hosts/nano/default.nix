@@ -19,7 +19,6 @@
   };
 
   hardware.cpu.intel.updateMicrocode = true;
-  hardware.video.hidpi.enable = false;
 
   powerManagement.cpuFreqGovernor = "performance";
 

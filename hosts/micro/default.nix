@@ -26,7 +26,6 @@
   };
 
   hardware.cpu.intel.updateMicrocode = true;
-  hardware.video.hidpi.enable = false;
   hardware.enableRedistributableFirmware = true;
 
   services.xserver = {
