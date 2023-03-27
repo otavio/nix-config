@@ -110,6 +110,8 @@
           ];
         };
 
+        formatter = pkgs.nixpkgs-fmt;
+
         checks = {
           lint = pkgs.runCommand "lint-code" { } ''
             ${pkgs.statix}/bin/statix check
