@@ -2,9 +2,6 @@
 
 {
   imports = [
-    # Include the results of the hardware scan.
-    ./hardware-configuration.nix
-
     ../common
     ../common/zram-swap.nix
     ../common/bluetooth.nix
@@ -17,6 +14,10 @@
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
 
+    initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "usbhid" ];
+    initrd.kernelModules = [ ];
+
+    kernelModules = [ "kvm-intel" ];
     kernelParams = [ "video=HDMI-A-1:2560x1080" ];
     extraModulePackages = [ config.boot.kernelPackages.rtl88x2bu ];
     extraModprobeConfig = ''
@@ -27,6 +28,16 @@
 
   hardware.cpu.intel.updateMicrocode = true;
   hardware.enableRedistributableFirmware = true;
+
+  fileSystems."/" = {
+    device = "/dev/disk/by-uuid/bcaece35-6b3b-4ee1-97a5-ecafa37576b1";
+    fsType = "ext4";
+  };
+
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/586E-96DA";
+    fsType = "vfat";
+  };
 
   services.xserver = {
     xrandrHeads = [{
