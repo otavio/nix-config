@@ -55,7 +55,7 @@ in
     hashKnownHosts = false;
 
     extraConfig = ''
-      Host code.ossystems.com.br
+      Host *.ossystems.com.br
            HostkeyAlgorithms +ssh-rsa
            PubkeyAcceptedAlgorithms +ssh-rsa
 
