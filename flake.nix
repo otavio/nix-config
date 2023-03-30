@@ -104,13 +104,20 @@
                 colmena
                 home-manager
                 sops
-                statix
               ];
             }
           ];
         };
 
-        formatter = pkgs.nixpkgs-fmt;
+        formatter = pkgs.writeShellApplication {
+          name = "normalise_nix";
+          runtimeInputs = with pkgs; [ nixpkgs-fmt statix ];
+          text = ''
+            set -o xtrace
+            nixpkgs-fmt "$@"
+            statix fix "$@"
+          '';
+        };
 
         checks = {
           lint = pkgs.runCommand "lint-code" { } ''
