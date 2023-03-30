@@ -8,6 +8,8 @@
     ../common/desktop.nix
     ../common/udev.nix
     ../common/x11.nix
+
+    ./disko.nix
   ];
 
   boot = {
@@ -28,16 +30,6 @@
 
   hardware.cpu.intel.updateMicrocode = true;
   hardware.enableRedistributableFirmware = true;
-
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/bcaece35-6b3b-4ee1-97a5-ecafa37576b1";
-    fsType = "ext4";
-  };
-
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/586E-96DA";
-    fsType = "vfat";
-  };
 
   services.xserver = {
     xrandrHeads = [{
