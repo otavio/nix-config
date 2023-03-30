@@ -126,7 +126,7 @@
 
         checks = {
           lint = pkgs.runCommand "lint-code" { } ''
-            ${pkgs.statix}/bin/statix check
+            ${pkgs.statix}/bin/statix check ${./.}
 
             # We need to produce it at end to avoid error.
             touch $out

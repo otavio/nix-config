@@ -13,7 +13,7 @@ let
     alwaysTangle = true;
 
     override = epkgs: epkgs // {
-      nix-mode = epkgs.nongnuPackages.nix-mode;
+      inherit (epkgs.nongnuPackages) nix-mode;
     };
   };
 in
