@@ -21,8 +21,11 @@ in
 
     kernelParams = [
       "quiet"
-      "udev.log_priority=3"
+      "loglevel=3"
+      "rd.systemd.show_status=auto"
+      "rd.udev.log_priority=3"
       "vt.global_cursor_default=0"
+      "vga=current"
       "mitigations=off" # turn off mitigations so we gain some performance
       "fsck.repair=yes"
     ];
