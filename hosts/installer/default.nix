@@ -25,6 +25,11 @@
     '';
   };
 
+  isoImage = {
+    compressImage = false;
+    squashfsCompression = "zstd -Xcompression-level 1";
+  };
+
   services = {
     openssh = {
       enable = true;
