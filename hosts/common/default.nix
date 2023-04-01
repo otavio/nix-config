@@ -63,13 +63,6 @@ in
     optimise.automatic = true;
   };
 
-  environment = {
-    etc = {
-      "nix/channels/nixpkgs".source = inputs.nixpkgs;
-      "nix/channels/home-manager".source = inputs.home-manager;
-    };
-  };
-
   services.openssh = {
     enable = true;
     settings = {
