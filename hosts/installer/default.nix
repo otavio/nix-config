@@ -30,6 +30,11 @@
     squashfsCompression = "zstd -Xcompression-level 1";
   };
 
+  # Disable ZFS support, it may not be compatible
+  # with the configured kernel version
+  boot.supportedFilesystems = pkgs.lib.mkForce
+    [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
+
   services = {
     openssh = {
       enable = true;
