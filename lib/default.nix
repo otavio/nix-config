@@ -122,4 +122,37 @@ in
         ../users/${username}/home
       ];
     };
+
+  mkInstallerForSystem =
+    { hostname
+    , targetConfiguration
+    , system
+    }:
+    (inputs.nixpkgs.lib.nixosSystem {
+      inherit system;
+
+      specialArgs = {
+        inherit inputs system targetConfiguration;
+      };
+
+      extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
+
+      modules = [
+        inputs.disko.nixosModules.disko
+        inputs.sops-nix.nixosModules.sops
+
+        ../hosts/installer
+
+        {
+          networking.hostName = hostname;
+
+          # Apply overlay and allow unfree packages
+          nixpkgs = {
+            inherit overlays;
+
+            config.allowUnfree = true;
+          };
+        }
+      ];
+    }).config.system.build.isoImage;
 }

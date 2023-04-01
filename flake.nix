@@ -84,15 +84,21 @@
         };
       };
 
-      # Generate the custom installer with:
-      # $: nix build .#mkInstallerIso
-      mkInstallerIso = (lib.mkSystem {
-        hostname = "installer";
-        system = "x86_64-linux";
-        users = [ "otavio" ];
-
-        graphical = false;
-      }).config.system.build.isoImage;
+      packages = builtins.foldl'
+        (packages: hostname:
+          let
+            inherit (self.nixosConfigurations.${hostname}.config.nixpkgs) system;
+            targetConfiguration = self.nixosConfigurations.${hostname};
+          in
+          packages // {
+            ${system} = (packages.${system} or { }) // {
+              "${hostname}-install-iso" = lib.mkInstallerForSystem { inherit hostname targetConfiguration system; };
+            };
+          })
+        { }
+        # FIXME: We shoudl convert to (builtins.attrNames self.nixosConfigurations) once all hosts
+        # move to 'disko' as it is used for partitioning.
+        [ "micro" ];
 
       colmena = lib.mkColmenaFromNixOSConfigurations self.nixosConfigurations;
     } // inputs.flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
