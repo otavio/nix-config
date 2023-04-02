@@ -1,17 +1,14 @@
 # This file holds config that i use on all hosts
 { lib, config, pkgs, system, inputs, ... }:
-let
-  inherit (lib) mkDefault;
-in
 {
   system.stateVersion = "22.05";
 
-  i18n.defaultLocale = pkgs.lib.mkDefault "en_US.UTF-8";
+  i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
   time.timeZone = "America/Sao_Paulo";
 
   console = {
-    font = mkDefault "Lat2-Terminus16";
-    keyMap = mkDefault "br-latin1-us";
+    font = lib.mkDefault "Lat2-Terminus16";
+    keyMap = lib.mkDefault "br-latin1-us";
   };
 
   boot = {

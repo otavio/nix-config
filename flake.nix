@@ -19,16 +19,12 @@
 
   outputs = { self, ... }@inputs:
     let
-      overlays = with inputs; [
-        (import ./overlays)
-
-        emacs-overlay.overlay
-        sops-nix.overlays.default
-      ];
-
-      lib = import ./lib { inherit inputs overlays; };
+      inherit (self) outputs;
+      lib = import ./lib { inherit inputs outputs; };
     in
     {
+      overlays = import ./overlays { inherit inputs outputs; };
+
       nixosConfigurations = {
         micro = lib.mkSystem {
           hostname = "micro";
@@ -78,7 +74,8 @@
       colmena = lib.mkColmenaFromNixOSConfigurations self.nixosConfigurations;
     } // inputs.flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
-        pkgs = import inputs.nixpkgs { inherit system overlays; };
+        inherit (self) outputs;
+        pkgs = import inputs.nixpkgs { inherit system outputs; };
       in
       {
         devShells.default = inputs.devenv.lib.mkShell {

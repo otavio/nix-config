@@ -1,6 +1,9 @@
-{ inputs, overlays }:
+{ inputs, outputs }:
 let
-  inherit (builtins) listToAttrs map mapAttrs;
+  inherit (builtins) attrValues listToAttrs map mapAttrs;
+  overlays = attrValues outputs.overlays ++ [
+    inputs.emacs-overlay.overlay
+  ];
 in
 {
   mkColmenaFromNixOSConfigurations = nixosConfigurations:
