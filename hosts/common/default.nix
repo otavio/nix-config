@@ -1,6 +1,8 @@
 # This file holds config that i use on all hosts
 { lib, config, pkgs, system, inputs, ... }:
 {
+  imports = [ ./upgrade-diff.nix ];
+
   system.stateVersion = "22.05";
 
   i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
