@@ -5,41 +5,16 @@
     nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
 
-    devenv = {
-      url = "github:cachix/devenv";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    sops-nix = {
-      url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-
-      # used for tests only so we can ignore it.
-      inputs.nixpkgs-stable.follows = "nixpkgs";
-    };
-
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    emacs-overlay = {
-      url = "github:nix-community/emacs-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
-
-    colmena = {
-      url = "github:zhaofengli/colmena";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.stable.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
+    devenv.url = "github:cachix/devenv";
+    disko.url = "github:nix-community/disko";
+    sops-nix.url = "github:Mic92/sops-nix";
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    colmena.url = "github:zhaofengli/colmena";
   };
 
   outputs = { self, ... }@inputs:
