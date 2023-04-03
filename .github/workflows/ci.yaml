@@ -1,7 +1,16 @@
 name: "CI"
+
 on:
   pull_request:
+    paths:
+      - '**.nix'
+      - 'flake.lock'
   push:
+    branches: [ master ]
+    paths:
+      - '**.nix'
+      - 'flake.lock'
+
 jobs:
   check:
     runs-on: ubuntu-latest
