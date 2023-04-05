@@ -52,8 +52,6 @@
   networking.wireless.enable = false;
   networking.networkmanager.enable = true;
 
-  sops.defaultSopsFile = ../../secrets/secrets.yaml;
-
   disko.enableConfig = false;
   environment.systemPackages = with pkgs; [
     zile
