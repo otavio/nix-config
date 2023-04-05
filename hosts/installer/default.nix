@@ -12,18 +12,6 @@
     keyMap = "br-latin1-us";
   };
 
-  nix = {
-    settings = {
-      trusted-users = [ "root" "@wheel" ];
-      auto-optimise-store = true;
-    };
-
-    extraOptions = ''
-      experimental-features = nix-command flakes repl-flake
-      warn-dirty = false
-    '';
-  };
-
   isoImage = {
     compressImage = false;
     squashfsCompression = "zstd -Xcompression-level 1";

@@ -55,12 +55,6 @@ in
 
             config.allowUnfree = true;
           };
-
-          # Add each input as a registry
-          nix.registry = inputs.nixpkgs.lib.mapAttrs'
-            (n: v:
-              inputs.nixpkgs.lib.nameValuePair n { flake = v; })
-            inputs;
         }
 
         inputs.home-manager.nixosModule

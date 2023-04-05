@@ -3,6 +3,7 @@
 {
   imports = [
     ./locale.nix
+    ./nix.nix
     ./upgrade-diff.nix
   ];
 
@@ -31,38 +32,6 @@
 
     consoleLogLevel = 0;
     initrd.verbose = false;
-  };
-
-  nix = {
-    settings = {
-      substituters = [
-        "https://nix-community.cachix.org"
-      ];
-
-      trusted-public-keys = [
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      ];
-
-      trusted-users = [ "root" "@wheel" ];
-      auto-optimise-store = true;
-    };
-
-    extraOptions = ''
-      experimental-features = nix-command flakes repl-flake
-      warn-dirty = false
-    '';
-
-    nixPath = [
-      "nixpkgs=/etc/nix/channels/nixpkgs"
-      "home-manager=/etc/nix/channels/home-manager"
-    ];
-
-    gc = {
-      automatic = true;
-      dates = "daily";
-    };
-
-    optimise.automatic = true;
   };
 
   services.openssh = {
