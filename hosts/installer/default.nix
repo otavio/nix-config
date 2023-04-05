@@ -7,11 +7,6 @@
     "${modulesPath}/installer/cd-dvd/installation-cd-base.nix"
   ];
 
-  console = {
-    font = "Lat2-Terminus16";
-    keyMap = "br-latin1-us";
-  };
-
   isoImage = {
     compressImage = false;
     squashfsCompression = "zstd -Xcompression-level 1";
