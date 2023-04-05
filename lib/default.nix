@@ -56,11 +56,8 @@ in
           };
         }
 
-        inputs.home-manager.nixosModule
         {
           home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
             users =
               listToAttrs
                 (map
