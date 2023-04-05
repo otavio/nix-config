@@ -2,6 +2,7 @@
 { lib, config, pkgs, system, inputs, ... }:
 {
   imports = [
+    ./console.nix
     ./locale.nix
     ./home-manager.nix
     ./nix.nix
@@ -11,11 +12,6 @@
   ];
 
   system.stateVersion = "22.05";
-
-  console = {
-    font = lib.mkDefault "Lat2-Terminus16";
-    keyMap = lib.mkDefault "br-latin1-us";
-  };
 
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
