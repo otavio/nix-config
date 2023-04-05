@@ -3,6 +3,7 @@
 {
   imports = [
     ./locale.nix
+    ./home-manager.nix
     ./nix.nix
     ./openssh.nix
     ./sops.nix
