@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ../features
+    ../features/required
     ../features/zram-swap.nix
     ../features/bluetooth.nix
     ../features/desktop.nix

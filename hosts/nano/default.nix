@@ -5,7 +5,7 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
 
-    ../features
+    ../features/required
     ../features/zram-swap.nix
     ../features/bluetooth.nix
     ../features/desktop.nix

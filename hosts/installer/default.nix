@@ -2,6 +2,8 @@
 
 {
   imports = [
+    ../features/required
+
     "${modulesPath}/installer/cd-dvd/installation-cd-base.nix"
   ];
 

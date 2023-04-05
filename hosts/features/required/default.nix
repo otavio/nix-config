@@ -1,7 +1,9 @@
 # This file holds config that i use on all hosts
 { lib, config, pkgs, system, inputs, ... }:
 {
-  imports = [ ./upgrade-diff.nix ];
+  imports = [
+    ./upgrade-diff.nix
+  ];
 
   system.stateVersion = "22.05";
 
@@ -76,5 +78,5 @@
 
   security.sudo.wheelNeedsPassword = false;
 
-  sops.defaultSopsFile = ../../secrets/secrets.yaml;
+  sops.defaultSopsFile = ../../../secrets/secrets.yaml;
 }
