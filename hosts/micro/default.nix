@@ -2,12 +2,12 @@
 
 {
   imports = [
-    ../common
-    ../common/zram-swap.nix
-    ../common/bluetooth.nix
-    ../common/desktop.nix
-    ../common/udev.nix
-    ../common/x11.nix
+    ../features
+    ../features/zram-swap.nix
+    ../features/bluetooth.nix
+    ../features/desktop.nix
+    ../features/udev.nix
+    ../features/x11.nix
 
     ./disko.nix
   ];

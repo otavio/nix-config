@@ -5,8 +5,8 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
 
-    ../common
-    ../common/zram-swap.nix
+    ../features
+    ../features/zram-swap.nix
   ];
 
   hardware.cpu.intel.updateMicrocode = true;
