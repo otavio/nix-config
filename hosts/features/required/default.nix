@@ -2,13 +2,11 @@
 { lib, config, pkgs, system, inputs, ... }:
 {
   imports = [
+    ./locale.nix
     ./upgrade-diff.nix
   ];
 
   system.stateVersion = "22.05";
-
-  i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
-  time.timeZone = "America/Sao_Paulo";
 
   console = {
     font = lib.mkDefault "Lat2-Terminus16";

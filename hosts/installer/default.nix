@@ -7,9 +7,6 @@
     "${modulesPath}/installer/cd-dvd/installation-cd-base.nix"
   ];
 
-  i18n.defaultLocale = "en_US.UTF-8";
-  time.timeZone = "America/Sao_Paulo";
-
   console = {
     font = "Lat2-Terminus16";
     keyMap = "br-latin1-us";
