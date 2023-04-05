@@ -5,6 +5,7 @@
     ./locale.nix
     ./nix.nix
     ./openssh.nix
+    ./sops.nix
     ./upgrade-diff.nix
   ];
 
@@ -36,6 +37,4 @@
   };
 
   security.sudo.wheelNeedsPassword = false;
-
-  sops.defaultSopsFile = ../../../secrets/secrets.yaml;
 }
