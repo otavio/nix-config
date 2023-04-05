@@ -4,6 +4,7 @@
   imports = [
     ./locale.nix
     ./nix.nix
+    ./openssh.nix
     ./upgrade-diff.nix
   ];
 
@@ -32,15 +33,6 @@
 
     consoleLogLevel = 0;
     initrd.verbose = false;
-  };
-
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      PermitRootLogin = "no";
-      X11Forwarding = true;
-    };
   };
 
   security.sudo.wheelNeedsPassword = false;

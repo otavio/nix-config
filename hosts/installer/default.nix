@@ -22,13 +22,6 @@
   boot.supportedFilesystems = pkgs.lib.mkForce
     [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
-  services = {
-    openssh = {
-      enable = true;
-      settings.PasswordAuthentication = false;
-    };
-  };
-
   security.sudo.wheelNeedsPassword = false;
 
   # The global useDHCP flag is deprecated, therefore explicitly set to false here.
