@@ -1,8 +1,4 @@
-{ config
-, graphical
-, hostname
-, ...
-}:
+{ config, outputs, graphical, hostname, ... }:
 
 {
   imports =
@@ -18,6 +14,13 @@
       ./i3.nix
       ./nix.nix
     ] else [ ]);
+
+  nixpkgs = {
+    overlays = builtins.attrValues outputs.overlays;
+    config = {
+      allowUnfree = true;
+    };
+  };
 
   # Symlink nix-config to .config/nixpkgs, so i can use `home-manager switch`
   home.file."home-config" = {

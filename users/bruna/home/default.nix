@@ -2,6 +2,12 @@
 {
   services.flameshot.enable = true;
 
+  nixpkgs = {
+    config = {
+      allowUnfree = true;
+    };
+  };
+
   home.packages = with pkgs; [
     anydesk
     chromium

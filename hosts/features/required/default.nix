@@ -6,6 +6,7 @@
     ./locale.nix
     ./home-manager.nix
     ./nix.nix
+    ./nixpkgs.nix
     ./openssh.nix
     ./sops.nix
     ./upgrade-diff.nix
