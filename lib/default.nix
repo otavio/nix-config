@@ -1,9 +1,6 @@
 { inputs, outputs }:
 let
   inherit (builtins) attrValues listToAttrs map mapAttrs;
-  overlays = attrValues outputs.overlays ++ [
-    inputs.emacs-overlay.overlay
-  ];
 in
 {
   mkColmenaFromNixOSConfigurations = nixosConfigurations:
@@ -11,11 +8,11 @@ in
       meta = {
         nixpkgs = import inputs.nixpkgs {
           system = "x86_64-linux";
-          inherit overlays;
+          overlays = builtins.attrValues outputs.overlays;
         };
 
         specialArgs = {
-          inherit inputs;
+          inherit inputs outputs;
         };
       };
     } // mapAttrs
@@ -36,7 +33,7 @@ in
       inherit system;
 
       specialArgs = {
-        inherit inputs system hostname;
+        inherit inputs outputs system hostname;
       };
 
       extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
@@ -47,13 +44,6 @@ in
         ../hosts/${hostname}
         {
           networking.hostName = hostname;
-
-          # Apply overlay and allow unfree packages
-          nixpkgs = {
-            inherit overlays;
-
-            config.allowUnfree = true;
-          };
         }
 
         {
@@ -81,27 +71,20 @@ in
     , graphical ? false
     , hostname ? "unknown"
     }:
-    let
-      pkgs = import inputs.nixpkgs { inherit overlays system; };
-    in
     inputs.home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-
       extraSpecialArgs = {
-        inherit inputs system graphical;
+        inherit inputs outputs system graphical;
       };
+
+      pkgs = inputs.nixpkgs.legacyPackages.${system};
 
       modules = [
         # Base configuration
         {
           home = {
             inherit username;
-            homeDirectory = "/home/${username}";
-          };
 
-          nixpkgs = {
-            inherit overlays;
-            config.allowUnfree = true;
+            homeDirectory = "/home/${username}";
           };
 
           programs = {
@@ -125,7 +108,7 @@ in
       inherit system;
 
       specialArgs = {
-        inherit inputs system targetConfiguration;
+        inherit inputs outputs system targetConfiguration;
       };
 
       extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
@@ -137,13 +120,6 @@ in
 
         {
           networking.hostName = hostname;
-
-          # Apply overlay and allow unfree packages
-          nixpkgs = {
-            inherit overlays;
-
-            config.allowUnfree = true;
-          };
         }
       ];
     }).config.system.build.isoImage;
