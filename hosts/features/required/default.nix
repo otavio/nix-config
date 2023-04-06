@@ -31,6 +31,5 @@
     initrd.verbose = false;
   };
 
-  security.sudo.wheelNeedsPassword = false;
   system.stateVersion = "22.05";
 }

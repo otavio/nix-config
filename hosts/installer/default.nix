@@ -17,8 +17,6 @@
   boot.supportedFilesystems = pkgs.lib.mkForce
     [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
-  security.sudo.wheelNeedsPassword = false;
-
   # The global useDHCP flag is deprecated, therefore explicitly set to false here.
   # Per-interface useDHCP will be mandatory in the future, so this generated config
   # replicates the default behaviour.
