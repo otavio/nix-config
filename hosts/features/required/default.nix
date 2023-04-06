@@ -1,5 +1,5 @@
 # This file holds config that i use on all hosts
-{ lib, config, pkgs, system, inputs, ... }:
+{ pkgs, ... }:
 {
   imports = [
     ./console.nix
@@ -10,8 +10,6 @@
     ./sops.nix
     ./upgrade-diff.nix
   ];
-
-  system.stateVersion = "22.05";
 
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
@@ -34,4 +32,5 @@
   };
 
   security.sudo.wheelNeedsPassword = false;
+  system.stateVersion = "22.05";
 }
