@@ -6,7 +6,8 @@
     ./hardware-configuration.nix
 
     ../features/required
-    ../features/zram-swap.nix
+
+    ../features/optional/zram-swap.nix
   ];
 
   hardware.cpu.intel.updateMicrocode = true;
