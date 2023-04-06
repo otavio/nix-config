@@ -3,11 +3,12 @@
 {
   imports = [
     ../features/required
-    ../features/zram-swap.nix
-    ../features/bluetooth.nix
-    ../features/desktop.nix
-    ../features/udev.nix
-    ../features/x11.nix
+
+    ../features/optional/bluetooth.nix
+    ../features/optional/desktop.nix
+    ../features/optional/udev.nix
+    ../features/optional/x11.nix
+    ../features/optional/zram-swap.nix
 
     ./disko.nix
   ];
