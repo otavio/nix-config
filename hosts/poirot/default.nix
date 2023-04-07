@@ -7,6 +7,7 @@
 
     ../features/required
 
+    ../features/optional/pipewire.nix
     ../features/optional/zram-swap.nix
   ];
 
