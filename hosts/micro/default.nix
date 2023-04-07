@@ -6,7 +6,9 @@
 
     ../features/optional/bluetooth.nix
     ../features/optional/desktop.nix
+    ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
+    ../features/optional/quietboot.nix
     ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
 
