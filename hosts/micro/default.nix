@@ -6,6 +6,7 @@
 
     ../features/optional/bluetooth.nix
     ../features/optional/desktop.nix
+    ../features/optional/docker.nix
     ../features/optional/latest-linux-kernel.nix
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
@@ -94,7 +95,6 @@
   # Enable thermald
   services.thermald.enable = true;
 
-  virtualisation.docker.enable = true;
   virtualisation.libvirtd.enable = true;
   environment.systemPackages = with pkgs; [ virt-manager virt-viewer ];
 
