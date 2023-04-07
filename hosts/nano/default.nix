@@ -9,7 +9,6 @@
 
     ../features/optional/bluetooth.nix
     ../features/optional/desktop.nix
-    ../features/optional/udev.nix
     ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
   ];
