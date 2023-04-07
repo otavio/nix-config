@@ -12,25 +12,5 @@
     ./upgrade-diff.nix
   ];
 
-  boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
-
-    tmpOnTmpfs = true;
-
-    kernelParams = [
-      "quiet"
-      "loglevel=3"
-      "rd.systemd.show_status=auto"
-      "rd.udev.log_priority=3"
-      "vt.global_cursor_default=0"
-      "vga=current"
-      "mitigations=off" # turn off mitigations so we gain some performance
-      "fsck.repair=yes"
-    ];
-
-    consoleLogLevel = 0;
-    initrd.verbose = false;
-  };
-
   system.stateVersion = "22.05";
 }

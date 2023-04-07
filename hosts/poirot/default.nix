@@ -7,7 +7,9 @@
 
     ../features/required
 
+    ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
+    ../features/optional/quietboot.nix
     ../features/optional/zram-swap.nix
   ];
 
