@@ -7,6 +7,7 @@
 
     ../features/required
 
+    ../features/optional/auto-upgrade.nix
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
     ../features/optional/quietboot.nix
