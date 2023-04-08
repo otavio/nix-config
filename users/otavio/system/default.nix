@@ -1,4 +1,7 @@
 { config, pkgs, ... }:
+let
+  addIfGroupExist = groups: builtins.filter (g: builtins.hasAttr g config.users.groups) groups;
+in
 {
   imports = [
     ./msmtp.nix
@@ -13,7 +16,13 @@
     description = "Otavio Salvador";
 
     isNormalUser = true;
-    extraGroups = [ "wheel" ];
+    extraGroups = [ "wheel" ] ++ addIfGroupExist [
+      "audio"
+      "networkmanager"
+      "docker"
+      "libvirtd"
+    ];
+
     uid = 1000;
     shell = pkgs.zsh;
 
@@ -24,10 +33,4 @@
     # Default - used for bootstrapping.
     password = "pw";
   };
-
-  # In case if it's enabled, I should have access to use it.
-  users.extraGroups.audio.members = [ "otavio" ];
-  users.extraGroups.networkmanager.members = [ "otavio" ];
-  users.extraGroups.docker.members = [ "otavio" ];
-  users.extraGroups.libvirtd.members = [ "otavio" ];
 }
