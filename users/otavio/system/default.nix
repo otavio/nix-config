@@ -1,8 +1,9 @@
 { config, pkgs, ... }:
-let
-  homeDirectory = "/home/otavio";
-in
 {
+  imports = [
+    ./restic.nix
+  ];
+
   programs = {
     zsh.enable = true;
     msmtp = {
@@ -24,37 +25,6 @@ in
 
   sops.secrets = {
     "msmtp-password" = { };
-    "backup/credentials" = { };
-    "backup/repository" = { };
-    "backup/password" = { };
-  };
-
-  services.restic.backups = {
-    wasabi = {
-      user = "root";
-      initialize = true;
-
-      environmentFile = "${config.sops.secrets."backup/credentials".path}";
-      repositoryFile = "${config.sops.secrets."backup/repository".path}";
-      passwordFile = "${config.sops.secrets."backup/password".path}";
-
-      paths = [ "${homeDirectory}" ];
-
-      pruneOpts = [
-        "--keep-daily 7"
-        "--keep-weekly 5"
-        "--keep-monthly 12"
-        "--keep-yearly 3"
-      ];
-
-      extraBackupArgs = [
-        "--exclude='.direnv'"
-        "--exclude='target'"
-        "--exclude='build*/**/tmp'"
-        "--exclude-caches"
-        "--exclude-if-present .backup-ignore"
-      ];
-    };
   };
 
   users.users.otavio = {
