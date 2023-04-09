@@ -1,9 +1,5 @@
 { config, pkgs, ... }:
 {
-  imports = [
-    ./restic.nix
-  ];
-
   users.users.bruna = {
     description = "Bruna C. Tessmer Salvador";
 

@@ -11,6 +11,8 @@
     ../features/optional/pipewire.nix
     ../features/optional/quietboot.nix
     ../features/optional/zram-swap.nix
+
+    ./restic.nix
   ];
 
   hardware.cpu.intel.updateMicrocode = true;
