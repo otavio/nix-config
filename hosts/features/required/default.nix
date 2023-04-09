@@ -1,5 +1,3 @@
-# This file holds config that i use on all hosts
-{ pkgs, ... }:
 {
   imports = [
     ./console.nix
@@ -9,6 +7,7 @@
     ./nixpkgs.nix
     ./openssh.nix
     ./sops.nix
+    ./sudo.nix
     ./upgrade-diff.nix
   ];
 
