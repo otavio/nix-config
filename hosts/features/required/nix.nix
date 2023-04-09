@@ -16,6 +16,9 @@
       warn-dirty = false;
     };
 
+    # improve desktop responsiveness when updating the system
+    daemonCPUSchedPolicy = "idle";
+
     optimise.automatic = true;
 
     gc = {
