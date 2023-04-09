@@ -14,7 +14,9 @@
     ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
 
+    ./msmtp.nix
     ./partitioning.nix
+    ./restic.nix
   ];
 
   boot = {

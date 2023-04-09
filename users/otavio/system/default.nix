@@ -3,11 +3,6 @@ let
   addIfGroupExist = groups: builtins.filter (g: builtins.hasAttr g config.users.groups) groups;
 in
 {
-  imports = [
-    ./msmtp.nix
-    ./restic.nix
-  ];
-
   programs = {
     zsh.enable = true;
   };
