@@ -2,9 +2,6 @@
 
 {
   imports = [
-    # Include the results of the hardware scan.
-    ./hardware-configuration.nix
-
     ../features/required
 
     ../features/optional/no-mitigations.nix
@@ -12,11 +9,17 @@
     ../features/optional/quietboot.nix
     ../features/optional/zram-swap.nix
 
+    ./partitioning.nix
     ./restic.nix
   ];
 
   hardware.cpu.intel.updateMicrocode = true;
   hardware.enableRedistributableFirmware = true;
+
+  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
+  boot.initrd.kernelModules = [ ];
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.extraModulePackages = [ ];
 
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
