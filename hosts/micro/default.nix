@@ -14,7 +14,7 @@
     ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
 
-    ./disko.nix
+    ./partitioning.nix
   ];
 
   boot = {
