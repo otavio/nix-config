@@ -119,16 +119,4 @@
           '';
         };
       });
-
-  nixConfig = {
-    extra-substituters = [
-      "https://nix-community.cachix.org"
-      "https://otavio-nix-config.cachix.org"
-    ];
-
-    extra-trusted-public-keys = [
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "otavio-nix-config.cachix.org-1:4HXl0KPGJ0+tkTUn/0tHRpz1wJst9MxovLjKbsPnqS4="
-    ];
-  };
 }
