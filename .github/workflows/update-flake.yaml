@@ -16,7 +16,7 @@ jobs:
           nix_conf: experimental-features = nix-command flakes repl-flake
       - name: Update flake.lock
         id: update
-        uses: DeterminateSystems/update-flake-lock@v18
+        uses: DeterminateSystems/update-flake-lock@v19
         with:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
       - name: Print PR number
