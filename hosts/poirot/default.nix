@@ -1,7 +1,11 @@
-{ config, pkgs, ... }:
+{ inputs, config, pkgs, ... }:
 
 {
-  imports = [
+  imports = with inputs.nixos-hardware.nixosModules; [
+    common-cpu-intel
+    common-gpu-intel
+    common-pc-laptop-ssd
+  ] ++ [
     ../features/required
 
     ../features/optional/auto-upgrade.nix
@@ -14,9 +18,6 @@
     ./partitioning.nix
     ./restic.nix
   ];
-
-  hardware.cpu.intel.updateMicrocode = true;
-  hardware.enableRedistributableFirmware = true;
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
   boot.initrd.kernelModules = [ ];

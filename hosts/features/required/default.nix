@@ -2,6 +2,7 @@
   imports = [
     ./console.nix
     ./disable-global-dhcp.nix
+    ./firmware.nix
     ./locale.nix
     ./home-manager.nix
     ./nix.nix

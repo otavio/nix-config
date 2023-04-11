@@ -254,6 +254,20 @@
         "type": "github"
       }
     },
+    "nixos-hardware": {
+      "locked": {
+        "lastModified": 1680876084,
+        "narHash": "sha256-eP9yxP0wc7XuVaODugh+ajgbFGaile2O1ihxiLxOuvU=",
+        "owner": "NixOS",
+        "repo": "nixos-hardware",
+        "rev": "3006d2860a6ed5e01b0c3e7ffb730e9b293116e2",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixos-hardware",
+        "type": "indirect"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1680213900,
@@ -433,6 +447,7 @@
         "emacs-overlay": "emacs-overlay",
         "flake-utils": "flake-utils_4",
         "home-manager": "home-manager",
+        "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_5",
         "sops-nix": "sops-nix"
       }

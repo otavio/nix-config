@@ -1,7 +1,9 @@
-{ config, pkgs, ... }:
+{ inputs, config, pkgs, ... }:
 
 {
-  imports = [
+  imports = with inputs.nixos-hardware.nixosModules; [
+    common-pc-ssd
+  ] ++ [
     ../features/required
 
     ../features/optional/bluetooth.nix
@@ -37,9 +39,6 @@
     '';
   };
 
-  hardware.cpu.intel.updateMicrocode = true;
-  hardware.enableRedistributableFirmware = true;
-
   services.xserver = {
     xrandrHeads = [{
       output = "HDMI-1";
@@ -57,10 +56,6 @@
   };
 
   networking.domain = "casa.salvador";
-
-  # Enable fstrim (for SSD disks)
-  services.fstrim.enable = true;
-  services.fstrim.interval = "weekly";
 
   virtualisation.libvirtd.enable = true;
   environment.systemPackages = with pkgs; [ virt-manager virt-viewer ];

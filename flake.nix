@@ -11,6 +11,7 @@
     };
 
     devenv.url = "github:cachix/devenv";
+    nixos-hardware.url = "nixos-hardware";
     disko.url = "github:nix-community/disko";
     sops-nix.url = "github:Mic92/sops-nix";
     emacs-overlay.url = "github:nix-community/emacs-overlay";

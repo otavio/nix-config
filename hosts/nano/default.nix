@@ -1,7 +1,11 @@
-{ config, ... }:
+{ inputs, config, ... }:
 
 {
-  imports = [
+  imports = with inputs.nixos-hardware.nixosModules; [
+    common-cpu-intel
+    common-gpu-intel
+    common-pc-laptop-ssd
+  ] ++ [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
 
@@ -21,10 +25,6 @@
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
   };
-
-  hardware.cpu.intel.updateMicrocode = true;
-
-  powerManagement.cpuFreqGovernor = "performance";
 
   # Enable WireGuard
   sops.secrets."wireguard/nano/private-key" = { };
