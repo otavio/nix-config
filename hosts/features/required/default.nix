@@ -1,6 +1,7 @@
 {
   imports = [
     ./console.nix
+    ./disable-global-dhcp.nix
     ./locale.nix
     ./home-manager.nix
     ./nix.nix

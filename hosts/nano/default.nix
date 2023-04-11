@@ -26,7 +26,6 @@
   powerManagement.cpuFreqGovernor = "performance";
 
   services.resolved.enable = true;
-  networking.useDHCP = false;
   networking.networkmanager = {
     enable = true;
     dns = "systemd-resolved";

@@ -56,7 +56,6 @@
   };
 
   services.resolved.enable = true;
-  networking.useDHCP = false;
   networking.domain = "casa.salvador";
 
   networking.networkmanager = {
