@@ -69,9 +69,6 @@
   services.fstrim.enable = true;
   services.fstrim.interval = "weekly";
 
-  # Enable thermald
-  services.thermald.enable = true;
-
   virtualisation.libvirtd.enable = true;
   environment.systemPackages = with pkgs; [ virt-manager virt-viewer ];
 
