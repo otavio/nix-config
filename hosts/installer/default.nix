@@ -32,7 +32,6 @@
     (writeShellScriptBin "nixos-do-install" ''
       set -eux
 
-      wipefs --all /dev/vda
       ${targetConfiguration.config.system.build.diskoNoDeps} --mode zap_create_mount
 
       ${config.system.build.nixos-install}/bin/nixos-install \
