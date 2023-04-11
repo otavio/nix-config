@@ -9,6 +9,7 @@
 
     ../features/optional/bluetooth.nix
     ../features/optional/desktop.nix
+    ../features/optional/network-manager.nix
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
     ../features/optional/quietboot.nix
@@ -24,13 +25,6 @@
   hardware.cpu.intel.updateMicrocode = true;
 
   powerManagement.cpuFreqGovernor = "performance";
-
-  services.resolved.enable = true;
-  networking.networkmanager = {
-    enable = true;
-    dns = "systemd-resolved";
-    wifi.backend = "iwd";
-  };
 
   # Enable WireGuard
   sops.secrets."wireguard/nano/private-key" = { };

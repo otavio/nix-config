@@ -8,6 +8,7 @@
     ../features/optional/desktop.nix
     ../features/optional/docker.nix
     ../features/optional/latest-linux-kernel.nix
+    ../features/optional/network-manager.nix
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
     ../features/optional/quietboot.nix
@@ -55,14 +56,7 @@
     }];
   };
 
-  services.resolved.enable = true;
   networking.domain = "casa.salvador";
-
-  networking.networkmanager = {
-    enable = true;
-    dns = "systemd-resolved";
-    wifi.backend = "iwd";
-  };
 
   # Enable fstrim (for SSD disks)
   services.fstrim.enable = true;

@@ -5,6 +5,7 @@
     ../features/required
 
     ../features/optional/auto-upgrade.nix
+    ../features/optional/network-manager.nix
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
     ../features/optional/quietboot.nix
@@ -29,8 +30,6 @@
   boot.loader.efi.efiSysMountPoint = "/efi";
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.grub.device = "nodev";
-
-  networking.networkmanager.enable = true;
 
   # Select internationalisation properties.
   i18n.defaultLocale = "pt_BR.UTF-8";
