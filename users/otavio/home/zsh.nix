@@ -140,11 +140,12 @@ in
       }
 
       keys-load() {
+          mkdir -p /tmp/otavio/keys
           if [ -z "$1" ]; then
               unset SSH_AUTH_SOCK
               echo Decriptando particao...
               sudo cryptsetup -v luksOpen /dev/disk/by-uuid/faae5ddb-df82-4a23-8a24-eedd6356ccff keys && \
-                  sudo mount /dev/mapper/keys /mnt && \
+                  sudo mount /dev/mapper/keys /tmp/otavio/keys && \
                   echo done || echo ERROR
 
               echo Carregando chave SSH ...
@@ -159,9 +160,10 @@ in
           echo Descarregando chave SSH
           keychain --stop mine
           echo -n Desligando particao encriptada...
-          sudo umount /mnt > /dev/null
+          sudo umount /tmp/otavio/keys > /dev/null
           sudo cryptsetup -v luksClose keys && \
               echo done || echo ERROR
+          rmdir -p /tmp/otavio/keys
       }
 
       transfer() {
