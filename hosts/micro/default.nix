@@ -2,6 +2,8 @@
 
 {
   imports = with inputs.nixos-hardware.nixosModules; [
+    common-cpu-amd
+    common-cpu-amd-pstate
     common-pc-ssd
   ] ++ [
     ../features/required
@@ -27,10 +29,10 @@
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
 
-    initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "usbhid" ];
+    initrd.availableKernelModules = [ "nvme" "xhci_pci" "usbhid" ];
     initrd.kernelModules = [ ];
 
-    kernelModules = [ "kvm-intel" ];
+    kernelModules = [ "kvm-amd" ];
     kernelParams = [ "video=HDMI-A-1:2560x1080" ];
     extraModulePackages = [ config.boot.kernelPackages.rtl88x2bu ];
     extraModprobeConfig = ''

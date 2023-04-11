@@ -1,7 +1,7 @@
 {
   disko.devices = {
     disk.primary = {
-      device = "/dev/sda";
+      device = "/dev/nvme0n1";
       type = "disk";
       content = {
         type = "table";
@@ -11,7 +11,9 @@
             type = "partition";
             name = "ESP";
             start = "1MiB";
-            end = "100MiB";
+            end = "512MiB";
+            fs-type = "fat32";
+            part-type = "primary";
             bootable = true;
             content = {
               type = "filesystem";
@@ -22,14 +24,15 @@
           {
             name = "root";
             type = "partition";
-            start = "100MiB";
+            start = "512MiB";
             end = "100%";
-            part-type = "primary";
-            bootable = true;
             content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/";
+              type = "btrfs";
+              extraArgs = [ "-f" ];
+              subvolumes = {
+                "/root" = { mountpoint = "/"; mountOptions = [ "compress=zstd" "noatime" ]; };
+                "/nix" = { mountOptions = [ "compress=zstd" "noatime" ]; };
+              };
             };
           }
         ];
