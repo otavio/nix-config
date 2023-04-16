@@ -9,7 +9,6 @@
           format = "gpt";
           partitions = [
             {
-              type = "partition";
               name = "ESP";
               start = "1M";
               end = "512M";
@@ -22,13 +21,11 @@
             }
             {
               name = "boot";
-              type = "partition";
               start = "0";
               end = "1M";
               flags = [ "bios_grub" ];
             }
             {
-              type = "partition";
               name = "root";
               start = "512M";
               end = "100%";
