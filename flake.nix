@@ -85,7 +85,7 @@
           modules = [
             {
               packages = with pkgs; [
-                colmena
+                inputs.colmena.packages.${system}.colmena
                 home-manager
                 sops
               ];
