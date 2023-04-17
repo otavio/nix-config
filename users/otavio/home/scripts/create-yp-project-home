@@ -1,19 +1,18 @@
 #!/bin/sh
 
-project_type=$1
-project_name=$2
-release=$3
+project_name=$1
+release=$2
 
-if [ -z $project_type ] || [ -z $project_name ] || [ -z $release ]; then
+if [ -z $project_name ] || [ -z $release ]; then
     echo "Invalid usage. Please check if you're using this correctly:"
     cat <<EOF
-$0 <project_type> <project_name> <release>
+$0 <project_name> <release>
 EOF
     exit 1
 fi
 
 tmuxp_profile="$HOME/.tmuxp/$project_name-$release.yaml"
-project_home="$HOME/src/$project_type/$project_name/$release"
+project_home="$HOME/src/oe/$project_name/$release"
 
 if [ ! -e "$tmuxp_profile" ]; then
     cat > $tmuxp_profile << EOF
