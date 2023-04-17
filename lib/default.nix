@@ -3,25 +3,16 @@ let
   inherit (builtins) attrValues listToAttrs map mapAttrs;
 in
 {
-  mkColmenaFromNixOSConfigurations = nixosConfigurations:
+  mkColmenaFromNixOSConfigurations = conf:
     {
       meta = {
-        nixpkgs = import inputs.nixpkgs {
-          system = "x86_64-linux";
-          overlays = builtins.attrValues outputs.overlays;
-        };
-
-        specialArgs = {
-          inherit inputs outputs;
-        };
+        description = "my personal machines";
+        # This can be overriden by node nixpkgs
+        nixpkgs = import inputs.nixpkgs { system = "x86_64-linux"; };
+        nodeNixpkgs = builtins.mapAttrs (name: value: value.pkgs) conf;
+        nodeSpecialArgs = builtins.mapAttrs (name: value: value._module.specialArgs) conf;
       };
-    } // mapAttrs
-      (name: value:
-        {
-          nixpkgs.system = value.config.nixpkgs.system;
-          imports = value._module.args.modules;
-        })
-      nixosConfigurations;
+    } // builtins.mapAttrs (name: value: { imports = value._module.args.modules; }) conf;
 
   mkSystem =
     { hostname
