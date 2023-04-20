@@ -15,6 +15,8 @@ let
     override = epkgs: epkgs // {
       inherit (epkgs.nongnuPackages) nix-mode;
     };
+
+    package = pkgs.emacsGit;
   };
 in
 {
