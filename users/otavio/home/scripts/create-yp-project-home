@@ -2,6 +2,7 @@
 
 project_name=$1
 release=$2
+yocto_env=$3
 
 if [ -z $project_name ] || [ -z $release ]; then
     echo "Invalid usage. Please check if you're using this correctly:"
@@ -14,8 +15,14 @@ fi
 tmuxp_profile="$HOME/.tmuxp/$project_name-$release.yaml"
 project_home="$HOME/src/oe/$project_name/$release"
 
-if [ ! -e "$tmuxp_profile" ]; then
-    cat > $tmuxp_profile << EOF
+
+if [ -e "$tmuxp_profile" ]; then
+    echo "INFO: $tmuxp_profile already has been overridden."
+fi
+
+[ -n "$yocto_env" ] || yocto_env=20.04
+
+cat > $tmuxp_profile << EOF
 session_name: $(echo $project_name-$release | tr '.' '-')
 start_directory: $project_home
 windows:
@@ -25,15 +32,14 @@ windows:
     automatic-rename: 'off'
   panes:
   - focus: 'true'
-    shell_command: yocto-env 20.04
-  - cd sources; sleep 3; eval \$EDITOR
-  - source setup-environment build; cd sources
+    shell_command: |
+      yocto-env $yocto_env
+      source setup-environment build
+  - cd && touch .projectile && eval \$EDITOR
+  - cd
   start_directory: $project_home
   window_name: build
 EOF
-else
-    echo "WARN: $tmuxp_profile already exists, reusing it."
-fi
 
 mkdir -p $project_home
 
