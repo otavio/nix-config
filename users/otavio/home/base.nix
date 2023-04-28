@@ -63,10 +63,6 @@ in
            ForwardAgent yes
            ForwardX11 yes
            ForwardX11Trusted yes
-
-      Host bitbucket.org
-           User git
-           IdentityFile ~/.ssh/devel-tools-dsa
     '';
   };
 
