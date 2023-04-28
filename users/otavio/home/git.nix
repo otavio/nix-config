@@ -37,6 +37,7 @@
     ignores = [ ".direnv" ];
 
     extraConfig = {
+      core.sshCommand = "${pkgs.openssh}/bin/ssh -F ~/.ssh/config";
       github.user = "otavio";
       pull = { rebase = true; };
       rebase = {
