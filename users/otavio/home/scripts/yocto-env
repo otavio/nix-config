@@ -54,6 +54,7 @@ docker run \
        --device=/dev/kvm \
        --device=/dev/net/tun \
        -v /tmp/.X11-unix:/tmp/.X11-unix \
+       -v /tmp/${USER}/keys:/tmp/${USER}/keys \
        -v /nix:/nix \
        -v ${HOME}:${HOME} \
        --env DISPLAY=$DISPLAY \
