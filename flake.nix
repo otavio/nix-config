@@ -10,7 +10,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    devenv.url = "github:cachix/devenv";
     nixos-hardware.url = "nixos-hardware";
     disko.url = "github:nix-community/disko";
     sops-nix.url = "github:Mic92/sops-nix";
@@ -79,17 +78,11 @@
         pkgs = import inputs.nixpkgs { inherit system outputs; };
       in
       {
-        devShells.default = inputs.devenv.lib.mkShell {
-          inherit inputs pkgs;
-
-          modules = [
-            {
-              packages = with pkgs; [
-                inputs.colmena.packages.${system}.colmena
-                home-manager
-                sops
-              ];
-            }
+        devShells.default = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            inputs.colmena.packages.${system}.colmena
+            home-manager
+            sops
           ];
         };
 
