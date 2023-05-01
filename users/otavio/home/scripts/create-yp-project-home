@@ -27,7 +27,8 @@ session_name: $(echo $project_name-$release | tr '.' '-')
 start_directory: $project_home
 windows:
 - layout: even-horizontal
-  shell_command_before: alias cd='HOME=$project_home cd'
+  shell_command_before: |
+    alias cd='HOME=$project_home cd'
   options:
     automatic-rename: 'off'
   panes:
@@ -35,9 +36,8 @@ windows:
     shell_command: |
       yocto-env $yocto_env
       source setup-environment build
-  - cd && touch .projectile && eval \$EDITOR
-  - cd
-  start_directory: $project_home
+  - cd sources && touch .projectile && eval \$EDITOR
+  -
   window_name: build
 EOF
 
