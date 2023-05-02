@@ -73,8 +73,6 @@ in
 
   home.file = {
     ".emacs.d" = { source = ./emacs.d; recursive = true; };
-    ".tmux.conf".source = ./tmux/tmux.conf;
-    ".tmuxp" = { source = ./tmux/tmuxp; recursive = true; };
     ".yocto/site.conf".source = ./yocto/site.conf;
   };
 }
