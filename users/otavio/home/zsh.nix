@@ -1,5 +1,14 @@
 { config, pkgs, ... }:
-
+let
+  local-scripts = pkgs.stdenv.mkDerivation {
+    name = "local-scripts";
+    src = ./scripts;
+    installPhase = ''
+      mkdir -p $out/bin
+      cp -r * $out/bin
+    '';
+  };
+in
 {
   home.packages = with pkgs; [
     zsh-completions
@@ -194,6 +203,8 @@
       [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
 
       [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]] && exec startx
+
+      export PATH=$PATH:${pkgs.lib.makeBinPath [ local-scripts ]}
     '';
 
     initExtraBeforeCompInit = ''
