@@ -1,5 +1,15 @@
 { config, pkgs, ... }:
-
+let
+  # Zsh specific scripts which are added to the shell's PATH.
+  zsh-scripts = pkgs.stdenv.mkDerivation {
+    name = "zsh-scripts";
+    src = ./zsh/scripts;
+    installPhase = ''
+      mkdir -p $out/bin
+      cp -r * $out/bin
+    '';
+  };
+in
 {
   home.packages = with pkgs; [
     zsh-completions
@@ -194,6 +204,8 @@
       [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
 
       [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]] && exec startx
+
+      export PATH=$PATH:${pkgs.lib.makeBinPath [ zsh-scripts ]}
     '';
 
     initExtraBeforeCompInit = ''

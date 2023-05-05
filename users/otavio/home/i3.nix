@@ -9,7 +9,7 @@ let
 
   editor = "emacs -nw";
   terminal = "i3-sensible-terminal --class=term";
-  menu = "i3-sensible-terminal -t 'fzf-menu' --class 'fzf-menu' -e fzf-menu";
+  menu = "i3-sensible-terminal -t 'fzf-menu' --class 'fzf-menu' -e ${fzf-menu}/bin/i3-fzf-menu";
 
   dunstCloseNotification = "dunstctl close";
 
@@ -17,6 +17,11 @@ let
   editorWs = "2: editor ";
   browserWs = "3: browser ";
   triviaWs = "10: trivia ";
+
+  fzf-menu = pkgs.writeScriptBin "i3-fzf-menu" (builtins.readFile (pkgs.substituteAll {
+    src = ./i3/fzf-menu;
+    fzf = "${pkgs.fzf}/bin/fzf";
+  }));
 in
 {
   # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8

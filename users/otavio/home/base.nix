@@ -1,21 +1,20 @@
 { config, pkgs, ... }:
-let
-  local-scripts = pkgs.stdenv.mkDerivation {
-    name = "local-scripts";
-    src = ./scripts;
-    installPhase = ''
-      mkdir -p $out/bin
-      cp -r * $out/bin
-    '';
-  };
-in
+
 {
   programs.home-manager.enable = true;
 
   home.stateVersion = "22.11";
 
   home.packages = with pkgs; [
-    local-scripts
+    # Local scripts added to default PATH.
+    (pkgs.stdenv.mkDerivation {
+      name = "base-scripts";
+      src = ./scripts;
+      installPhase = ''
+        mkdir -p $out/bin
+        cp -r * $out/bin
+      '';
+    })
 
     cryptsetup
     gping
