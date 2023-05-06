@@ -16,10 +16,8 @@
       '';
     })
 
-    cryptsetup
     gping
     htop
-    keychain
     mtr
     nnn
     tmux
@@ -37,9 +35,6 @@
     aspellDicts.en-computers
     aspellDicts.en-science
     aspellDicts.pt_BR
-
-    manix
-    nixfmt
 
     awscli2
   ];
