@@ -8,6 +8,7 @@
   ] ++ [
     ../features/required
 
+    ../features/optional/anydesk.nix
     ../features/optional/auto-upgrade.nix
     ../features/optional/network-manager.nix
     ../features/optional/no-mitigations.nix

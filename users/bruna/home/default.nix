@@ -9,7 +9,6 @@
   };
 
   home.packages = with pkgs; [
-    anydesk
     chromium
     libreoffice
     system-config-printer
