@@ -25,6 +25,7 @@ in
   ];
 
   home.packages = with pkgs; [
+    keychain
     emacs-all-the-icons-fonts
 
     emacsWithPackages
