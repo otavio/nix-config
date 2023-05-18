@@ -19,6 +19,7 @@
     ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
 
+    ./mods.nix
     ./msmtp.nix
     ./partitioning.nix
     ./restic.nix
