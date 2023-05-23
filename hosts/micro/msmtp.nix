@@ -2,7 +2,10 @@
 
 {
   sops.secrets = {
-    "msmtp/password" = { };
+    "msmtp/password" = {
+      owner = config.users.users.otavio.name;
+      inherit (config.users.users.otavio) group;
+    };
   };
 
   programs = {
