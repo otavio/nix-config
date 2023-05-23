@@ -42,6 +42,8 @@
     ];
 
     extraConfig = ''
+      set -sg terminal-overrides ",*:RGB"
+
       # Repeat key press automatically
       set-option -g repeat-time 1000
 
