@@ -29,6 +29,10 @@ in
     emacs-all-the-icons-fonts
 
     emacsWithPackages
+
+    # Used in lsp-mode
+    nixpkgs-fmt
+    nil
   ];
 
   home.sessionVariables.EDITOR = "emacs -nw";
