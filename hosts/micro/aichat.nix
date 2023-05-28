@@ -9,6 +9,6 @@
   };
 
   environment.systemPackages = with pkgs; [
-    (writeScriptBin "mods" "OPENAI_API_KEY=$(cat ${config.sops.secrets."openapi".path}) ${mods}/bin/mods")
+    (writeScriptBin "aichat" "AICHAT_API_KEY=$(cat ${config.sops.secrets."openapi".path}) ${aichat}/bin/aichat")
   ];
 }
