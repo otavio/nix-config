@@ -22,20 +22,34 @@ in
   };
 
   nixpkgs.config.allowUnfree = true;
-  home.packages = with pkgs; [
-    anydesk
-    discord
-    gthumb
-    irssiWrapper
-    tdesktop
-    nixpkgs-fmt
-    nixpkgs-review
-    obsidian
-    pavucontrol
-    scrcpy
-    skypeforlinux
-    slack
-  ];
+  home.packages =
+    let
+      flameshotOcrForLang = lang: pkgs.writeScriptBin "flameshot-ocr-${lang}" ''
+        # The sleep is required to give time for the fzf-menu to disappear before opening flameshot.
+        sleep 0.1
+
+        ${pkgs.flameshot}/bin/flameshot gui -r | \
+           ${pkgs.tesseract}/bin/tesseract -l ${lang} - - | \
+           ${pkgs.xclip}/bin/xclip -sel clip
+      '';
+    in
+    with pkgs; [
+      (flameshotOcrForLang "eng")
+      (flameshotOcrForLang "por")
+
+      anydesk
+      discord
+      gthumb
+      irssiWrapper
+      tdesktop
+      nixpkgs-fmt
+      nixpkgs-review
+      obsidian
+      pavucontrol
+      scrcpy
+      skypeforlinux
+      slack
+    ];
 
   services.unclutter.enable = true;
 
