@@ -1,8 +1,8 @@
 { pkgs, ... }:
 {
   home.file = {
-    ".gitaliases".source = ./git/aliases;
-    ".patman".source = ./git/patman;
+    ".gitaliases".source = ./aliases;
+    ".patman".source = ./patman;
   };
 
   home.packages = with pkgs; [

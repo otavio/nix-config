@@ -47,12 +47,7 @@
       };
 
       homeConfigurations = {
-        otavio = lib.mkHome {
-          system = "x86_64-linux";
-          username = "otavio";
-
-          graphical = false;
-        };
+        "otavio@generic-x86" = lib.mkHome ./users/otavio/home/generic.nix "x86_64-linux";
       };
 
       packages = builtins.foldl'

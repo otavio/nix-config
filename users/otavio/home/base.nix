@@ -1,10 +1,6 @@
 { pkgs, ... }:
 
 {
-  programs.home-manager.enable = true;
-
-  home.stateVersion = "22.11";
-
   home.packages = with pkgs; [
     # Local scripts added to default PATH.
     (pkgs.stdenv.mkDerivation {
@@ -41,23 +37,6 @@
 
   services.gpg-agent.enable = true;
   programs.gpg.enable = true;
-  programs.ssh = {
-    enable = true;
-
-    controlMaster = "auto";
-    hashKnownHosts = false;
-
-    extraConfig = ''
-      Host *.ossystems.com.br
-           HostkeyAlgorithms +ssh-rsa
-           PubkeyAcceptedAlgorithms +ssh-rsa
-
-      Host *.lab.ossystems
-           ForwardAgent yes
-           ForwardX11 yes
-           ForwardX11Trusted yes
-    '';
-  };
 
   home.sessionVariables = {
     TERMINAL = "alacritty";

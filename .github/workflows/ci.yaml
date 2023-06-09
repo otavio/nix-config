@@ -52,7 +52,7 @@ jobs:
     strategy:
       matrix:
         homeConfiguration:
-          - otavio
+          - "otavio@generic-x86"
     steps:
     - run: sudo apt-get clean
     - uses: actions/checkout@v3

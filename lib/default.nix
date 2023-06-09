@@ -54,37 +54,18 @@
         (u: ../users/${u}/system);
     };
 
-  mkHome =
-    { username
-    , system
-    , graphical ? false
-    }:
+  mkHome = module: system:
     inputs.home-manager.lib.homeManagerConfiguration {
+      pkgs = import inputs.nixpkgs { inherit system; };
+
       extraSpecialArgs = {
-        inherit inputs outputs system graphical;
+        inherit inputs outputs;
+
+        graphical = false;
+        hostname = "unknown";
       };
 
-      pkgs = inputs.nixpkgs.legacyPackages.${system};
-
-      modules = [
-        # Base configuration
-        {
-          home = {
-            inherit username;
-
-            homeDirectory = "/home/${username}";
-          };
-
-          programs = {
-            home-manager.enable = true;
-            git.enable = true;
-          };
-
-          systemd.user.startServices = "sd-switch";
-        }
-
-        ../users/${username}/home
-      ];
+      modules = [ module ];
     };
 
   mkInstallerForSystem =
