@@ -1,7 +1,5 @@
 { inputs, outputs }:
-let
-  inherit (builtins) attrValues listToAttrs map mapAttrs;
-in
+
 {
   mkColmenaFromNixOSConfigurations = conf:
     {
@@ -40,9 +38,9 @@ in
         {
           home-manager = {
             users =
-              listToAttrs
-                (map
-                  (u: { name = u; value = import ../users/${ u}/home; })
+              builtins.listToAttrs
+                (builtins.map
+                  (u: { name = u; value = import ../users/${u}/home; })
                   users);
 
             extraSpecialArgs = {
