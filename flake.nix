@@ -97,18 +97,10 @@
         };
 
         checks = {
-          lint = pkgs.runCommand "lint-code" { } ''
-            ${pkgs.statix}/bin/statix check ${./.}
-
-            # We need to produce it at end to avoid error.
-            touch $out
-          '';
-
-          format = pkgs.runCommand "check-format" { } ''
-            # Check Nix format.
-            ${pkgs.nixpkgs-fmt}/bin/nixpkgs-fmt --check ${./.}
-
-            # We need to produce it at end to avoid error.
+          lint = pkgs.runCommand "lint-code" { nativeBuildInputs = with pkgs; [ nixpkgs-fmt deadnix statix ]; } ''
+            deadnix --fail ${./.}
+            #statix check ${./.} # https://github.com/nerdypepper/statix/issues/75
+            nixpkgs-fmt --check ${./.}
             touch $out
           '';
         };
