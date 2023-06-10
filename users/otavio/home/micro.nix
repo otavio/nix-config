@@ -4,6 +4,7 @@
   imports =
     [
       ./global
+      ./features/gpg
 
       ./base.nix
       ./emacs.nix

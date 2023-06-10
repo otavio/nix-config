@@ -35,9 +35,6 @@
     awscli2
   ];
 
-  services.gpg-agent.enable = true;
-  programs.gpg.enable = true;
-
   home.sessionVariables = {
     TERMINAL = "alacritty";
     TERM = "xterm-256color";
