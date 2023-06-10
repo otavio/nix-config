@@ -12,9 +12,14 @@ let
 
   cryptsetup = "${pkgs.cryptsetup}/bin/cryptsetup";
   keychain = "${pkgs.keychain}/bin/keychain";
+
+  nix-differ = pkgs.writeScriptBin "nix-differ" ''
+    nix run nixpkgs#nix-diff /run/current-system $(nix eval .#nixosConfigurations.$(hostname).config.system.build.toplevel --raw)
+  '';
 in
 {
   home.packages = with pkgs; [
+    nix-differ
     zsh-completions
   ];
 
