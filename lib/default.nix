@@ -40,7 +40,7 @@
             users =
               builtins.listToAttrs
                 (builtins.map
-                  (u: { name = u; value = import ../users/${u}/home; })
+                  (u: { name = u; value = import ../users/${u}/home/${hostname}.nix; })
                   users);
 
             extraSpecialArgs = {
