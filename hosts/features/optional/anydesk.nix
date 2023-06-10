@@ -14,7 +14,7 @@
       Restart = "on-failure";
       RestartSec = 5;
       StartLimitBurst = 3;
-      StartLimitInterval = 10;
+      StartLimitIntervalSec = 10;
       TimeoutStopSec = 30;
       LimitNOFILE = 100000;
       PIDFile = /var/run/anydesk.pid;
