@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 let
   # Zsh specific scripts which are added to the shell's PATH.
   zsh-scripts = pkgs.stdenv.mkDerivation {

@@ -1,4 +1,5 @@
-{ pkgs, config, ... }:
+_:
+
 {
   console = {
     earlySetup = false;

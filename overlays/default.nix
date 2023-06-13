@@ -1,9 +1,10 @@
-{ outputs, inputs }:
+_:
+
 {
   # Adds my custom packages
-  additions = final: prev: import ../pkgs { pkgs = final; };
+  additions = final: _: import ../pkgs { pkgs = final; };
 
-  modifications = final: prev: {
+  modifications = _: prev: {
     fzf = prev.fzf.overrideAttrs (oa: {
       # https://github.com/NixOS/nixpkgs/pull/226847
       postInstall = oa.postInstall + ''
@@ -14,7 +15,7 @@
       '';
     });
 
-    linuxPackages_latest = prev.linuxPackages_latest.extend (final: prev: {
+    linuxPackages_latest = prev.linuxPackages_latest.extend (_: prev: {
       rtl88x2bu = prev.callPackage ./rtl88x2bu { };
     });
   };

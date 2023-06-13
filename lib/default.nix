@@ -7,10 +7,10 @@
         description = "my personal machines";
         # This can be overriden by node nixpkgs
         nixpkgs = import inputs.nixpkgs { system = "x86_64-linux"; };
-        nodeNixpkgs = builtins.mapAttrs (name: value: value.pkgs) conf;
-        nodeSpecialArgs = builtins.mapAttrs (name: value: value._module.specialArgs) conf;
+        nodeNixpkgs = builtins.mapAttrs (_: value: value.pkgs) conf;
+        nodeSpecialArgs = builtins.mapAttrs (_: value: value._module.specialArgs) conf;
       };
-    } // builtins.mapAttrs (name: value: { imports = value._module.args.modules; }) conf;
+    } // builtins.mapAttrs (_: value: { imports = value._module.args.modules; }) conf;
 
   mkSystem =
     { hostname
@@ -58,7 +58,6 @@
     { username
     , system
     , graphical ? false
-    , hostname ? "unknown"
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
       extraSpecialArgs = {

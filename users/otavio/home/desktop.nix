@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 let
   irssiWrapper = pkgs.writeScriptBin "irssi" ''
     export LIBERACHAT_PASSWORD=$(${pkgs.sops}/bin/sops --decrypt --extract '["irssi-nickserv"]' $HOME/nix-config/secrets/secrets.yaml)

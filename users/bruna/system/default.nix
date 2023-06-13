@@ -1,4 +1,5 @@
-{ config, pkgs, ... }:
+_:
+
 {
   users.users.bruna = {
     description = "Bruna C. Tessmer Salvador";

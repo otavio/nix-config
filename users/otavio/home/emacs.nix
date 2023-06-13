@@ -1,4 +1,4 @@
-{ inputs, config, pkgs, ... }:
+{ inputs, pkgs, ... }:
 let
   emacsWithPackages = pkgs.emacsWithPackagesFromUsePackage {
     config = ./emacs.d/settings.org;
