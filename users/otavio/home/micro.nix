@@ -4,6 +4,7 @@
   imports =
     [
       ./global
+      ./features/flameshot
       ./features/gpg
 
       ./base.nix

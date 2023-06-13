@@ -25,8 +25,6 @@ in
   home.packages = with pkgs; [
     anydesk
     discord
-    flameshotOcr.eng
-    flameshotOcr.por
     gthumb
     irssiWrapper
     nixpkgs-fmt
@@ -57,8 +55,6 @@ in
   services.dunst.enable = true;
   xdg.configFile."dunst/dunstrc".source = ./dunst/dunstrc;
   xdg.configFile."dunst/skype".source = ./dunst/skype;
-
-  services.flameshot.enable = true;
 
   home.file.".irssi" = {
     source = ./irssi;
