@@ -12,6 +12,8 @@ EOF
     exit 1
 fi
 
+mkdir -p $HOME/.tmuxp
+
 tmuxp_profile="$HOME/.tmuxp/$project_name-$release.yaml"
 project_home="$HOME/src/oe/$project_name/$release"
 
