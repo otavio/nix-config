@@ -18,9 +18,5 @@
           --replace "fzf " "$out/bin/fzf "
       '';
     });
-
-    linuxPackages_latest = prev.linuxPackages_latest.extend (_: prev: {
-      rtl88x2bu = prev.callPackage ./rtl88x2bu { };
-    });
   };
 }
