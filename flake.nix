@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -20,26 +19,34 @@
   outputs = { self, ... }@inputs:
     let
       inherit (self) outputs;
-      lib = import ./lib { inherit inputs outputs; };
+      inherit (import ./lib { inherit inputs outputs; })
+        mkSystem
+        mkHome
+        mkColmenaFromNixOSConfigurations
+        mkInstallerForSystem
+        ;
+      systems = [ "x86_64-linux" "aarch64-linux" ];
+      forEachSystem = f: inputs.nixpkgs.lib.genAttrs systems (sys: f pkgsFor.${sys});
+      pkgsFor = inputs.nixpkgs.legacyPackages;
     in
     {
       overlays = import ./overlays { inherit inputs outputs; };
 
       nixosConfigurations = {
-        micro = lib.mkSystem {
+        micro = mkSystem {
           hostname = "micro";
           system = "x86_64-linux";
           users = [ "otavio" ];
         };
 
-        nano = lib.mkSystem {
+        nano = mkSystem {
           hostname = "nano";
           system = "x86_64-linux";
           users = [ "otavio" ];
         };
 
         # My wife device
-        poirot = lib.mkSystem {
+        poirot = mkSystem {
           hostname = "poirot";
           system = "x86_64-linux";
           users = [ "bruna" "otavio" ];
@@ -47,7 +54,7 @@
       };
 
       homeConfigurations = {
-        "otavio@generic-x86" = lib.mkHome ./users/otavio/home/generic.nix "x86_64-linux";
+        "otavio@generic-x86" = mkHome ./users/otavio/home/generic.nix "x86_64-linux";
       };
 
       packages = builtins.foldl'
@@ -58,46 +65,42 @@
           in
           packages // {
             ${system} = (packages.${system} or { }) // {
-              "${hostname}-install-iso" = lib.mkInstallerForSystem { inherit hostname targetConfiguration system; };
+              "${hostname}-install-iso" = mkInstallerForSystem { inherit hostname targetConfiguration system; };
             };
           })
-        { }
+        (forEachSystem (pkgs: import ./pkgs { inherit pkgs; }))
         # FIXME: We shoudl convert to (builtins.attrNames self.nixosConfigurations) once all hosts
         # move to 'disko' as it is used for partitioning.
         [ "micro" ];
 
-      colmena = lib.mkColmenaFromNixOSConfigurations self.nixosConfigurations;
-    } // inputs.flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
-      let
-        inherit (self) outputs;
-        pkgs = import inputs.nixpkgs { inherit system outputs; };
-      in
-      {
-        devShells.default = pkgs.mkShell {
+      colmena = mkColmenaFromNixOSConfigurations self.nixosConfigurations;
+      devShells = forEachSystem (pkgs: {
+        default = pkgs.mkShell {
           buildInputs = with pkgs; [
             inputs.colmena.packages.${system}.colmena
             home-manager
             sops
           ];
         };
-
-        formatter = pkgs.writeShellApplication {
-          name = "normalise_nix";
-          runtimeInputs = with pkgs; [ nixpkgs-fmt statix ];
-          text = ''
-            set -o xtrace
-            nixpkgs-fmt "$@"
-            statix fix "$@"
-          '';
-        };
-
-        checks = {
-          lint = pkgs.runCommand "lint-code" { nativeBuildInputs = with pkgs; [ nixpkgs-fmt deadnix statix ]; } ''
-            deadnix --fail ${./.}
-            #statix check ${./.} # https://github.com/nerdypepper/statix/issues/75
-            nixpkgs-fmt --check ${./.}
-            touch $out
-          '';
-        };
       });
+
+      formatter = forEachSystem (pkgs: pkgs.writeShellApplication {
+        name = "normalise_nix";
+        runtimeInputs = with pkgs; [ nixpkgs-fmt statix ];
+        text = ''
+          set -o xtrace
+          nixpkgs-fmt "$@"
+          statix fix "$@"
+        '';
+      });
+
+      checks = forEachSystem (pkgs: {
+        lint = pkgs.runCommand "lint-code" { nativeBuildInputs = with pkgs; [ nixpkgs-fmt deadnix statix ]; } ''
+          deadnix --fail ${./.}
+          #statix check ${./.} # https://github.com/nerdypepper/statix/issues/75
+          nixpkgs-fmt --check ${./.}
+          touch $out
+        '';
+      });
+    };
 }
