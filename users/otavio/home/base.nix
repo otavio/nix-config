@@ -12,6 +12,8 @@
       '';
     })
 
+    ossystems-tools
+
     gping
     htop
     mtr

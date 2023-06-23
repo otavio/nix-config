@@ -9,6 +9,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    lab-ossystems.url = "github:OSSystems/lab-builders-nix-config";
+
     nixos-hardware.url = "nixos-hardware";
     disko.url = "github:nix-community/disko";
     sops-nix.url = "github:Mic92/sops-nix";

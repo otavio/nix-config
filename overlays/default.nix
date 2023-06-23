@@ -1,6 +1,10 @@
-_:
+{ inputs, ... }:
 
 {
+  inherited = _: prev: {
+    inherit (inputs.lab-ossystems.packages."${prev.system}") ossystems-tools;
+  };
+
   # Adds my custom packages
   additions = final: _: import ../pkgs { pkgs = final; };
 
