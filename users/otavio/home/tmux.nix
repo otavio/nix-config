@@ -18,20 +18,7 @@
       tmuxPlugins.copycat
       tmuxPlugins.fzf-tmux-url
       {
-        # Until update goes in release channel we need to package it ourselves.
-        plugin = tmuxPlugins.mkTmuxPlugin {
-          pluginName = "catppuccin";
-          version = "unstable-2023-04-03";
-          src = fetchFromGitHub {
-            owner = "catppuccin";
-            repo = "tmux";
-            rev = "4e48b09a76829edc7b55fbb15467cf0411f07931";
-            sha256 = "sha256-bXEsxt4ozl3cAzV3ZyvbPsnmy0RAdpLxHwN82gvjLdU=";
-          };
-          postInstall = ''
-            sed -i -e 's|''${PLUGIN_DIR}/catppuccin-selected-theme.tmuxtheme|''${TMUX_TMPDIR}/catppuccin-selected-theme.tmuxtheme|g' $target/catppuccin.tmux
-          '';
-        };
+        plugin = tmuxPlugins.catppuccin;
         extraConfig = ''
           set -g @catppuccin_flavour "mocha"
           set -g @catppuccin_host "on"
