@@ -52,5 +52,5 @@
     '';
   };
 
-  home.file.".tmuxp" = { source = ./tmux/tmuxp; recursive = true; };
+  home.file.".tmuxp" = { source = ./tmuxp; recursive = true; };
 }

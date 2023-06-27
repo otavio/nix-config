@@ -7,5 +7,6 @@ _:
     ../features/nix
     ../features/ssh
     ../features/systemd
+    ../features/tmux
   ];
 }

@@ -18,8 +18,6 @@
     htop
     mtr
     nnn
-    tmux
-    tmuxp
     tree
     xclip
 

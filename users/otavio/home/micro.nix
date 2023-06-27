@@ -9,7 +9,6 @@
 
       ./base.nix
       ./emacs.nix
-      ./tmux.nix
       ./zsh.nix
     ] ++ (if graphical && hostname != "poirot" then [
       ./desktop.nix
