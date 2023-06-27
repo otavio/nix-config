@@ -16,7 +16,7 @@ let
       inherit (epkgs.nongnuPackages) nix-mode;
     };
 
-    package = pkgs.emacsGit;
+    package = pkgs.emacs-git;
   };
 in
 {
