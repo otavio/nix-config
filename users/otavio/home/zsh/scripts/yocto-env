@@ -45,6 +45,12 @@ DOCKER_EXTRA_ARGS=""
 # ssh-agent support
 [ -n "$SSH_AUTH_SOCK" ] && DOCKER_EXTRA_ARGS="$DOCKER_EXTRA_ARGS -v $SSH_AUTH_SOCK:/ssh-agent --env=SSH_AUTH_SOCK=/ssh-agent"
 
+# NixOS support
+DOCKER_EXTRA_ARGS="$DOCKER_EXTRA_ARGS \
+       -v /nix:/nix \
+       -v /run/current-system:/run/current-system \
+"
+
 docker run \
        --rm \
        -t \
@@ -55,7 +61,6 @@ docker run \
        --device=/dev/net/tun \
        -v /tmp/.X11-unix:/tmp/.X11-unix \
        -v /tmp/${USER}/keys:/tmp/${USER}/keys \
-       -v /nix:/nix \
        -v ${HOME}:${HOME} \
        --env DISPLAY=$DISPLAY \
        --env=HOST_UID=$(id -u) \
