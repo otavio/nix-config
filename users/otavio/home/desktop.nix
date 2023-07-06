@@ -50,6 +50,11 @@ in
     };
   };
 
+  home.sessionVariables = {
+    TERMINAL = "alacritty";
+    TERM = "xterm-256color";
+  };
+
   programs.zathura.enable = true;
 
   services.dunst.enable = true;

@@ -30,9 +30,4 @@
     aspellDicts.en-science
     aspellDicts.pt_BR
   ];
-
-  home.sessionVariables = {
-    TERMINAL = "alacritty";
-    TERM = "xterm-256color";
-  };
 }
