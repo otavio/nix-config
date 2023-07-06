@@ -1,7 +1,7 @@
 { inputs, pkgs, ... }:
 let
   emacsWithPackages = pkgs.emacsWithPackagesFromUsePackage {
-    config = ./emacs.d/settings.org;
+    config = ./settings.org;
 
     # `use-package-always-ensure` to `t` in your config.
     alwaysEnsure = true;
@@ -40,7 +40,7 @@ in
     ".emacs.d/init.el".text = "(org-babel-load-file \"~/.emacs.d/settings.org\")";
 
     ".emacs.d/settings.org" = {
-      source = ./emacs.d/settings.org;
+      source = ./settings.org;
 
       onChange = ''
         # We need to ensure we regenerate the Emacs Lisp file for the changes be

@@ -4,12 +4,12 @@
   imports =
     [
       ./global
+      ./features/emacs
       ./features/flameshot
       ./features/gpg
       ./features/ossystems-specific
 
       ./base.nix
-      ./emacs.nix
       ./zsh.nix
     ] ++ (if graphical && hostname != "poirot" then [
       ./desktop.nix

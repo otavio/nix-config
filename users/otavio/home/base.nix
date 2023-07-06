@@ -35,8 +35,4 @@
     TERMINAL = "alacritty";
     TERM = "xterm-256color";
   };
-
-  home.file = {
-    ".emacs.d" = { source = ./emacs.d; recursive = true; };
-  };
 }
