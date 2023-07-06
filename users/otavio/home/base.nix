@@ -12,8 +12,6 @@
       '';
     })
 
-    ossystems-tools
-
     gping
     htop
     mtr
@@ -31,8 +29,6 @@
     aspellDicts.en-computers
     aspellDicts.en-science
     aspellDicts.pt_BR
-
-    awscli2
   ];
 
   home.sessionVariables = {
@@ -42,6 +38,5 @@
 
   home.file = {
     ".emacs.d" = { source = ./emacs.d; recursive = true; };
-    ".yocto/site.conf".source = ./yocto/site.conf;
   };
 }

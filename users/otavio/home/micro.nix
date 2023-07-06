@@ -6,6 +6,7 @@
       ./global
       ./features/flameshot
       ./features/gpg
+      ./features/ossystems-specific
 
       ./base.nix
       ./emacs.nix
