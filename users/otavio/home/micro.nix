@@ -1,19 +1,17 @@
-{ graphical, hostname, ... }:
+_:
 
 {
-  imports =
-    [
-      ./global
-      ./features/emacs
-      ./features/flameshot
-      ./features/gpg
-      ./features/ossystems-specific
+  imports = [
+    ./global
+    ./features/emacs
+    ./features/flameshot
+    ./features/gpg
+    ./features/ossystems-specific
 
-      ./base.nix
-      ./zsh.nix
-    ] ++ (if graphical && hostname != "poirot" then [
-      ./desktop.nix
-      ./gtk.nix
-      ./i3.nix
-    ] else [ ]);
+    ./base.nix
+    ./zsh.nix
+    ./desktop.nix
+    ./gtk.nix
+    ./i3.nix
+  ];
 }
