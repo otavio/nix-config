@@ -37,6 +37,11 @@
         irssi
       '';
     })
+
+    discord
+    skypeforlinux
+    slack
+    tdesktop
   ];
 
   home.file.".irssi" = {

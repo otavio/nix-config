@@ -4,14 +4,10 @@
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
     anydesk
-    discord
     gthumb
     nixpkgs-fmt
     nixpkgs-review
     scrcpy
-    skypeforlinux
-    slack
-    tdesktop
   ];
 
   services.unclutter.enable = true;
