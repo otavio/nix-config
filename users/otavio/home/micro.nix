@@ -7,6 +7,8 @@
     ./features/flameshot
     ./features/gpg
     ./features/ossystems-specific
+    ./features/xdg
+    ./features/zathura
 
     ./base.nix
     ./zsh.nix

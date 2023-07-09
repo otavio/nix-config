@@ -5,6 +5,8 @@ _:
     ./global
     ./features/flameshot
     ./features/emacs
+    ./features/xdg
+    ./features/zathura
 
     ./base.nix
     ./zsh.nix

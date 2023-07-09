@@ -6,13 +6,6 @@ let
   '';
 in
 {
-  xdg.enable = true;
-  xdg.mimeApps = {
-    enable = true;
-    defaultApplications = {
-      "application/pdf" = [ "org.pwmt.zathura.desktop" ];
-    };
-  };
 
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
@@ -47,8 +40,6 @@ in
     TERMINAL = "alacritty";
     TERM = "xterm-256color";
   };
-
-  programs.zathura.enable = true;
 
   services.dunst.enable = true;
   xdg.configFile."dunst/dunstrc".source = ./dunst/dunstrc;
