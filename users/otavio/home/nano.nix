@@ -3,6 +3,7 @@ _:
 {
   imports = [
     ./global
+    ./features/alacritty
     ./features/flameshot
     ./features/emacs
     ./features/xdg
