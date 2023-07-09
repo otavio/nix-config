@@ -7,7 +7,6 @@
     gthumb
     nixpkgs-fmt
     nixpkgs-review
-    scrcpy
   ];
 
   programs.brave.enable = true;

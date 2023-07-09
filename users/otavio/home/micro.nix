@@ -42,6 +42,14 @@
       '';
     })
 
+    (writeShellApplication {
+      name = "scrcpy";
+      runtimeInputs = with pkgs; [ scrcpy ];
+      text = ''
+        scrcpy -M
+      '';
+    })
+
     discord
     skypeforlinux
     slack
