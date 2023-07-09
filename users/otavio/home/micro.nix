@@ -50,6 +50,8 @@
       '';
     })
 
+    anydesk
+
     discord
     skypeforlinux
     slack
