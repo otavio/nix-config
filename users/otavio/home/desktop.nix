@@ -10,9 +10,5 @@
     scrcpy
   ];
 
-  services.dunst.enable = true;
-  xdg.configFile."dunst/dunstrc".source = ./dunst/dunstrc;
-  xdg.configFile."dunst/skype".source = ./dunst/skype;
-
   programs.brave.enable = true;
 }

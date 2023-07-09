@@ -4,6 +4,7 @@
   imports = [
     ./global
     ./features/alacritty
+    ./features/dunst
     ./features/emacs
     ./features/flameshot
     ./features/gpg
