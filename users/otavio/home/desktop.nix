@@ -1,18 +1,11 @@
 { pkgs, ... }:
-let
-  irssiWrapper = pkgs.writeScriptBin "irssi" ''
-    export LIBERACHAT_PASSWORD=$(${pkgs.sops}/bin/sops --decrypt --extract '["irssi-nickserv"]' $HOME/nix-config/secrets/secrets.yaml)
-    ${pkgs.irssi}/bin/irssi
-  '';
-in
-{
 
+{
   nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
     anydesk
     discord
     gthumb
-    irssiWrapper
     nixpkgs-fmt
     nixpkgs-review
     obsidian
@@ -44,11 +37,6 @@ in
   services.dunst.enable = true;
   xdg.configFile."dunst/dunstrc".source = ./dunst/dunstrc;
   xdg.configFile."dunst/skype".source = ./dunst/skype;
-
-  home.file.".irssi" = {
-    source = ./irssi;
-    recursive = true;
-  };
 
   programs.brave.enable = true;
 }

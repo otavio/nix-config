@@ -17,8 +17,8 @@
     ./i3.nix
   ];
 
-  home.packages = [
-    (pkgs.writeShellApplication {
+  home.packages = with pkgs; [
+    (writeShellApplication {
       name = "open-windoze";
       runtimeInputs = with pkgs; [ virt-viewer ];
       text = ''
@@ -27,5 +27,20 @@
           && exec virt-viewer -f -c qemu:///system Windoze
       '';
     })
+
+    (writeShellApplication {
+      name = "irssi";
+      runtimeInputs = with pkgs; [ sops irssi ];
+      text = ''
+        LIBERACHAT_PASSWORD=$(sops --decrypt --extract '["irssi-nickserv"]' "$HOME"/nix-config/secrets/secrets.yaml)
+        export LIBERACHAT_PASSWORD=
+        irssi
+      '';
+    })
   ];
+
+  home.file.".irssi" = {
+    source = ./irssi;
+    recursive = true;
+  };
 }
