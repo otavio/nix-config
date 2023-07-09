@@ -15,7 +15,6 @@ _:
 
     ./base.nix
     ./zsh.nix
-    ./desktop.nix
     ./gtk.nix
     ./i3.nix
   ];
