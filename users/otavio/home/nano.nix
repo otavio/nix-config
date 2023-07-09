@@ -7,6 +7,7 @@ _:
     ./features/flameshot
     ./features/emacs
     ./features/unclutter
+    ./features/parcellite
     ./features/xdg
     ./features/zathura
 
