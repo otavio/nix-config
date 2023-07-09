@@ -1,7 +1,0 @@
-#!/bin/sh
-
-export LIBVIRT_DEFAULT_URI=qemu:///system 
-
-virsh start Windoze
-
-exec virt-viewer -f -c qemu:///system Windoze

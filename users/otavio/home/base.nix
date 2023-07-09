@@ -2,16 +2,6 @@
 
 {
   home.packages = with pkgs; [
-    # Local scripts added to default PATH.
-    (pkgs.stdenv.mkDerivation {
-      name = "base-scripts";
-      src = ./scripts;
-      installPhase = ''
-        mkdir -p $out/bin
-        cp -r * $out/bin
-      '';
-    })
-
     gping
     htop
     mtr
