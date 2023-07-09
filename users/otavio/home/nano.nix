@@ -6,6 +6,7 @@ _:
     ./features/alacritty
     ./features/flameshot
     ./features/emacs
+    ./features/unclutter
     ./features/xdg
     ./features/zathura
 

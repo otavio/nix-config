@@ -10,8 +10,6 @@
     scrcpy
   ];
 
-  services.unclutter.enable = true;
-
   services.parcellite.enable = true;
   xdg.configFile."parcellite/parcelliterc".source =
     ./parcellite/parcelliterc;
