@@ -8,7 +8,6 @@
     gthumb
     nixpkgs-fmt
     nixpkgs-review
-    obsidian
     pavucontrol
     scrcpy
     skypeforlinux
