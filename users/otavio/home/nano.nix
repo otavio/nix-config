@@ -4,6 +4,7 @@ _:
   imports = [
     ./global
     ./features/alacritty
+    ./features/brave
     ./features/dunst
     ./features/flameshot
     ./features/emacs
