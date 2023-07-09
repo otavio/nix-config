@@ -8,6 +8,7 @@
     ./features/flameshot
     ./features/gpg
     ./features/ossystems-specific
+    ./features/parcellite
     ./features/unclutter
     ./features/xdg
     ./features/zathura
