@@ -36,8 +36,8 @@
       name = "irssi";
       runtimeInputs = with pkgs; [ sops irssi ];
       text = ''
-        LIBERACHAT_PASSWORD=$(sops --decrypt --extract '["irssi-nickserv"]' "$HOME"/nix-config/secrets/secrets.yaml)
-        export LIBERACHAT_PASSWORD=
+        LIBERACHAT_PASSWORD=$(sops --decrypt --extract '["irssi-nickserv"]' "$HOME"/src/nix-config/secrets/secrets.yaml)
+        export LIBERACHAT_PASSWORD
         irssi
       '';
     })
