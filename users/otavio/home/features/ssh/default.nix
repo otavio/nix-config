@@ -8,9 +8,8 @@ _:
     hashKnownHosts = false;
 
     extraConfig = ''
-      Host *.ossystems.com.br
-           HostkeyAlgorithms +ssh-rsa
-           PubkeyAcceptedAlgorithms +ssh-rsa
+      Host code.ossystems.com.br
+           HostName code.ossystems.io
 
       Host *.lab.ossystems
            ForwardAgent yes
