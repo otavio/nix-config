@@ -32,7 +32,7 @@
     (writeShellScriptBin "nixos-do-install" ''
       set -eux
 
-      ${targetConfiguration.config.system.build.diskoNoDeps} --mode zap_create_mount
+      ${targetConfiguration.config.system.build.diskoScriptNoDeps} --mode zap_create_mount
 
       ${config.system.build.nixos-install}/bin/nixos-install \
           --root /mnt \
