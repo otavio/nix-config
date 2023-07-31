@@ -13,7 +13,7 @@
 
   programs.xss-lock.enable = true;
 
-  fonts.fonts = with pkgs; [
+  fonts.packages = with pkgs; [
     font-awesome
     source-code-pro
 
