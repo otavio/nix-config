@@ -1,6 +1,11 @@
 { config, ... }:
 
 {
+  # Workaround fix for nm-online-service from stalling on Wireguard interface.
+  # Refs: https://github.com/NixOS/nixpkgs/issues/180175
+  networking.networkmanager.unmanaged = [ "wg0" ];
+  systemd.network.wait-online.enable = false;
+
   sops.secrets."wireguard/micro/private-key" = { };
   networking.wireguard.interfaces = {
     wg0 = {
