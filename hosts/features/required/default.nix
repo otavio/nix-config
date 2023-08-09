@@ -5,6 +5,7 @@
     ./firmware.nix
     ./locale.nix
     ./home-manager.nix
+    ./network.nix
     ./nix.nix
     ./nixpkgs.nix
     ./openssh.nix
