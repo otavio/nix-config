@@ -15,5 +15,5 @@
     simple-scan
   ];
 
-  home.stateVersion = "22.11";
+  home.stateVersion = "23.11";
 }
