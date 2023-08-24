@@ -146,7 +146,7 @@ in
 
       transfer() {
           # Easier change of service in use
-          host=https://temp.sh
+          host=https://transfer.sh
 
           curl --version 2>&1 > /dev/null
           if [ $? -ne 0 ]; then
