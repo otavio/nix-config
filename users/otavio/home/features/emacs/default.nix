@@ -30,6 +30,9 @@ in
 
     emacsWithPackages
 
+    # Markdown
+    multimarkdown
+
     # Used in lsp-mode
     nixpkgs-fmt
     nil

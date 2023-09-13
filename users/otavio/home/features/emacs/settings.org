@@ -1577,7 +1577,7 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
   (use-package markdown-mode
     :mode "\\.md\\'"
     :config
-    (setq markdown-command "marked")
+    (setq markdown-command "multimarkdown")
     (defun os/set-markdown-header-font-sizes ()
       (dolist (face '((markdown-header-face-1 . 1.2)
                       (markdown-header-face-2 . 1.1)
