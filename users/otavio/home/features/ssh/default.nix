@@ -15,6 +15,9 @@ _:
            ForwardAgent yes
            ForwardX11 yes
            ForwardX11Trusted yes
+
+      Host gitlab.com
+           IdentityFile ~/.ssh/id_ed25519
     '';
   };
 }
