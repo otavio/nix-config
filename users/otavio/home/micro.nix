@@ -15,6 +15,7 @@
     ./features/ossystems-specific
     ./features/parcellite
     ./features/unclutter
+    ./features/vscode
     ./features/xdg
     ./features/zathura
     ./features/zsh
