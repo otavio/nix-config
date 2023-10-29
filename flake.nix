@@ -9,13 +9,30 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    lab-ossystems.url = "github:OSSystems/lab-builders-nix-config";
-
     nixos-hardware.url = "nixos-hardware";
-    disko.url = "github:nix-community/disko";
-    sops-nix.url = "github:Mic92/sops-nix";
-    emacs-overlay.url = "github:nix-community/emacs-overlay";
-    colmena.url = "github:zhaofengli/colmena";
+
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs";
+    };
+
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs";
+    };
+
+    colmena = {
+      url = "github:zhaofengli/colmena";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.stable.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, ... }@inputs:
