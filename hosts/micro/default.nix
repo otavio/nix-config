@@ -23,7 +23,7 @@
     ./msmtp.nix
     ./partitioning.nix
     ./restic.nix
-    ./wireguard.nix
+    ./zerotier.nix
   ];
 
   boot = {
