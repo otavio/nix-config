@@ -65,7 +65,7 @@
   networking.domain = "casa.salvador";
 
   virtualisation.libvirtd.enable = true;
-  environment.systemPackages = with pkgs; [ virt-manager virt-viewer ];
+  environment.systemPackages = with pkgs; [ virt-manager virt-viewer cntr ];
 
   deployment = {
     targetUser = "otavio";
