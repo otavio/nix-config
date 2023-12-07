@@ -90,6 +90,7 @@
     - [[#nix][Nix]]
     - [[#python][Python]]
     - [[#qt][Qt]]
+    - [[#robot-framework][Robot Framework]]
     - [[#rust][Rust]]
     - [[#systemd][SystemD]]
     - [[#terraform][Terraform]]
@@ -1636,6 +1637,15 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
 
   (use-package qt-pro-mode
     :mode ("\\.pro\\'" "\\.pri\\'"))
+
+#+end_src
+
+*** Robot Framework
+
+#+begin_src emacs-lisp
+
+  (use-package robot-mode)
+  (use-package robot-log)
 
 #+end_src
 
