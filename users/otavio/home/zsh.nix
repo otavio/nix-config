@@ -2,7 +2,6 @@
 let
   cryptsetup = "${pkgs.cryptsetup}/bin/cryptsetup";
   keychain = "${pkgs.keychain}/bin/keychain";
-  nix-your-shell = "${pkgs.nix-your-shell}/bin/nix-your-shell";
 
   nix-differ = pkgs.writeScriptBin "nix-differ" ''
     nix run nixpkgs#nix-diff /run/current-system $(nix eval .#nixosConfigurations.$(hostname).config.system.build.toplevel --raw)
@@ -197,8 +196,6 @@ in
           # cleanup
           rm -f $tmpfile
       }
-
-      ${nix-your-shell} zsh | source /dev/stdin
 
       keys-load "not-ask"
 
