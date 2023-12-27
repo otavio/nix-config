@@ -8,6 +8,7 @@ _:
     ./features/dunst
     ./features/flameshot
     ./features/emacs
+    ./features/gtk
     ./features/unclutter
     ./features/parcellite
     ./features/xdg
@@ -15,7 +16,6 @@ _:
 
     ./base.nix
     ./zsh.nix
-    ./gtk.nix
     ./i3.nix
   ];
 }

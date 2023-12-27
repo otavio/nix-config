@@ -9,6 +9,7 @@
     ./features/emacs
     ./features/flameshot
     ./features/gpg
+    ./features/gtk
     ./features/ossystems-specific
     ./features/parcellite
     ./features/unclutter
@@ -17,7 +18,6 @@
 
     ./base.nix
     ./zsh.nix
-    ./gtk.nix
     ./i3.nix
   ];
 
