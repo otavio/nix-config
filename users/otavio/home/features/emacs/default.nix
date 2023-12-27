@@ -36,6 +36,12 @@ in
     # Used in lsp-mode
     nixpkgs-fmt
     nil
+
+    aspell
+    aspellDicts.en
+    aspellDicts.en-computers
+    aspellDicts.en-science
+    aspellDicts.pt_BR
   ];
 
   home.sessionVariables.EDITOR = "emacs -nw";
