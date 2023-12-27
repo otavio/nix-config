@@ -17,6 +17,10 @@
   boot.supportedFilesystems = pkgs.lib.mkForce
     [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
+  boot.swraid.enable = true;
+  # remove warning about unset mail
+  boot.swraid.mdadmConf = "PROGRAM ${pkgs.coreutils}/bin/true";
+
   # The global useDHCP flag is deprecated, therefore explicitly set to false here.
   # Per-interface useDHCP will be mandatory in the future, so this generated config
   # replicates the default behaviour.

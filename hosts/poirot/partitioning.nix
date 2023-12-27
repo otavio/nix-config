@@ -1,4 +1,6 @@
 {
+  boot.swraid.enable = false;
+
   disko.devices = {
     disk = {
       main = {
