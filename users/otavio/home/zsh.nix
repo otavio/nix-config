@@ -9,8 +9,11 @@ let
 in
 {
   home.packages = with pkgs; [
+    tree
     nix-differ
     zsh-completions
+    nettools # for ifconfig
+    psmisc # for killall
   ];
 
   programs.direnv = {

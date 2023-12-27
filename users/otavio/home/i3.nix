@@ -247,6 +247,7 @@ in
     i3
     pa-applet
     pavucontrol
+    xclip
   ];
 
   home.file.".xinitrc".source = ./i3/xinitrc;

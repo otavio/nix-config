@@ -14,7 +14,6 @@ _:
     ./features/xdg
     ./features/zathura
 
-    ./base.nix
     ./zsh.nix
     ./i3.nix
   ];
