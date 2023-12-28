@@ -12,6 +12,21 @@ let
     # defaulting it to `yes`.
     alwaysTangle = true;
 
+    extraEmacsPackages = epkgs: [
+      (epkgs.trivialBuild {
+        pname = "bitbake-modes";
+        version = "0.5.3-unstable-2023-08-24";
+        src = pkgs.fetchFromBitbucket {
+          owner = "olanilsson";
+          repo = "bitbake-modes";
+          rev = "7bcfaaca9ec4646700361b293128ffeb00ba48e4";
+          hash = "sha256-tGvJ2EtYsSAfyunrm+ccgBulYgTcHoVYvBhm6hKFyHw=";
+        };
+
+        packageRequires = [ epkgs.mmm-mode ];
+      })
+    ];
+
     override = epkgs: epkgs // {
       inherit (epkgs.nongnuPackages) nix-mode;
     };

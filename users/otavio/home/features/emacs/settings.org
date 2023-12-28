@@ -150,8 +150,7 @@ Set up ELPA, MELPA, and Org package repositories and load =use-package= to manag
 
   (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                            ("org" . "https://orgmode.org/elpa/")
-                           ("elpa" . "https://elpa.gnu.org/packages/")
-                           ("onpa" . "https://olanilsson.bitbucket.io/packages/")))
+                           ("elpa" . "https://elpa.gnu.org/packages/")))
 
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
@@ -509,10 +508,8 @@ The [[https://github.com/myrjola/diminish.el][diminish]] package hides pesky min
 
 #+begin_src emacs-lisp
 
-  (use-package paren
-    :config
-    (set-face-attribute 'show-paren-match-expression nil :background "#363e4a")
-    (show-paren-mode 1))
+  (set-face-attribute 'show-paren-match-expression nil :background "#363e4a")
+  (show-paren-mode t)
 
 #+end_src
 
@@ -624,14 +621,10 @@ Default to an indentation size of 4 spaces since it's the norm for pretty much e
 
 #+begin_src emacs-lisp
 
-  (use-package cua-base
-  :diminish cua-mode
-  :config (cua-mode t)
-  :init
-  (progn
-    (setq cua-auto-tabify-rectangles nil)
-    (setq cua-keep-region-after-copy nil)
-    (setq cua-enable-cua-keys nil)))
+  (cua-mode t)
+  (setq cua-auto-tabify-rectangles nil)
+  (setq cua-keep-region-after-copy nil)
+  (setq cua-enable-cua-keys nil)
 
 #+end_src
 
@@ -760,10 +753,8 @@ Default to an indentation size of 4 spaces since it's the norm for pretty much e
 
 #+begin_src emacs-lisp
 
-  (use-package savehist
-    :config
-    (setq history-length 25)
-    (savehist-mode 1))
+  (setq history-length 25)
+  (savehist-mode t)
 
   ;; Individual history elements can be configured separately
   ;;(put 'minibuffer-history 'history-length 25)
@@ -1432,12 +1423,11 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
 
 #+begin_src emacs-lisp
 
-  (use-package bitbake-modes
-    :defer t
-    :custom-face
-    (bitbake-python-function-face ((t (:background "color-19"))))
-    (bitbake-python-task-face ((t (:background "color-19"))))
-    (bitbake-shell-function-face ((t (:background "color-19")))))
+  (require 'bitbake-modes)
+  (custom-set-faces
+   '(bitbake-python-function-face ((t (:background "color-19"))))
+   '(bitbake-python-task-face ((t (:background "color-19"))))
+   '(bitbake-shell-function-face ((t (:background "color-19")))))
 
 #+end_src
 
@@ -1445,6 +1435,7 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
 - https://bitbucket.org/olanilsson/bitbake-modes/src/master/
 - http://xemacs.sourceforge.net/Documentation/packages/html/mmm_toc.html#SEC_Contents
 - https://github.com/canatella/bitbake-el
+
 *** C/C++
 
 #+begin_src emacs-lisp
@@ -1859,12 +1850,9 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 
 #+begin_src emacs-lisp
 
-  (use-package flyspell
-    :diminish flyspell-mode
-    :hook
-    (text-mode . flyspell-mode)
-    (org-mode . flyspell-mode)
-    (prog-mode . flyspell-prog-mode))
+  (add-hook 'text-mode-hook 'flyspell-mode)
+  (add-hook 'org-mode-hook 'flyspell-mode)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
 #+end_src
 
