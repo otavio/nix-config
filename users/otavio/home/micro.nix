@@ -10,6 +10,7 @@
     ./features/flameshot
     ./features/gpg
     ./features/gtk
+    ./features/irssi
     ./features/ossystems-specific
     ./features/parcellite
     ./features/unclutter
@@ -32,16 +33,6 @@
     })
 
     (writeShellApplication {
-      name = "irssi";
-      runtimeInputs = with pkgs; [ sops irssi ];
-      text = ''
-        LIBERACHAT_PASSWORD=$(sops --decrypt --extract '["irssi-nickserv"]' "$HOME"/src/nix-config/secrets/secrets.yaml)
-        export LIBERACHAT_PASSWORD
-        irssi
-      '';
-    })
-
-    (writeShellApplication {
       name = "scrcpy";
       runtimeInputs = with pkgs; [ scrcpy ];
       text = ''
@@ -56,9 +47,4 @@
     slack
     tdesktop
   ];
-
-  home.file.".irssi" = {
-    source = ./irssi;
-    recursive = true;
-  };
 }
