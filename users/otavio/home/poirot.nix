@@ -1,7 +1,5 @@
 _:
 
 {
-  imports = [
-    ./global
-  ];
+  imports = [ ./features/global ];
 }

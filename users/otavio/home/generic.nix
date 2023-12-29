@@ -2,7 +2,7 @@ _:
 
 {
   imports = [
-    ./global
+    ./features/global
     ./features/home-manager-switch
     ./features/emacs
   ];

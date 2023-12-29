@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ./global
+    ./features/global
     ./features/alacritty
     ./features/brave
     ./features/dunst
