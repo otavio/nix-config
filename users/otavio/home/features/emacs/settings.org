@@ -9,7 +9,7 @@
 - [[#package-management][Package Management]]
 - [[#keep-emacsd-clean][Keep .emacs.d Clean]]
 - [[#default-coding-system][Default Coding System]]
-- [[#keychain-environment---project-homepage][keychain-environment -]]
+- [[#keychain-environment][keychain-environment]]
 - [[#direnv-support][Direnv support]]
 - [[#undo-tree][Undo tree]]
 - [[#keybinding-panel-which-key][Keybinding Panel (which-key)]]
@@ -41,7 +41,7 @@
   - [[#use-parinfer-for-lispy-languages][Use Parinfer for Lispy languages]]
   - [[#origamiel-for-folding][Origami.el for Folding]]
   - [[#set-margins-for-modes][Set Margins for Modes]]
-  - [[#smarter-navigation-to-the-beginning-of-a-line---reference][Smarter navigation to the beginning of a line -]]
+  - [[#smarter-navigation-to-the-beginning-of-a-line][Smarter navigation to the beginning of a line]]
   - [[#avoids-saving-active-regions-to-the-primary-selection][Avoids saving active regions to the primary selection]]
 - [[#stateful-keymaps-with-hydra][Stateful Keymaps with Hydra]]
 - [[#completion-system][Completion System]]
@@ -66,12 +66,12 @@
   - [[#auto-show-markup-symbols][Auto-show Markup Symbols]]
 - [[#development][Development]]
   - [[#git][Git]]
-    - [[#magit---its-magit-a-git-porcelain-inside-emacs][Magit -]]
+    - [[#magit---its-magit-a-git-porcelain-inside-emacs][Magit - It's Magit! A Git porcelain inside Emacs]]
       - [[#show-todo-items-in-current-changing-files][Show TODO items in current changing files]]
-    - [[#diff-hl---emacs-package-for-highlighting-uncommitted-changes][diff-hl -]]
+    - [[#diff-hl---emacs-package-for-highlighting-uncommitted-changes][diff-hl - Emacs package for highlighting uncommitted changes]]
     - [[#create-urls-for-files-and-commits-in-githubbitbucketgitlab-repositories][Create URLs for files and commits in GitHub/Bitbucket/GitLab/... repositories]]
-  - [[#yafolding---yet-another-folding-extension-for-emacs][Yafolding -]]
-  - [[#wgrep---writable-grep-buffer-and-apply-the-changes-to-files][wgrep -]]
+  - [[#yafolding---yet-another-folding-extension-for-emacs][Yafolding - Yet another folding extension for Emacs]]
+  - [[#wgrep---writable-grep-buffer-and-apply-the-changes-to-files][wgrep - Writable grep buffer and apply the changes to files]]
   - [[#mmm][MMM]]
   - [[#projectile][Projectile]]
   - [[#languages][Languages]]
@@ -200,7 +200,7 @@ Set the coding system the default to UTF-8.
 
 #+end_src
 
-* keychain-environment - [[https://github.com/tarsius/keychain-environment][Project Homepage]]
+* keychain-environment
 
 Allow loading the ~keychain~ environment variables so we can use the SSH and GNU GPG keys inside the Emacs. To load the environment variables, we can call ~keychain-refresh-environment~.
 
@@ -697,10 +697,11 @@ Default to an indentation size of 4 spaces since it's the norm for pretty much e
 
 #+end_src
 
-** Smarter navigation to the beginning of a line - [[https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/][Reference]]
+** Smarter navigation to the beginning of a line
 
 #+begin_src emacs-lisp
 
+  ;;; Ref: https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/
   (defun smarter-move-beginning-of-line (arg)
     "Move point back to indentation of beginning of line.
 
