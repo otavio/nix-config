@@ -9,12 +9,11 @@ _:
     ./features/flameshot
     ./features/emacs
     ./features/gtk
+    ./features/i3wm
     ./features/unclutter
     ./features/parcellite
     ./features/xdg
     ./features/zathura
     ./features/zsh
-
-    ./i3.nix
   ];
 }

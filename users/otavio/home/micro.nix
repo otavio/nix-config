@@ -10,6 +10,7 @@
     ./features/flameshot
     ./features/gpg
     ./features/gtk
+    ./features/i3wm
     ./features/irssi
     ./features/ossystems-specific
     ./features/parcellite
@@ -17,8 +18,6 @@
     ./features/xdg
     ./features/zathura
     ./features/zsh
-
-    ./i3.nix
   ];
 
   home.packages = with pkgs; [

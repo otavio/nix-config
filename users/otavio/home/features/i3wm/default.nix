@@ -19,7 +19,7 @@ let
   triviaWs = "10: trivia ";
 
   fzf-menu = pkgs.writeScriptBin "i3-fzf-menu" (builtins.readFile (pkgs.substituteAll {
-    src = ./i3/fzf-menu;
+    src = ./fzf-menu;
     fzf = "${pkgs.fzf}/bin/fzf";
   }));
 in
@@ -250,5 +250,5 @@ in
     xclip
   ];
 
-  home.file.".xinitrc".source = ./i3/xinitrc;
+  home.file.".xinitrc".source = ./xinitrc;
 }
