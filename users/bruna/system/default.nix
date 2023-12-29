@@ -1,5 +1,3 @@
-_:
-
 {
   users.users.bruna = {
     description = "Bruna C. Tessmer Salvador";

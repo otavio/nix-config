@@ -49,7 +49,7 @@
       pkgsFor = inputs.nixpkgs.legacyPackages;
     in
     {
-      overlays = import ./overlays { inherit inputs outputs; };
+      overlays = import ./overlays;
 
       nixosConfigurations = {
         micro = mkSystem {

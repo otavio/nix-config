@@ -1,5 +1,3 @@
-_:
-
 {
   # Adds my custom packages
   additions = final: _: import ../pkgs { pkgs = final; };

@@ -1,5 +1,3 @@
-_:
-
 {
   console = {
     earlySetup = false;
