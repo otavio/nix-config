@@ -15,8 +15,8 @@
     ./features/unclutter
     ./features/xdg
     ./features/zathura
+    ./features/zsh
 
-    ./zsh.nix
     ./i3.nix
   ];
 
