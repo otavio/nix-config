@@ -88,9 +88,7 @@
             };
           })
         (forEachSystem (pkgs: import ./pkgs { inherit pkgs; }))
-        # FIXME: We shoudl convert to (builtins.attrNames self.nixosConfigurations) once all hosts
-        # move to 'disko' as it is used for partitioning.
-        [ "micro" ];
+        (builtins.attrNames self.nixosConfigurations);
 
       colmena = mkColmenaFromNixOSConfigurations self.nixosConfigurations;
       devShells = forEachSystem (pkgs: {
