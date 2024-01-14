@@ -6,9 +6,6 @@
     common-gpu-intel
     common-pc-laptop-ssd
   ] ++ [
-    # Include the results of the hardware scan.
-    ./hardware-configuration.nix
-
     ../features/required
 
     ../features/optional/bluetooth.nix
@@ -20,12 +17,15 @@
     ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
 
+    ./partitioning.nix
     ./zerotier.nix
   ];
 
   boot = {
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
+    initrd.availableKernelModules = [ "xhci_pci" "usbhid" "usb_storage" "sd_mod" "sdhci_acpi" ];
+    kernelModules = [ "kvm-intel" ];
   };
 
   # Enable fstrim (for SSD disks)
