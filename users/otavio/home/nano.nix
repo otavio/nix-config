@@ -1,3 +1,5 @@
+{ pkgs, ... }:
+
 {
   imports = [
     ./features/global
@@ -13,5 +15,9 @@
     ./features/xdg
     ./features/zathura
     ./features/zsh
+  ];
+
+  home.packages = with pkgs; [
+    anydesk
   ];
 }
