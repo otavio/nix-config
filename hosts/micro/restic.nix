@@ -8,7 +8,7 @@
   };
 
   services.restic.backups = {
-    wasabi = {
+    r2 = {
       user = "root";
       initialize = true;
 
