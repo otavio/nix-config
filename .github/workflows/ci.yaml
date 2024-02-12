@@ -25,7 +25,7 @@ jobs:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
     - name: Install SSH Private Key
-      uses: webfactory/ssh-agent@v0.8.0
+      uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - run: nix flake check
@@ -50,7 +50,7 @@ jobs:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
     - name: Install SSH Private Key
-      uses: webfactory/ssh-agent@v0.8.0
+      uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - run: nix -Lv build ".#nixosConfigurations.${{ matrix.nixosConfiguration }}.config.system.build.toplevel"
@@ -73,7 +73,7 @@ jobs:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
     - name: Install SSH Private Key
-      uses: webfactory/ssh-agent@v0.8.0
+      uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - run: nix -Lv build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
