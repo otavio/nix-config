@@ -34,6 +34,9 @@
       # Repeat key press automatically
       set-option -g repeat-time 1000
 
+      # Keep environment variables synced
+      set -g update-environment -r
+
       # Easier and faster switching between next/prev window
       bind C-p previous-window
       bind C-n next-window
