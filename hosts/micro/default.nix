@@ -17,7 +17,6 @@
     ../features/optional/pipewire.nix
     ../features/optional/polkit.nix
     ../features/optional/quietboot.nix
-    ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
 
     ./aichat.nix
@@ -50,25 +49,14 @@
     ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
     # Set scheduler for rotating disks
     ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
+
+    # Keystone 3 Pro
+    ATTRS{idVendor}=="1209", ATTRS{idProduct}=="3001", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_PORT_IGNORE}="1"
   '';
 
-  services.xserver = {
-    xrandrHeads = [{
-      output = "HDMI-1";
-      primary = true;
-      monitorConfig = ''
-        Modeline "2560x1080_60.00"  230.76  2560 2728 3000 3440  1080 1081 1084 1118  -HSync +Vsync
-        Option "PreferredMode" "2560x1080"
-        Option "Position" "0 0"
-      '';
-    }];
-    resolutions = [{
-      x = 2560;
-      y = 1080;
-    }];
-  };
-
   networking.domain = "casa.salvador";
+
+  security.pam.services.swaylock = { };
 
   virtualisation.libvirtd.enable = true;
   environment.systemPackages = with pkgs; [
