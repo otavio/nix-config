@@ -242,12 +242,20 @@ in
     };
   };
 
+  fonts.fontconfig.enable = true;
   home.packages = with pkgs; [
+    font-awesome
+    source-code-pro
+    jetbrains-mono
+    iosevka-bin
+    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
+
     fzf
     i3
     pa-applet
     pavucontrol
     xclip
+    xss-lock
   ];
 
   home.file.".xinitrc".source = ./xinitrc;

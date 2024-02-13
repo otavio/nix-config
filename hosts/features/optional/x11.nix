@@ -1,5 +1,3 @@
-{ pkgs, ... }:
-
 {
   services.xserver = {
     enable = true;
@@ -13,16 +11,4 @@
       options = "caps:super";
     };
   };
-
-  programs.xss-lock.enable = true;
-
-  fonts.packages = with pkgs; [
-    font-awesome
-    source-code-pro
-
-    jetbrains-mono
-    iosevka-bin
-
-    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
-  ];
 }
