@@ -26,6 +26,11 @@
     loader.efi.canTouchEfiVariables = true;
     initrd.availableKernelModules = [ "xhci_pci" "usbhid" "usb_storage" "sd_mod" "sdhci_acpi" ];
     kernelModules = [ "kvm-intel" ];
+    kernelParams = [
+      # The GPD Pocket uses a tablet OLED display, that is mounted rotated 90° counter-clockwise
+      "fbcon=rotate:1"
+      "video=DSI-1:panel_orientation=right_side_up"
+    ];
   };
 
   # Enable fstrim (for SSD disks)
@@ -34,22 +39,6 @@
 
   # Enable thermald
   services.thermald.enable = true;
-
-  # Rotate screen as for proper use in GPD Pocket
-  services.xserver = {
-    videoDrivers = [ "intel" ];
-    xrandrHeads = [
-      {
-        output = "DSI1";
-        primary = true;
-        monitorConfig = ''
-          Option "Rotate" "right"
-        '';
-      }
-    ];
-
-    dpi = 140;
-  };
 
   deployment = {
     targetUser = "otavio";
