@@ -11,12 +11,17 @@
     r2 = {
       user = "root";
       initialize = true;
+      createWrapper = true;
 
       environmentFile = config.sops.secrets."backup/credentials".path;
       repositoryFile = config.sops.secrets."backup/repository".path;
       passwordFile = config.sops.secrets."backup/password".path;
 
       paths = [ config.users.users.otavio.home ];
+
+      backupPrepareCommand = ''
+        restic-r2 unlock
+      '';
 
       pruneOpts = [
         "--keep-daily 7"
