@@ -11,6 +11,7 @@
     r2 = {
       user = "root";
       initialize = true;
+      createWrapper = true;
 
       environmentFile = config.sops.secrets."backup/credentials".path;
       repositoryFile = config.sops.secrets."backup/repository".path;
