@@ -15,7 +15,16 @@ let
   };
 in
 {
-  services.flameshot.enable = true;
+  services.flameshot = {
+    enable = true;
+    # Refs: https://github.com/NixOS/nixpkgs/pull/287307
+    package = pkgs.flameshot.overrideAttrs (oldAttrs: {
+      buildInputs = oldAttrs.buildInputs ++ [ pkgs.libsForQt5.kguiaddons ];
+      cmakeFlags = [
+        "-DUSE_WAYLAND_CLIPBOARD=true"
+      ];
+    });
+  };
 
   home.packages = [
     flameshotOcr.eng
