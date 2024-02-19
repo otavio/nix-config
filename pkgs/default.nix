@@ -7,7 +7,4 @@
   ossystems-tools = pkgs.callPackage ./ossystems-tools { };
   pa-applet = pkgs.callPackage ./pa-applet { };
   patman = pkgs.callPackage ./patman { };
-
-  # https://github.com/NixOS/nixpkgs/pull/281007
-  tmuxp = pkgs.callPackage ./tmuxp { };
 }
