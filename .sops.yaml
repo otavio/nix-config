@@ -2,7 +2,7 @@ keys:
   - &admin_otavio b7f7f218a0541d2a0bedbe8beb70fef3cdfc6e4f
   - &host_micro age18fmflp9w4lzh8e2gpxhzeu0n4vy769n3asfhj39tn3sn320zzdps7yz53w
   - &host_nano age196rtqfrvsu4x7e39aknntd7ne5fl20ggk3yuz2v0tm09wmavzeusj46fsm
-  - &host_poirot age1u9ug8zm5jkrz52np2jrmhuqehlzntpckkd843vvvex9uec2f29xs60yfg6
+  - &host_poirot age1e36nrp3jcjwdhvfsmva9rx04tp3p9y28pw6ukjtxjyssfwscqfxqzlfx5t
 creation_rules:
   - path_regex: secrets/[^/]+\.yaml$
     key_groups:
