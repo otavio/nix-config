@@ -41,6 +41,7 @@
     keyMap = "br-abnt2";
   };
 
+  services.switcherooControl.enable = false;
   services.xserver = {
     enable = true;
 
