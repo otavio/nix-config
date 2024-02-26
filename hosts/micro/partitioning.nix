@@ -1,5 +1,6 @@
 {
   boot.swraid.enable = false;
+  services.btrfs.autoScrub.enable = true;
 
   disko.devices = {
     disk.primary = {
