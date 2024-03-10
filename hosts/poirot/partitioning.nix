@@ -8,28 +8,27 @@
         type = "disk";
         device = "/dev/disk/by-id/ata-ADATA_IM2S3338-128GD2_5J4220001138";
         content = {
-          type = "table";
-          format = "gpt";
-          partitions = [
-            {
-              name = "ESP";
+          type = "gpt";
+          partitions = {
+            ESP = {
+              label = "ESP";
               start = "1M";
               end = "512M";
-              bootable = true;
+              type = "EF00";
               content = {
                 type = "filesystem";
                 format = "vfat";
                 mountpoint = "/efi";
               };
-            }
-            {
-              name = "boot";
+            };
+            boot = {
+              label = "boot";
               start = "0";
               end = "1M";
-              flags = [ "bios_grub" ];
-            }
-            {
-              name = "root";
+              type = "EF02"; # for grub MBR
+            };
+            root = {
+              label = "root";
               start = "512M";
               end = "100%";
               content = {
@@ -38,8 +37,8 @@
                 mountpoint = "/";
                 mountOptions = [ "compress=zstd" "noatime" ];
               };
-            }
-          ];
+            };
+          };
         };
       };
     };

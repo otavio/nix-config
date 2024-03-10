@@ -4,27 +4,24 @@
 
   disko.devices = {
     disk.primary = {
-      device = "/dev/nvme0n1";
       type = "disk";
+      device = "/dev/disk/by-diskseq/1";
       content = {
-        type = "table";
-        format = "gpt";
-        partitions = [
-          {
-            name = "ESP";
+        type = "gpt";
+        partitions = {
+          ESP = {
+            label = "ESP";
             start = "1MiB";
             end = "512MiB";
-            fs-type = "fat32";
-            part-type = "primary";
-            bootable = true;
+            type = "EF00";
             content = {
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
             };
-          }
-          {
-            name = "root";
+          };
+          root = {
+            label = "root";
             start = "512MiB";
             end = "100%";
             content = {
@@ -35,8 +32,8 @@
                 "/nix" = { mountpoint = "/nix"; mountOptions = [ "compress=zstd" "noatime" ]; };
               };
             };
-          }
-        ];
+          };
+        };
       };
     };
   };

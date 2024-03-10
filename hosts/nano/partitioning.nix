@@ -7,11 +7,21 @@
         type = "disk";
         device = "/dev/mmcblk1";
         content = {
-          type = "table";
-          format = "gpt";
-          partitions = [
-            {
-              name = "root";
+          type = "gpt";
+          partitions = {
+            ESP = {
+              label = "ESP";
+              start = "1M";
+              end = "512M";
+              type = "EF00";
+              content = {
+                type = "filesystem";
+                format = "vfat";
+                mountpoint = "/boot";
+              };
+            };
+            root = {
+              label = "root";
               start = "512M";
               end = "-8G";
               content = {
@@ -19,25 +29,14 @@
                 format = "ext4";
                 mountpoint = "/";
               };
-            }
-            {
-              name = "swap";
+            };
+            swap = {
+              label = "swap";
               start = "-8G";
               end = "100%";
               content = { type = "swap"; };
-            }
-            {
-              name = "ESP";
-              start = "1M";
-              end = "512M";
-              bootable = true;
-              content = {
-                type = "filesystem";
-                format = "vfat";
-                mountpoint = "/boot";
-              };
-            }
-          ];
+            };
+          };
         };
       };
     };
