@@ -30,12 +30,14 @@
 
     extraConfig = ''
       set -sg terminal-overrides ",*:RGB"
+      set -sg set-clipboard on
 
       # Repeat key press automatically
       set-option -g repeat-time 1000
 
       # Keep environment variables synced
       set -g update-environment -r
+      set-option -g update-environment "DISPLAY WAYLAND_DISPLAY SSH_AUTH_SOCK"
 
       # Easier and faster switching between next/prev window
       bind C-p previous-window
