@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 let
   flameshotOcrForLang = lang: pkgs.writeScriptBin "flameshot-ocr-${lang}" ''
     # The sleep is required to give time for the fzf-menu to disappear before opening flameshot.
@@ -13,17 +13,20 @@ let
     eng = flameshotOcrForLang "eng";
     por = flameshotOcrForLang "por";
   };
+
+  flameshot = pkgs.libsForQt5.callPackage ./flameshot.nix { };
 in
 {
   services.flameshot = {
     enable = true;
-    # Refs: https://github.com/NixOS/nixpkgs/pull/287307
-    package = pkgs.flameshot.overrideAttrs (oldAttrs: {
-      buildInputs = oldAttrs.buildInputs ++ [ pkgs.libsForQt5.kguiaddons ];
-      cmakeFlags = [
-        "-DUSE_WAYLAND_CLIPBOARD=true"
-      ];
-    });
+    package = flameshot;
+    settings = {
+      General = {
+        disabledTrayIcon = true;
+        showDesktopNotification = false;
+        savePath = "${config.home.homeDirectory}/Downloads";
+      };
+    };
   };
 
   home.packages = [
