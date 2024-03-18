@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install Nix
-      uses: nixbuild/nix-quick-install-action@v26
+      uses: nixbuild/nix-quick-install-action@v27
       with:
         nix_conf: experimental-features = nix-command flakes repl-flake
     - uses: cachix/cachix-action@v14
@@ -42,7 +42,7 @@ jobs:
     - run: sudo apt-get clean
     - uses: actions/checkout@v4
     - name: Install Nix
-      uses: nixbuild/nix-quick-install-action@v26
+      uses: nixbuild/nix-quick-install-action@v27
       with:
         nix_conf: experimental-features = nix-command flakes repl-flake
     - uses: cachix/cachix-action@v14
@@ -65,7 +65,7 @@ jobs:
     - run: sudo apt-get clean
     - uses: actions/checkout@v4
     - name: Install Nix
-      uses: nixbuild/nix-quick-install-action@v26
+      uses: nixbuild/nix-quick-install-action@v27
       with:
         nix_conf: experimental-features = nix-command flakes repl-flake
     - uses: cachix/cachix-action@v14
