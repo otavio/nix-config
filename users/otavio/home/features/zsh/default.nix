@@ -30,10 +30,8 @@ in
     tmux.enableShellIntegration = true;
   };
 
-  programs.eza = {
-    enable = true;
-    enableAliases = true;
-  };
+  programs.eza.enable = true;
+
 
   home.file.".config/zsh/zfunc" = {
     source = ./zfunc;

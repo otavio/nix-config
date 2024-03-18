@@ -1,8 +1,10 @@
+{ pkgs, ... }:
+
 {
 
   services.gpg-agent = {
     enable = true;
-    pinentryFlavor = "curses";
+    pinentryPackage = pkgs.pinentry-curses;
   };
 
   programs.gpg.enable = true;
