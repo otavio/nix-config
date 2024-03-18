@@ -29,8 +29,6 @@
   networking.wireless.enable = false;
   networking.networkmanager.enable = true;
 
-  users.users.nixos.password = "nixos";
-
   disko.enableConfig = false;
   environment.systemPackages = with pkgs; [
     zile
