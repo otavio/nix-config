@@ -68,12 +68,8 @@ jobs:
       uses: nixbuild/nix-quick-install-action@v27
       with:
         nix_conf: experimental-features = nix-command flakes repl-flake
-    - uses: cachix/cachix-action@v14
-      with:
-        name: otavio-nix-config
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
     - name: Install SSH Private Key
       uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    - run: nix -Lv build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
+    - run: nix -L build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
