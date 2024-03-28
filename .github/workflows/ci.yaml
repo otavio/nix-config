@@ -76,4 +76,4 @@ jobs:
       uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    - run: nix -Lv build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
+    - run: nix -L build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
