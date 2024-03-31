@@ -2,14 +2,17 @@
 {
   nix = {
     settings = {
-      # Caches in trusted-substituters can be used by unprivileged users i.e. in
-      # flakes but are not enabled by default.
-      trusted-substituters = [
+      substituters = [
         "https://nix-community.cachix.org"
         "https://cache.garnix.io"
         "https://otavio-nix-config.cachix.org"
         "https://numtide.cachix.org"
       ];
+
+      # Caches in trusted-substituters can be used by unprivileged users i.e. in
+      # flakes but are not enabled by default.
+      trusted-substituters = config.nix.settings.substituters;
+
       trusted-public-keys = [
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
