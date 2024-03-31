@@ -16,16 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install Nix
-      uses: nixbuild/nix-quick-install-action@v27
-      with:
-        nix_conf: experimental-features = nix-command flakes repl-flake
+    - uses: DeterminateSystems/nix-installer-action@v10
     - uses: cachix/cachix-action@v14
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - name: Install SSH Private Key
-      uses: webfactory/ssh-agent@v0.9.0
+    - uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - run: nix flake check
@@ -39,21 +35,16 @@ jobs:
           - nano
           - poirot
     steps:
-    - run: sudo apt-get clean
     - uses: actions/checkout@v4
-    - name: Install Nix
-      uses: nixbuild/nix-quick-install-action@v27
-      with:
-        nix_conf: experimental-features = nix-command flakes repl-flake
+    - uses: DeterminateSystems/nix-installer-action@v10
     - uses: cachix/cachix-action@v14
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - name: Install SSH Private Key
-      uses: webfactory/ssh-agent@v0.9.0
+    - uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    - run: nix -Lv build ".#nixosConfigurations.${{ matrix.nixosConfiguration }}.config.system.build.toplevel"
+    - run: nix -L build ".#nixosConfigurations.${{ matrix.nixosConfiguration }}.config.system.build.toplevel"
 
   nix:
     runs-on: ubuntu-latest
@@ -62,18 +53,13 @@ jobs:
         homeConfiguration:
           - "otavio@generic-x86"
     steps:
-    - run: sudo apt-get clean
     - uses: actions/checkout@v4
-    - name: Install Nix
-      uses: nixbuild/nix-quick-install-action@v27
-      with:
-        nix_conf: experimental-features = nix-command flakes repl-flake
+    - uses: DeterminateSystems/nix-installer-action@v10
     - uses: cachix/cachix-action@v14
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - name: Install SSH Private Key
-      uses: webfactory/ssh-agent@v0.9.0
+    - uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    - run: nix -Lv build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
+    - run: nix -L build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
