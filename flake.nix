@@ -84,7 +84,7 @@
           in
           packages // {
             ${system} = (packages.${system} or { }) // {
-              "${hostname}-install-iso" = mkInstallerForSystem { inherit hostname targetConfiguration system; };
+              "installer-iso-${hostname}" = mkInstallerForSystem { inherit hostname targetConfiguration system; };
             };
           })
         (forEachSystem (pkgs: import ./pkgs { inherit pkgs; }))

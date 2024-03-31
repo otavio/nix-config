@@ -6,10 +6,6 @@
 :END:
 :CONTENTS:
 - [[#installing-nixos-on-a-newexisting-device][Installing NixOS on a new/existing device]]
-  - [[#generating-the-nixos-installer-with-ssh-and-networkmanager-support][Generating the NixOS Installer with SSH and NetworkManager support]]
-  - [[#doing-the-partitioning-of-disk][Doing the partitioning of disk]]
-  - [[#generate-the-configurationnix---optional][Generate the configuration.nix - optional]]
-  - [[#install-the-device-using-the-desired-configuration][Install the device using the desired configuration]]
 - [[#installation-inside-an-existing-linux-system][Installation inside an existing Linux system]]
 :END:
   :CUSTOM_ID: configuration-repository
@@ -17,67 +13,17 @@
 
 * Installing NixOS on a new/existing device
 
-** Generating the NixOS Installer with SSH and NetworkManager support
-
-To generate the installer you can run:
+First we need to generate the device-specific NixOS Installer with SSH and NetworkManager support. To generate the installer you can run:
 
 #+begin_src sh
 
-  nix build .#mkInstallerIso
+  nix build .#installer-iso-<hostname>
 
 #+end_src
 
-** Doing the partitioning of disk
+Once booted, the system can be installed running the script ~install-system~.
 
-The installer allow SSH connection and has the authorized keys based on ~otavio~ user. Currently, I've been using following steps to format the disk:
-
-#+begin_src sh
-
-  device=/dev/xxx
-  deviceNixOSPart=${device}1
-  deviceEFIPart=${device}3
-  deviceBootSize=512MiB
-
-  parted --script ${device} -- \
-         mklabel gpt \
-         mkpart ESP fat32 8MiB ${deviceBootSize} \
-         set 1 boot on \
-         mkpart no-fs 0 1024KiB \
-         set 2 bios_grub on \
-         mkpart primary ext4 ${deviceBootSize} -1
-
-  mkdosfs -F32 ${deviceEFIPart} -n EFI
-
-  mkfs.btrfs ${deviceNixOSPart}
-  mount -t btrfs ${deviceNixOSPart} /mnt
-
-  umount /mnt
-  mount -o subvol=nixos,compress=zstd,discard,noatime,autodefrag ${deviceNixOSPart} /mnt
-
-  mkdir /mnt/efi
-  mount ${deviceEFIPart} /mnt/efi
-
-#+end_src
-
-** Generate the =configuration.nix= - optional
-
-Once the partitioning is done, we may generate the =hardware-configuration.nix= if it is a new device. We than copy it to our machine definition.
-
-#+begin_src sh
-
-  nixos-generate-config --root /mnt/
-
-#+end_src
-
-** Install the device using the desired configuration
-
-The installation of the machine can be done using the machine's flake. For it use:
-
-#+begin_src text
-
-  nixos-install --flake github:otavio/nix-config#<machine>
-
-#+end_src
+*WARNING*: all device data will be lost.
 
 * Installation inside an existing Linux system
 
@@ -85,7 +31,7 @@ For Debian-based systems we need to have =curl=, =rsync=, =zsh=, =xz-utils= and 
 before proceeding. Use:
 
 #+begin_src sh
-  sudo apt install -y curl rsync zsh xz-utils git-core
+  sudo apt install -y curl git-core
 #+end_src
 
 The user must use =zsh= as shell so do it using:
@@ -97,11 +43,7 @@ The user must use =zsh= as shell so do it using:
 Install the daemon inside the existing operating system with:
 
 #+begin_src sh
-  curl -L https://nixos.org/nix/install | sh -s -- --daemon
-
-  # Enable Nix Flakes support
-  mkdir -p ~/.config/nix
-  echo 'experimental-features = nix-command flakes repl-flake' > ~/.config/nix/nix.conf
+  curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 #+end_src
 
 Finally, clone this repository as:
@@ -114,5 +56,5 @@ Finally, clone this repository as:
 Add the required channels to the environment, using:
 
 #+begin_src sh
-  home-manager switch --flake .#otavio
+  home-manager switch --flake '.#otavio@generic-x86'
 #+end_src
