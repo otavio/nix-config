@@ -2,7 +2,7 @@
   description = "Otavio Salvador's NixOS/Home Manager config";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "nixpkgs/fff25929187584b748a75998f783f3592cf6b05d";
 
     home-manager = {
       url = "github:nix-community/home-manager";
