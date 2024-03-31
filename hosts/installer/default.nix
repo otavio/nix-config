@@ -30,26 +30,40 @@
   networking.networkmanager.enable = true;
 
   disko.enableConfig = false;
-  environment.systemPackages = with pkgs; [
-    zile
+  environment.systemPackages =
+    let
+      cfg = targetConfiguration.config.system.build;
 
-    (writeShellScriptBin "nixos-do-install" ''
-      set -eux
+      disko = pkgs.writeShellScriptBin "disko" "${cfg.diskoScript}";
+      disko-mount = pkgs.writeShellScriptBin "disko-mount" "${cfg.mountScript}";
+      disko-format = pkgs.writeShellScriptBin "disko-format" "${cfg.formatScript}";
+      install-system = pkgs.writeShellScriptBin "install-system" ''
+        set -euo pipefail
 
-      ${targetConfiguration.config.system.build.diskoScript} --mode zap_create_mount
+        echo "Formatting disks..."
+        disko-format
 
-      ${config.system.build.nixos-install}/bin/nixos-install \
+        echo "Mounting disks..."
+        disko-mount
+
+        echo "Installing system..."
+        ${cfg.nixos-install}/bin/nixos-install \
           --root /mnt \
           --no-root-passwd \
           --no-channel-copy \
-          --system ${targetConfiguration.config.system.build.toplevel}
+          --system ${cfg.toplevel}
 
-      echo "Syncing filesystems"
+        echo "Shutting off..."
+        ${pkgs.systemd}/bin/shutdown now
+      '';
+    in
+    [
+      pkgs.git
+      pkgs.zile
 
-      sync
-
-      echo "Shutting off..."
-      ${systemd}/bin/shutdown now
-    '')
-  ];
+      disko
+      disko-mount
+      disko-format
+      install-system
+    ];
 }
