@@ -42,6 +42,13 @@
   };
 
   services.switcherooControl.enable = false;
+
+  services.displayManager = {
+    hiddenUsers = [ "otavio" ];
+
+    defaultSession = "cinnamon";
+  };
+
   services.xserver = {
     enable = true;
 
@@ -49,14 +56,9 @@
 
     libinput.enable = true;
 
-    displayManager = {
-      hiddenUsers = [ "otavio" ];
-      defaultSession = "cinnamon";
-
-      lightdm.greeters = {
-        slick.enable = false;
-        pantheon.enable = true;
-      };
+    displayManager.lightdm.greeters = {
+      slick.enable = false;
+      pantheon.enable = true;
     };
 
     desktopManager.cinnamon.enable = true;
