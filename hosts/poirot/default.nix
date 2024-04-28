@@ -43,6 +43,8 @@
 
   services.switcherooControl.enable = false;
 
+  services.libinput.enable = true;
+
   services.displayManager = {
     hiddenUsers = [ "otavio" ];
 
@@ -53,8 +55,6 @@
     enable = true;
 
     xkb.layout = "br";
-
-    libinput.enable = true;
 
     displayManager.lightdm.greeters = {
       slick.enable = false;
