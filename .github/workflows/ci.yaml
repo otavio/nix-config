@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: DeterminateSystems/nix-installer-action@v10
+    - uses: DeterminateSystems/nix-installer-action@v11
     - uses: cachix/cachix-action@v14
       with:
         name: otavio-nix-config
@@ -36,7 +36,7 @@ jobs:
           - poirot
     steps:
     - uses: actions/checkout@v4
-    - uses: DeterminateSystems/nix-installer-action@v10
+    - uses: DeterminateSystems/nix-installer-action@v11
     - uses: cachix/cachix-action@v14
       with:
         name: otavio-nix-config
@@ -54,7 +54,7 @@ jobs:
           - "otavio@generic-x86"
     steps:
     - uses: actions/checkout@v4
-    - uses: DeterminateSystems/nix-installer-action@v10
+    - uses: DeterminateSystems/nix-installer-action@v11
     - uses: cachix/cachix-action@v14
       with:
         name: otavio-nix-config
