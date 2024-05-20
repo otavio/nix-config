@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@v11
-    - uses: cachix/cachix-action@v14
+    - uses: cachix/cachix-action@v15
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -37,7 +37,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@v11
-    - uses: cachix/cachix-action@v14
+    - uses: cachix/cachix-action@v15
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -55,7 +55,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: DeterminateSystems/nix-installer-action@v11
-    - uses: cachix/cachix-action@v14
+    - uses: cachix/cachix-action@v15
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
