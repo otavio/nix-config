@@ -25,6 +25,11 @@
     loader.efi.canTouchEfiVariables = true;
     initrd.availableKernelModules = [ "xhci_pci" "usbhid" "usb_storage" "sd_mod" "sdhci_acpi" ];
     kernelModules = [ "kvm-intel" ];
+    kernelParams = [
+      # The GPD Pocket uses a tablet OLED display, that is mounted rotated 90° counter-clockwise
+      "fbcon=rotate:1"
+      "video=DSI-1:panel_orientation=right_side_up"
+    ];
   };
 
   # Enable fstrim (for SSD disks)
