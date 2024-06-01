@@ -31,7 +31,7 @@ let
       inherit (epkgs.nongnuPackages) nix-mode;
     };
 
-    package = pkgs.emacs29;
+    package = pkgs.emacs29-gtk3;
   };
 in
 {
