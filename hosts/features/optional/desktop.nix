@@ -1,6 +1,5 @@
 {
-  hardware.opengl.enable = true;
-  hardware.opengl.driSupport = true;
+  hardware.graphics.enable = true;
 
   programs.adb.enable = true;
   programs.dconf.enable = true;
