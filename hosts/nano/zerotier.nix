@@ -9,6 +9,11 @@
       # O.S. Systems
       "5e6f75af38d42102"
     ];
+    localConf = {
+      settings = {
+        softwareUpdate = "disable";
+      };
+    };
   };
 
   systemd.services.zerotierone-dns = {
