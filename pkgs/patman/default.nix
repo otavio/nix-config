@@ -1,10 +1,10 @@
-{ python3
+{ python311
 , fetchFromGitHub
 , gitFull
 , git
 }:
 
-python3.pkgs.buildPythonApplication rec {
+python311.pkgs.buildPythonApplication rec {
   pname = "patman";
   version = "2021.10";
 
