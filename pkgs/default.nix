@@ -7,4 +7,6 @@
   ossystems-tools = pkgs.callPackage ./ossystems-tools { };
   pa-applet = pkgs.callPackage ./pa-applet { };
   patman = pkgs.callPackage ./patman { };
+
+  xwaylandvideobridge = pkgs.callPackage ./xwaylandvideobridge { };
 }

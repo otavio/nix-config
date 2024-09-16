@@ -1,5 +1,9 @@
 { inputs, lib, config, ... }:
 {
+  nixpkgs.config.permittedInsecurePackages = [
+    "nix-2.24.5"
+  ];
+
   nix = {
     settings = {
       substituters = [
