@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
   imports = [
@@ -43,7 +43,13 @@
       '';
     })
 
-    discord
+    (writeShellApplication {
+      name = "discord";
+      text = ''
+        XDG_SESSION_TYPE=x11 ${lib.getExe discord}
+      '';
+    })
+
     zoom-us
     skypeforlinux
     slack
