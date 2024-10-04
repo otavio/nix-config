@@ -42,6 +42,7 @@
     anydesk
 
     discord
+    zoom-us
     skypeforlinux
     slack
     tdesktop

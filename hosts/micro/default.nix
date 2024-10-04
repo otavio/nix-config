@@ -75,7 +75,6 @@
     virt-manager
     virt-viewer
     cntr
-    zoom-us
   ];
 
   deployment = {
