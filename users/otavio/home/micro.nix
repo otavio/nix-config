@@ -39,8 +39,6 @@
       '';
     })
 
-    anydesk
-
     discord
     zoom-us
     skypeforlinux
