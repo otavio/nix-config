@@ -27,10 +27,6 @@ let
       })
     ];
 
-    override = epkgs: epkgs // {
-      inherit (epkgs.nongnuPackages) nix-mode;
-    };
-
     package = pkgs.emacs29-gtk3;
   };
 in
