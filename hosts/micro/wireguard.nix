@@ -10,7 +10,7 @@
 
       peers = [
         {
-          publicKey = "o1jZWNTlnZD50WwtATXWS/QDxuijQ9kyJxQODJp0bGo=";
+          publicKey = "7poZW/qGM9HyZuKaA7ryP+EEtuK6b4E+G2sMcbNr6iM=";
           allowedIPs = [ "192.168.0.0/24" ];
           endpoint = "8aff0aba023e.sn.mynetname.net:13231";
           persistentKeepalive = 25;
