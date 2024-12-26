@@ -41,7 +41,7 @@
 
   # Rotate screen as for proper use in GPD Pocket
   services.xserver = {
-    videoDrivers = [ "intel" ];
+    videoDrivers = [ "modesetting" ];
     xrandrHeads = [
       {
         output = "DSI1";

@@ -987,9 +987,6 @@ This module is absolutely necessary for working inside of Emacs Lisp files, espe
     (dired-rainbow-define vc "#0074d9" ("git" "gitignore" "gitattributes" "gitmodules"))
     (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
 
-  (use-package dired-single
-    :defer t)
-
   (use-package dired-ranger
     :defer t)
 

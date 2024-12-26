@@ -26,6 +26,9 @@
   # replicates the default behaviour.
   networking.useDHCP = false;
 
+  # Allow root login
+  services.openssh.settings.PermitRootLogin = pkgs.lib.mkForce "without-password";
+
   networking.wireless.enable = false;
   networking.networkmanager.enable = true;
 
