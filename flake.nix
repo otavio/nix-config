@@ -27,11 +27,7 @@
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
-    colmena = {
-      url = "github:zhaofengli/colmena";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.stable.follows = "nixpkgs";
-    };
+    colmena.url = "github:zhaofengli/colmena";
   };
 
   outputs = { self, ... }@inputs:
