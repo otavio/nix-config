@@ -146,7 +146,7 @@ in
 
       transfer() {
           # Easier change of service in use
-          host=https://transfer.sh
+          host=https://temp.sh/upload
 
           curl --version 2>&1 > /dev/null
           if [ $? -ne 0 ]; then
@@ -178,15 +178,17 @@ in
                   # zip directory and transfer
                   tgzfile=$( mktemp -t transferXXX.tgz )
                   cd $(dirname $file) && tar czf $tgzfile $(basename $file)
-                  curl --progress-bar --upload-file "$tgzfile" "$host/$basefile.tgz" >> $tmpfile
+                  curl --progress-bar -F "file=@$tgzfile" "$host" >> $tmpfile
                   rm -f $tgzfile
               else
                   # transfer file
-                  curl --progress-bar --upload-file "$file" "$host/$basefile" >> $tmpfile
+                  curl --progress-bar -F "file=@$file" "$host" >> $tmpfile
               fi
           else
               # transfer pipe
-              curl --progress-bar --upload-file "-" "$host/$file" >> $tmpfile
+              tmp=$( mktemp -t )
+              dd of=$tmp 2> /dev/null
+              curl --progress-bar -F "file=@$tmp" "$host" >> $tmpfile
           fi
 
           # cat output link
