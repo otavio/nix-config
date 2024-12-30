@@ -251,7 +251,6 @@ in
 
     fzf
     i3
-    pa-applet
     pavucontrol
     xclip
     xss-lock
