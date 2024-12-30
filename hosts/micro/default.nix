@@ -35,7 +35,6 @@
     initrd.kernelModules = [ ];
 
     kernelModules = [ "kvm-amd" ];
-    kernelParams = [ "video=HDMI-A-1:2560x1080" ];
     extraModulePackages = [ config.boot.kernelPackages.rtl88x2bu ];
     extraModprobeConfig = ''
       blacklist rtw88_8822bu
