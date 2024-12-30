@@ -20,10 +20,6 @@
     ./features/zsh
   ];
 
-  # FIXME: Avoid Vulkan use in GTK rendering as it causes GPU error, see:
-  # https://gitlab.freedesktop.org/drm/nouveau/-/issues/381
-  home.sessionVariables.GSK_RENDERER = "gl";
-
   home.packages = with pkgs; [
     (writeShellApplication {
       name = "open-windoze";
