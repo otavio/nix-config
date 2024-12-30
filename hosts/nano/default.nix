@@ -13,7 +13,6 @@
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
     ../features/optional/quietboot.nix
-    ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
 
     ./partitioning.nix
@@ -38,22 +37,6 @@
 
   # Enable thermald
   services.thermald.enable = true;
-
-  # Rotate screen as for proper use in GPD Pocket
-  services.xserver = {
-    videoDrivers = [ "modesetting" ];
-    xrandrHeads = [
-      {
-        output = "DSI1";
-        primary = true;
-        monitorConfig = ''
-          Option "Rotate" "right"
-        '';
-      }
-    ];
-
-    dpi = 140;
-  };
 
   deployment = {
     targetUser = "otavio";

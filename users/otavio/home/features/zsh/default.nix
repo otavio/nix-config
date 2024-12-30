@@ -202,8 +202,6 @@ in
       keys-load "not-ask"
 
       [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
-
-      [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]] && exec startx
     '';
 
     initExtraBeforeCompInit = ''
