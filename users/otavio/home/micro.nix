@@ -35,7 +35,7 @@
       name = "scrcpy";
       runtimeInputs = with pkgs; [ scrcpy ];
       text = ''
-        scrcpy -M
+        scrcpy -M --no-audio
       '';
     })
 
