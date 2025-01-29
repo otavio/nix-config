@@ -9,6 +9,7 @@
 
     ../features/optional/anydesk.nix
     ../features/optional/auto-upgrade.nix
+    ../features/optional/latest-linux-kernel.nix
     ../features/optional/network-manager.nix
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
@@ -22,6 +23,7 @@
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelParams = [ "systemd.gpt_auto=0" ];
+  boot.blacklistedKernelModules = [ "nouveau" ];
 
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
