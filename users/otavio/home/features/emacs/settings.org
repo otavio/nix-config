@@ -76,7 +76,6 @@
   - [[#projectile][Projectile]]
   - [[#languages][Languages]]
     - [[#language-server-support][Language Server Support]]
-    - [[#debug-adapter-support][Debug Adapter Support]]
     - [[#bitbake][BitBake]]
       - [[#references][References]]
     - [[#cc][C/C++]]
@@ -1401,19 +1400,6 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
     (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
     (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
     (define-key lsp-ui-mode-map (kbd "C-h") #'lsp-describe-thing-at-point))
-
-#+end_src
-
-*** Debug Adapter Support
-
-#+begin_src emacs-lisp
-
-  (use-package dap-mode
-    :custom
-    (lsp-enable-dap-auto-configure nil)
-    :config
-    (dap-ui-mode 1)
-    (dap-tooltip-mode 1))
 
 #+end_src
 
