@@ -59,8 +59,8 @@
     xkb.layout = "br";
 
     displayManager.lightdm.greeters = {
-      slick.enable = false;
-      pantheon.enable = true;
+      slick.enable = true;
+      pantheon.enable = false;
     };
 
     desktopManager.cinnamon.enable = true;
