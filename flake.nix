@@ -59,9 +59,15 @@
           users = [ "otavio" ];
         };
 
-        # My wife device
+        # My wife devices
         poirot = mkSystem {
           hostname = "poirot";
+          system = "x86_64-linux";
+          users = [ "bruna" "otavio" ];
+        };
+
+        miss-marple = mkSystem {
+          hostname = "miss-marple";
           system = "x86_64-linux";
           users = [ "bruna" "otavio" ];
         };

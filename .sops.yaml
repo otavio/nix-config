@@ -3,6 +3,7 @@ keys:
   - &host_micro age18fmflp9w4lzh8e2gpxhzeu0n4vy769n3asfhj39tn3sn320zzdps7yz53w
   - &host_nano age196rtqfrvsu4x7e39aknntd7ne5fl20ggk3yuz2v0tm09wmavzeusj46fsm
   - &host_poirot age1e36nrp3jcjwdhvfsmva9rx04tp3p9y28pw6ukjtxjyssfwscqfxqzlfx5t
+  - &host_miss-marple age1m43cprvuz5kdrla7lwsdlt324kys788n9g7lv4pzslvd4xvlt5gsjgm4q8
 creation_rules:
   - path_regex: secrets/[^/]+\.yaml$
     key_groups:
@@ -10,6 +11,7 @@ creation_rules:
       - *host_micro
       - *host_nano
       - *host_poirot
+      - *host_miss-marple
       pgp:
       - *admin_otavio
   - path_regex: secrets/admins/[^/]+\.yaml$
