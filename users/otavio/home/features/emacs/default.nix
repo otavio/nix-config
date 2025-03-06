@@ -26,8 +26,6 @@ let
         packageRequires = [ epkgs.mmm-mode ];
       })
     ];
-
-    package = pkgs.emacs29-gtk3;
   };
 in
 {
