@@ -21,7 +21,7 @@ jobs:
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - uses: webfactory/ssh-agent@v0.9.0
+    - uses: webfactory/ssh-agent@v0.9.1
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - run: nix flake check
@@ -42,7 +42,7 @@ jobs:
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - uses: webfactory/ssh-agent@v0.9.0
+    - uses: webfactory/ssh-agent@v0.9.1
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - run: nix -L build ".#nixosConfigurations.${{ matrix.nixosConfiguration }}.config.system.build.toplevel"
@@ -60,7 +60,7 @@ jobs:
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - uses: webfactory/ssh-agent@v0.9.0
+    - uses: webfactory/ssh-agent@v0.9.1
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - run: nix -L build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
