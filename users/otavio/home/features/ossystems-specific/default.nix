@@ -18,7 +18,6 @@ in
   home.packages = with pkgs; [
     awscli2
     obsidian
-    ossystems-tools
   ];
 
   home.file = {
