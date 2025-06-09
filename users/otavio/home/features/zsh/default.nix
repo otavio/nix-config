@@ -44,7 +44,7 @@ in
     syntaxHighlighting.enable = true;
 
     dotDir = ".config/zsh";
-    envExtra = ''
+    initContent = ''
       # Nix
       if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
           . '/nix/var/nix/profiles/default/etc/profile.d/nix.sh'
@@ -52,9 +52,7 @@ in
 
       export NIX_PATH=$HOME/.nix-defexpr/channels:$NIX_PATH
       # End Nix
-    '';
 
-    initExtraFirst = ''
       source ${pkgs.grml-zsh-config}/etc/zsh/zshrc
 
       # Prompt modifications.
@@ -94,9 +92,7 @@ in
           [ -s "$BASE16_SHELL_PATH/profile_helper.sh" ] && \
               source "$BASE16_SHELL_PATH/profile_helper.sh"
       [ -n "$PS1" ] && set_theme ayu-dark
-    '';
 
-    initExtra = ''
       source ${pkgs.bitbake-completion}/share/bitbake-completion/bitbake_completion
 
       # Workaround to 'flakes problems related to # and zsh'
@@ -202,9 +198,7 @@ in
       keys-load "not-ask"
 
       [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
-    '';
 
-    initExtraBeforeCompInit = ''
       autoload -U +X bashcompinit && bashcompinit
       fpath+=~/.config/zsh/zfunc
     '';

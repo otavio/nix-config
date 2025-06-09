@@ -19,8 +19,7 @@ let
   browserWs = "3: browser ";
   triviaWs = "10: trivia ";
 
-  fzf-menu = pkgs.writeScriptBin "i3-fzf-menu" (builtins.readFile (pkgs.substituteAll {
-    src = ./fzf-menu;
+  fzf-menu = pkgs.writeScriptBin "i3-fzf-menu" (builtins.readFile (pkgs.replaceVars ./fzf-menu {
     fzf = "${pkgs.fzf}/bin/fzf";
   }));
 in

@@ -105,7 +105,6 @@
     - [[#rainbow-mode][Rainbow Mode]]
     - [[#string-inflection][String Inflection]]
     - [[#tramp][TRAMP]]
-      - [[#docker-support][Docker support]]
     - [[#browse-kill-ring][Browse Kill Ring]]
     - [[#highlight-symbol][Highlight Symbol]]
     - [[#spelling][Spelling]]
@@ -1798,15 +1797,6 @@ Sets the background of HTML color strings in buffers to be the color mentioned.
 
   ;; Set default connection mode to SSH
   (setq tramp-default-method "ssh")
-
-#+end_src
-
-**** Docker support
-
-#+begin_src emacs-lisp
-
-  (use-package docker-tramp
-    :after tramp )
 
 #+end_src
 

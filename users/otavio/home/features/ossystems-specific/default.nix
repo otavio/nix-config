@@ -24,9 +24,7 @@ in
     ".yocto/site.conf".source = ./yocto-site.conf;
   };
 
-  programs.zsh = {
-    initExtra = ''
-      export PATH=$PATH:${pkgs.lib.makeBinPath [ ossystems-scripts ]}
-    '';
-  };
+  programs.zsh.initContent = ''
+    export PATH=$PATH:${pkgs.lib.makeBinPath [ ossystems-scripts ]}
+  '';
 }
