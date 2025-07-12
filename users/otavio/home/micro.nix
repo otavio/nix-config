@@ -46,7 +46,6 @@
     })
 
     zoom-us
-    skypeforlinux
     slack
     tdesktop
   ];
