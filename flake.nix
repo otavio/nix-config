@@ -91,7 +91,7 @@
         (forEachSystem (pkgs: import ./pkgs { inherit pkgs; }))
         (builtins.attrNames self.nixosConfigurations);
 
-      colmena = mkColmenaFromNixOSConfigurations self.nixosConfigurations;
+      colmenaHive = mkColmenaFromNixOSConfigurations self.nixosConfigurations;
       devShells = forEachSystem (pkgs: {
         default = pkgs.mkShell {
           buildInputs = with pkgs; [

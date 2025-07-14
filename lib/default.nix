@@ -2,7 +2,7 @@
 
 {
   mkColmenaFromNixOSConfigurations = conf:
-    {
+    inputs.colmena.lib.makeHive ({
       meta = {
         description = "my personal machines";
         # This can be overriden by node nixpkgs
@@ -10,7 +10,7 @@
         nodeNixpkgs = builtins.mapAttrs (_: value: value.pkgs) conf;
         nodeSpecialArgs = builtins.mapAttrs (_: value: value._module.specialArgs) conf;
       };
-    } // builtins.mapAttrs (_: value: { imports = value._module.args.modules; }) conf;
+    } // builtins.mapAttrs (_: value: { imports = value._module.args.modules; }) conf);
 
   mkSystem =
     { hostname
