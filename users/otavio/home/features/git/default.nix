@@ -2,7 +2,6 @@
 {
   home.file = {
     ".gitaliases".source = ./aliases;
-    ".patman".source = ./patman;
   };
 
   home.packages = with pkgs; [
@@ -10,7 +9,6 @@
     git-secret
     gitRepo
     gh
-    patman
   ];
 
   programs.git = {
