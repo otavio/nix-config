@@ -53,6 +53,7 @@
 
   security.pam.services.swaylock = { };
 
+  networking.firewall.trustedInterfaces = [ "virbr0" ];
   virtualisation.libvirtd.enable = true;
   environment.systemPackages = with pkgs; [
     virt-manager
