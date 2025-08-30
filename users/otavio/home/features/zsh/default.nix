@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 let
   cryptsetup = "${pkgs.cryptsetup}/bin/cryptsetup";
   keychain = "${pkgs.keychain}/bin/keychain";
@@ -44,7 +44,7 @@ in
     syntaxHighlighting.enable = true;
 
     dotDir = ".config/zsh";
-    initContent = ''
+    initContent = lib.mkOrder 500 ''
       # Nix
       if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
           . '/nix/var/nix/profiles/default/etc/profile.d/nix.sh'
@@ -92,8 +92,6 @@ in
           [ -s "$BASE16_SHELL_PATH/profile_helper.sh" ] && \
               source "$BASE16_SHELL_PATH/profile_helper.sh"
       [ -n "$PS1" ] && set_theme ayu-dark
-
-      source ${pkgs.bitbake-completion}/share/bitbake-completion/bitbake_completion
 
       # Workaround to 'flakes problems related to # and zsh'
       # See: https://github.com/NixOS/nix/issues/4686
@@ -200,6 +198,7 @@ in
       [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
 
       autoload -U +X bashcompinit && bashcompinit
+      source ${pkgs.bitbake-completion}/share/bitbake-completion/bitbake_completion
       fpath+=~/.config/zsh/zfunc
     '';
 
