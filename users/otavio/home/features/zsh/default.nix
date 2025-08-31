@@ -200,6 +200,8 @@ in
       autoload -U +X bashcompinit && bashcompinit
       source ${pkgs.bitbake-completion}/share/bitbake-completion/bitbake_completion
       fpath+=~/.config/zsh/zfunc
+
+      [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]] && exec startx
     '';
 
     shellAliases = {

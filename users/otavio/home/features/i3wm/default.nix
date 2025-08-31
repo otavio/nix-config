@@ -9,8 +9,8 @@ let
 
   copyq = "copyq";
   editor = "emacs -nw";
-  terminal = "alacritty --class=term";
-  menu = "alacritty -t 'fzf-menu' --class 'fzf-menu' -e ${fzf-menu}/bin/i3-fzf-menu";
+  terminal = "i3-sensible-terminal --class=term";
+  menu = "i3-sensible-terminal -t 'fzf-menu' --class 'fzf-menu' -e ${fzf-menu}/bin/i3-fzf-menu";
 
   dunstCloseNotification = "dunstctl close";
 
@@ -24,32 +24,28 @@ let
   }));
 in
 {
-  wayland.windowManager.sway = {
-    enable = true;
+  # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8
+  xsession.scriptPath = ".hm-xsession";
 
+  xsession.windowManager.i3 = {
+    enable = true;
     config = {
       inherit modifier terminal menu;
 
-      left = "l";
-      right = "semicolon";
-      up = "j";
-      down = "k";
-
       assigns = {
-        "${shellWs}" = [{ app_id = "term"; }];
-        "${editorWs}" = [{ app_id = "Emacs"; }];
+        "${shellWs}" = [{ class = "term"; instance = "term"; }];
+        "${editorWs}" = [{ class = "Emacs"; }];
         "${browserWs}" = [
-          { app_id = "Google-chrome"; }
-          { app_id = "Firefox"; }
-          { app_id = "Brave"; }
-          { app_id = "chromium"; }
+          { class = "Google-chrome"; }
+          { class = "Firefox"; }
+          { class = "Brave"; }
+          { class = "chromium"; }
         ];
 
         "${triviaWs}" = [
-          { app_id = "skype"; }
-          { app_id = "slack"; }
-          { app_id = "discord"; }
-          { app_id = "telegram-desktop"; }
+          { class = "slack"; }
+          { class = "discord"; }
+          { class = "telegram-desktop"; }
         ];
       };
 
@@ -108,6 +104,16 @@ in
       keybindings = lib.mkOptionDefault {
         "${modifier}+x" = "kill";
 
+        "${modifier}+l" = "focus left";
+        "${modifier}+k" = "focus down";
+        "${modifier}+j" = "focus up";
+        "${modifier}+semicolon" = "focus right";
+
+        "${modifier}+Shift+l" = "move left";
+        "${modifier}+Shift+k" = "move down";
+        "${modifier}+Shift+j" = "move up";
+        "${modifier}+Shift+semicolon" = "move right";
+
         "${modifier}+1" = "workspace number ${shellWs}";
         "${modifier}+2" = "workspace number ${editorWs}";
         "${modifier}+3" = "workspace number ${browserWs}";
@@ -118,20 +124,12 @@ in
         "${modifier}+Shift+3" = "move container to workspace number ${browserWs}";
         "${modifier}+Shift+0" = "move container to workspace number ${triviaWs}";
 
-        "Print" = "exec flameshot gui --raw | ${pkgs.wl-clipboard}/bin/wl-copy";
-        #"Print" = "exec flameshot gui";
+        "Print" = "exec flameshot gui";
 
         "Control+Alt+h" = "exec ${copyq} toggle";
 
         # Hide dunst notification.
         "Control+Shift+space" = "exec ${dunstCloseNotification}";
-      };
-
-      input."type:keyboard" = {
-        xkb_variant = "intl";
-        xkb_model = "pc105";
-        xkb_layout = "us";
-        xkb_options = "caps:super";
       };
 
       window.commands = [
@@ -146,7 +144,7 @@ in
         }
 
         {
-          criteria = { app_id = "fzf-menu"; };
+          criteria = { class = "fzf-menu"; };
           command = "border none, sticky enable, floating enable, focus";
         }
 
@@ -162,23 +160,15 @@ in
       ];
 
       startup = [
-        { command = "pa-applet"; }
+        { command = "pa-applet"; notification = true; }
       ] ++ pkgs.lib.lists.optionals (hostname == "micro") [
-        { command = "Discord"; }
-        { command = editor; }
-        { command = terminal; }
-        { command = "brave"; }
-        { command = "skypeforlinux"; }
-        { command = "slack"; }
-        { command = "telegram-desktop"; }
-        { command = "${pkgs.lib.getExe pkgs.sway-audio-idle-inhibit}"; }
+        { command = "discord"; notification = true; }
+        { command = editor; notification = true; }
+        { command = terminal; notification = true; }
+        { command = "brave"; notification = true; }
+        { command = "slack"; notification = true; }
+        { command = "Telegram"; notification = true; }
       ];
-    };
-
-    systemd.xdgAutostart = true;
-
-    wrapperFeatures = {
-      gtk = true;
     };
   };
 
@@ -258,62 +248,19 @@ in
     };
   };
 
-  # clipboard manager. keeps the contents once the original program quits.
-  services.copyq = {
-    enable = true;
-    systemdTarget = "sway-session.target";
-  };
-
-  services.swayidle = {
-    enable = true;
-    systemdTarget = "sway-session.target";
-    timeouts = [
-      {
-        timeout = 300;
-        command = "${pkgs.swaylock-effects}/bin/swaylock --grace 10";
-      }
-    ];
-  };
-
-  programs.swaylock = {
-    enable = true;
-    package = pkgs.swaylock-effects;
-    settings = {
-      fade-in = "2";
-      screenshots = true;
-      effect-pixelate = "10";
-      effect-greyscale = true;
-    };
-  };
-
-  xdg.portal = {
-    enable = true;
-    config.sway = {
-      default = [ "gtk" ];
-
-      # for flameshot to work
-      # https://github.com/flameshot-org/flameshot/issues/3363#issuecomment-1753771427
-      "org.freedesktop.impl.portal.Screencast" = "wlr";
-      "org.freedesktop.impl.portal.Screenshot" = "wlr";
-    };
-
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-wlr
-      xdg-desktop-portal-gtk
-      qt6Packages.xwaylandvideobridge
-    ];
-  };
-
   fonts.fontconfig.enable = true;
   home.packages = with pkgs; [
     iosevka-bin
     noto-fonts
-    noto-fonts-emoji
     nerd-fonts.fira-code
     font-awesome
 
-    xdg-utils
     fzf
+    i3
     pavucontrol
+    xclip
+    xss-lock
   ];
+
+  home.file.".xinitrc".source = ./xinitrc;
 }

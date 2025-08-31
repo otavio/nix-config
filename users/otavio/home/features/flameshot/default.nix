@@ -6,7 +6,7 @@ let
 
     ${pkgs.flameshot}/bin/flameshot gui -r | \
        ${pkgs.tesseract}/bin/tesseract -l ${lang} - - | \
-       ${pkgs.wl-clipboard}/bin/wl-copy
+       ${pkgs.xclip}/bin/xclip -sel clip
   '';
 
   flameshotOcr = {

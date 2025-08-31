@@ -9,7 +9,7 @@
     ./features/flameshot
     ./features/emacs
     ./features/gtk
-    ./features/swaywm
+    ./features/i3wm
     ./features/unclutter
     ./features/parcellite
     ./features/xdg

@@ -10,7 +10,7 @@
     ./features/flameshot
     ./features/gpg
     ./features/gtk
-    ./features/swaywm
+    ./features/i3wm
     ./features/irssi
     ./features/ossystems-specific
     ./features/unclutter
