@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   cryptsetup = "${pkgs.cryptsetup}/bin/cryptsetup";
   keychain = "${pkgs.keychain}/bin/keychain";
@@ -32,7 +32,7 @@ in
 
   programs.eza.enable = true;
 
-  home.file.".config/zsh/zfunc" = {
+  home.file."${config.programs.zsh.dotDir}/zfunc" = {
     source = ./zfunc;
     recursive = true;
   };
@@ -43,7 +43,8 @@ in
     enableVteIntegration = true;
     syntaxHighlighting.enable = true;
 
-    dotDir = ".config/zsh";
+    dotDir = "${config.xdg.configHome}/zsh";
+    history.path = "${config.xdg.stateHome}/zsh_history";
     initContent = lib.mkOrder 500 ''
       # Nix
       if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
@@ -199,7 +200,7 @@ in
 
       autoload -U +X bashcompinit && bashcompinit
       source ${pkgs.bitbake-completion}/share/bitbake-completion/bitbake_completion
-      fpath+=~/.config/zsh/zfunc
+      fpath+=${config.programs.zsh.dotDir}/zfunc
 
       [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]] && exec startx
     '';
