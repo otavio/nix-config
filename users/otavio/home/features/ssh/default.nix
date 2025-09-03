@@ -1,21 +1,27 @@
 {
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
 
-    controlMaster = "auto";
-    hashKnownHosts = false;
+    matchBlocks = {
+      "*" = {
+        controlMaster = "auto";
+        hashKnownHosts = false;
+      };
 
-    extraConfig = ''
-      Host code.ossystems.com.br
-           HostName code.ossystems.io
+      "code.ossystems.com.br" = {
+        hostname = "code.ossystems.io";
+      };
 
-      Host *.lab.ossystems
-           ForwardAgent yes
-           ForwardX11 yes
-           ForwardX11Trusted yes
+      "*.lab.ossystems" = {
+        forwardAgent = true;
+        forwardX11 = true;
+        forwardX11Trusted = true;
+      };
 
-      Host gitlab.com
-           IdentityFile ~/.ssh/id_ed25519
-    '';
+      "gitlab.com" = {
+        identityFile = "~/.ssh/id_ed25519";
+      };
+    };
   };
 }
