@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
-    - uses: DeterminateSystems/nix-installer-action@v20
+    - uses: DeterminateSystems/nix-installer-action@v21
     - uses: cachix/cachix-action@v16
       with:
         name: otavio-nix-config
@@ -37,7 +37,7 @@ jobs:
           - miss-marple
     steps:
     - uses: actions/checkout@v5
-    - uses: DeterminateSystems/nix-installer-action@v20
+    - uses: DeterminateSystems/nix-installer-action@v21
     - uses: cachix/cachix-action@v16
       with:
         name: otavio-nix-config
@@ -55,7 +55,7 @@ jobs:
           - "otavio@generic-x86"
     steps:
     - uses: actions/checkout@v5
-    - uses: DeterminateSystems/nix-installer-action@v20
+    - uses: DeterminateSystems/nix-installer-action@v21
     - uses: cachix/cachix-action@v16
       with:
         name: otavio-nix-config
