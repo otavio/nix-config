@@ -47,6 +47,6 @@
 
     zoom-us
     slack
-    tdesktop
+    telegram-desktop
   ];
 }

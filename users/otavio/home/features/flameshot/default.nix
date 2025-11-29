@@ -13,13 +13,10 @@ let
     eng = flameshotOcrForLang "eng";
     por = flameshotOcrForLang "por";
   };
-
-  flameshot = pkgs.libsForQt5.callPackage ./flameshot.nix { };
 in
 {
   services.flameshot = {
     enable = true;
-    package = flameshot;
     settings = {
       General = {
         disabledTrayIcon = true;
