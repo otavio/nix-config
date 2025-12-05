@@ -2,3 +2,4 @@
 /.direnv/
 /nix/emacs.d/flycheck_init.el
 /.devenv/
+/result

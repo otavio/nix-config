@@ -113,7 +113,7 @@
       devShells = forEachSystem (pkgs: {
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            inputs.colmena.packages.${system}.colmena
+            inputs.colmena.packages.${pkgs.stdenv.hostPlatform.system}.colmena
             home-manager
             sops
           ];
