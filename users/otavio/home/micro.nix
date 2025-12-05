@@ -5,6 +5,7 @@
     ./features/global
     ./features/alacritty
     ./features/brave
+    ./features/claude-code
     ./features/dunst
     ./features/emacs
     ./features/flameshot
