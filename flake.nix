@@ -4,6 +4,13 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
 
+    flake-utils.url = "github:numtide/flake-utils";
+
+    nix-github-actions = {
+      url = "github:nix-community/nix-github-actions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -19,6 +26,7 @@
     claude-code-overlay = {
       url = "github:ryoppippi/claude-code-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
 
     sops-nix = {
@@ -32,7 +40,12 @@
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
-    colmena.url = "github:zhaofengli/colmena";
+    colmena = {
+      url = "github:zhaofengli/colmena";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.nix-github-actions.follows = "nix-github-actions";
+    };
   };
 
   outputs = { self, ... }@inputs:
