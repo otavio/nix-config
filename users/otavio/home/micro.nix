@@ -16,6 +16,7 @@
     ./features/irssi
     ./features/ossystems-specific
     ./features/unclutter
+    ./features/talon
     ./features/xdg
     ./features/zathura
     ./features/zsh

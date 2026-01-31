@@ -165,6 +165,22 @@
         "type": "github"
       }
     },
+    "nix-secrets": {
+      "locked": {
+        "lastModified": 1764637171,
+        "narHash": "sha256-tGfdXjnYO94cf7n5trTqLSsrG2cis2+VLBME0MsiV2E=",
+        "ref": "refs/heads/main",
+        "rev": "e968c1f55f045901e858f417f43284c6386c0704",
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@github.com/otavio/nix-secrets"
+      },
+      "original": {
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@github.com/otavio/nix-secrets"
+      }
+    },
     "nixos-hardware": {
       "locked": {
         "lastModified": 1764440730,
@@ -203,9 +219,11 @@
         "flake-utils": "flake-utils",
         "home-manager": "home-manager",
         "nix-github-actions": "nix-github-actions",
+        "nix-secrets": "nix-secrets",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
-        "sops-nix": "sops-nix"
+        "sops-nix": "sops-nix",
+        "talon-nix": "talon-nix"
       }
     },
     "sops-nix": {
@@ -256,6 +274,30 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "talon-nix": {
+      "inputs": {
+        "nix-github-actions": [
+          "nix-github-actions"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1748314790,
+        "narHash": "sha256-yFNpbCxVaQg0xtS8Sd080kY5sP8d2cE2I6zAp/SeP3k=",
+        "owner": "fidgetingbits",
+        "repo": "talon-nix",
+        "rev": "e7ef63976b6f7ed76e3db649165c1a944c239830",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fidgetingbits",
+        "ref": "overrides",
+        "repo": "talon-nix",
         "type": "github"
       }
     }

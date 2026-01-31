@@ -39,11 +39,21 @@
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
+    talon-nix = {
+      url = "github:fidgetingbits/talon-nix?ref=overrides";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nix-github-actions.follows = "nix-github-actions";
+    };
+
     colmena = {
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
       inputs.nix-github-actions.follows = "nix-github-actions";
+    };
+
+    nix-secrets = {
+      url = "git+ssh://git@github.com/otavio/nix-secrets?shallow=1";
     };
   };
 
@@ -61,7 +71,7 @@
       pkgsFor = inputs.nixpkgs.legacyPackages;
     in
     {
-      overlays = import ./overlays;
+      overlays = import ./overlays { inherit inputs; };
 
       nixosConfigurations = {
         micro = mkSystem {

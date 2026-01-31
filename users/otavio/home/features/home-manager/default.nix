@@ -1,8 +1,11 @@
-{ lib, config, outputs, ... }:
+{ inputs, lib, config, outputs, ... }:
 
 {
   nixpkgs = {
-    overlays = builtins.attrValues outputs.overlays;
+    overlays = [
+      inputs.talon-nix.overlays.default
+    ] ++ (builtins.attrValues outputs.overlays);
+
     config = {
       allowUnfree = true;
       allowUnfreePredicate = _: true;

@@ -17,6 +17,7 @@
     ../features/optional/pipewire.nix
     ../features/optional/polkit.nix
     ../features/optional/quietboot.nix
+    ../features/optional/voice-coding.nix
     ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
 
