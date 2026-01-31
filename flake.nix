@@ -98,7 +98,7 @@
       packages = builtins.foldl'
         (packages: hostname:
           let
-            inherit (self.nixosConfigurations.${hostname}.config.nixpkgs) system;
+            inherit (self.nixosConfigurations.${hostname}.config.nixpkgs.hostPlatform) system;
             targetConfiguration = self.nixosConfigurations.${hostname};
           in
           packages // {

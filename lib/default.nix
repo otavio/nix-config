@@ -19,8 +19,6 @@
     , users ? [ ]
     }:
     inputs.nixpkgs.lib.nixosSystem {
-      inherit system;
-
       specialArgs = {
         inherit inputs outputs system hostname;
       };
@@ -28,6 +26,8 @@
       extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
 
       modules = [
+        { nixpkgs.hostPlatform = system; }
+
         inputs.disko.nixosModules.disko
 
         ../hosts/${hostname}
@@ -56,7 +56,7 @@
 
   mkHome = module: system:
     inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = import inputs.nixpkgs { inherit system; };
+      pkgs = inputs.nixpkgs.legacyPackages.${system};
 
       extraSpecialArgs = {
         inherit inputs outputs;
@@ -74,8 +74,6 @@
     , system
     }:
     (inputs.nixpkgs.lib.nixosSystem {
-      inherit system;
-
       specialArgs = {
         inherit inputs outputs system targetConfiguration;
       };
@@ -83,6 +81,8 @@
       extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
 
       modules = [
+        { nixpkgs.hostPlatform = system; }
+
         inputs.disko.nixosModules.disko
 
         ../hosts/installer
