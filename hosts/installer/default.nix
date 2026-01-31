@@ -29,7 +29,6 @@
   # Allow root login
   services.openssh.settings.PermitRootLogin = pkgs.lib.mkForce "without-password";
 
-  networking.wireless.enable = false;
   networking.networkmanager.enable = true;
 
   disko.enableConfig = false;
