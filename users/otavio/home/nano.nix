@@ -4,6 +4,7 @@
   imports = [
     ./features/global
     ./features/alacritty
+    ./features/android
     ./features/brave
     ./features/dunst
     ./features/flameshot
