@@ -2,19 +2,16 @@
   "nodes": {
     "claude-code-overlay": {
       "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1764892984,
-        "narHash": "sha256-u6ge8E/L9ptrFwdWViFRYHgL0XyR36TCW8rElMpbrwo=",
+        "lastModified": 1769896590,
+        "narHash": "sha256-3mOuLW4Yd4fZGukpJDWX3cQEJWWWT4zbi7zOZx625f4=",
         "owner": "ryoppippi",
         "repo": "claude-code-overlay",
-        "rev": "acf593c479bb41f10406e3427104e70b7e1a683f",
+        "rev": "ba16467f4d52f5028114af5ec151a791f6ba9a16",
         "type": "github"
       },
       "original": {

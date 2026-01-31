@@ -1,8 +1,9 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
+let
+  notificationSound = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/complete.oga";
+in
 {
-  imports = [
-    inputs.claude-code-overlay.homeManagerModules.default
-  ];
+  home.packages = with pkgs; [ jq ];
 
   nixpkgs = {
     overlays = [ inputs.claude-code-overlay.overlays.default ];
@@ -12,6 +13,8 @@
   programs.claude-code = {
     enable = true;
     settings = {
+      model = "opus";
+      alwaysThinkingEnabled = true;
       permissions = {
         allow = [
           "Bash(find:*)"
@@ -23,6 +26,37 @@
           "WebFetch(domain:github.com)"
           "WebFetch(domain:mynixos.com)"
           "WebSearch"
+        ];
+      };
+      statusLine = {
+        type = "command";
+        command = "bash ~/.claude/statusline-command.sh";
+      };
+      attribution = {
+        commit = "";
+        pr = "";
+      };
+      hooks = {
+        Notification = [
+          {
+            matcher = "";
+            hooks = [
+              {
+                type = "command";
+                command = "${pkgs.pulseaudio}/bin/paplay ${notificationSound} 2>/dev/null || true";
+              }
+            ];
+          }
+        ];
+        Stop = [
+          {
+            hooks = [
+              {
+                type = "command";
+                command = "${pkgs.pulseaudio}/bin/paplay ${notificationSound} 2>/dev/null || true";
+              }
+            ];
+          }
         ];
       };
     };
