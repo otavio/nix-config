@@ -24,6 +24,12 @@ jobs:
     - uses: webfactory/ssh-agent@v0.9.1
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Configure SSH for Nix daemon
+      run: |
+        sudo mkdir -p /root/.ssh
+        sudo ssh-keyscan github.com | sudo tee /root/.ssh/known_hosts
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" | sudo tee /root/.ssh/id_ed25519 > /dev/null
+        sudo chmod 600 /root/.ssh/id_ed25519
     - run: nix flake check
 
   nixos:
@@ -45,6 +51,12 @@ jobs:
     - uses: webfactory/ssh-agent@v0.9.1
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Configure SSH for Nix daemon
+      run: |
+        sudo mkdir -p /root/.ssh
+        sudo ssh-keyscan github.com | sudo tee /root/.ssh/known_hosts
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" | sudo tee /root/.ssh/id_ed25519 > /dev/null
+        sudo chmod 600 /root/.ssh/id_ed25519
     - run: nix -L build ".#nixosConfigurations.${{ matrix.nixosConfiguration }}.config.system.build.toplevel"
 
   nix:
@@ -63,4 +75,10 @@ jobs:
     - uses: webfactory/ssh-agent@v0.9.1
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Configure SSH for Nix daemon
+      run: |
+        sudo mkdir -p /root/.ssh
+        sudo ssh-keyscan github.com | sudo tee /root/.ssh/known_hosts
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" | sudo tee /root/.ssh/id_ed25519 > /dev/null
+        sudo chmod 600 /root/.ssh/id_ed25519
     - run: nix -L build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
