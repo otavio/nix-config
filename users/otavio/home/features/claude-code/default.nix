@@ -12,6 +12,7 @@ in
 
   programs.claude-code = {
     enable = true;
+    commands.refactor-claude-md = builtins.readFile ./refactor-claude-md.md;
     settings = {
       model = "opus";
       alwaysThinkingEnabled = true;
