@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(git -C /home/otavio/src/nix-config log --oneline -15)"
-    ]
-  }
-}

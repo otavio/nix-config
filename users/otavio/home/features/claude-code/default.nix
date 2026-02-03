@@ -12,7 +12,6 @@ in
 
   programs.claude-code = {
     enable = true;
-    commands.refactor-claude-md = builtins.readFile ./refactor-claude-md.md;
     settings = {
       model = "opus";
       alwaysThinkingEnabled = true;
@@ -59,6 +58,22 @@ in
             ];
           }
         ];
+      };
+
+      # Plugin marketplace configuration
+      extraKnownMarketplaces = {
+        ossystems = {
+          source = {
+            source = "github";
+            repo = "OSSystems/claude-code-plugin";
+          };
+        };
+      };
+
+      # Enable plugins from the marketplace
+      enabledPlugins = {
+        "ossystems-commit@ossystems" = true;
+        "ossystems-refactor-claude-md@ossystems" = true;
       };
     };
   };
