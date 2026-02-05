@@ -68,12 +68,19 @@ in
             repo = "OSSystems/claude-code-plugin";
           };
         };
+        ui-ux-pro-max-skill = {
+          source = {
+            source = "github";
+            repo = "nextlevelbuilder/ui-ux-pro-max-skill";
+          };
+        };
       };
 
       # Enable plugins from the marketplace
       enabledPlugins = {
         "ossystems-commit@ossystems" = true;
         "ossystems-refactor-claude-md@ossystems" = true;
+        "ui-ux-pro-max@ui-ux-pro-max-skill" = true;
       };
     };
   };
