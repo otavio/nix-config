@@ -74,6 +74,12 @@ in
             repo = "nextlevelbuilder/ui-ux-pro-max-skill";
           };
         };
+        knowledge-work-plugins = {
+          source = {
+            source = "github";
+            repo = "anthropics/knowledge-work-plugins";
+          };
+        };
       };
 
       # Enable plugins from the marketplace
@@ -81,6 +87,7 @@ in
         "ossystems-commit@ossystems" = true;
         "ossystems-refactor-claude-md@ossystems" = true;
         "ui-ux-pro-max@ui-ux-pro-max-skill" = true;
+        "legal@knowledge-work-plugins" = true;
       };
     };
   };
