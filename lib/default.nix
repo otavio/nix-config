@@ -20,7 +20,7 @@
     }:
     inputs.nixpkgs.lib.nixosSystem {
       specialArgs = {
-        inherit inputs outputs system hostname;
+        inherit inputs outputs hostname;
       };
 
       extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
@@ -44,7 +44,7 @@
                   users);
 
             extraSpecialArgs = {
-              inherit inputs system graphical hostname;
+              inherit inputs graphical hostname;
             };
           };
         }
@@ -75,7 +75,7 @@
     }:
     (inputs.nixpkgs.lib.nixosSystem {
       specialArgs = {
-        inherit inputs outputs system targetConfiguration;
+        inherit inputs outputs targetConfiguration;
       };
 
       extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
