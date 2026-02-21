@@ -124,6 +124,8 @@ in
         "${modifier}+Shift+3" = "move container to workspace number ${browserWs}";
         "${modifier}+Shift+0" = "move container to workspace number ${triviaWs}";
 
+        "${modifier}+o" = "exec onboard";
+
         "Print" = "exec flameshot gui";
 
         "Control+Alt+h" = "exec ${copyq} toggle";
@@ -156,6 +158,16 @@ in
         {
           criteria = { class = "xwaylandvideobridge"; };
           command = "opacity 0.0, floating enable";
+        }
+
+        {
+          criteria = { class = "InputOutput"; };
+          command = "floating enable, sticky enable, border none";
+        }
+
+        {
+          criteria = { class = "Onboard"; };
+          command = "floating enable, sticky enable, border none";
         }
       ];
 
@@ -257,6 +269,7 @@ in
 
     fzf
     i3
+    onboard
     pavucontrol
     xclip
     xss-lock

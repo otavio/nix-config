@@ -11,6 +11,10 @@
       "org/freedesktop/appearance" = {
         color-scheme = 1;
       };
+
+      "org/onboard/theme-settings" = {
+        key-label-overrides = [ "LWIN:Super:" "RWIN:Super:" ];
+      };
     };
   };
 
