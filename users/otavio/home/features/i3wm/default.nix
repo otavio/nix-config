@@ -173,6 +173,7 @@ in
 
       startup = [
         { command = "pa-applet"; notification = true; }
+        { command = "onboard"; notification = false; }
       ] ++ pkgs.lib.lists.optionals (hostname == "micro") [
         { command = "discord"; notification = true; }
         { command = editor; notification = true; }

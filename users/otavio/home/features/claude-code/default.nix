@@ -100,6 +100,12 @@ in
             repo = "anthropics/knowledge-work-plugins";
           };
         };
+        custom-claude-code-plugins = {
+          source = {
+            source = "github";
+            repo = "stefanoginella/claude-code-plugins";
+          };
+        };
       };
 
       # Enable plugins from the marketplace
@@ -108,6 +114,7 @@ in
         "ossystems-refactor-claude-md@ossystems" = true;
         "ui-ux-pro-max@ui-ux-pro-max-skill" = true;
         "legal@knowledge-work-plugins" = true;
+        # auto-bmad@custom-claude-code-plugins is installed per-project
       };
     };
   };
