@@ -10,6 +10,7 @@
     aggressiveResize = true;
     baseIndex = 1;
     clock24 = true;
+    mouse = true;
     tmuxp.enable = true;
 
     plugins = with pkgs; [
