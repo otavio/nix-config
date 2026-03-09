@@ -25,7 +25,7 @@ in
       pkgs.just
 
       # FIXME: Double check these are actually needed anymore?
-      (pkgs.python311.withPackages (p: (lib.attrValues { inherit (p) lxml beautifulsoup4 requests; })))
+      (pkgs.python312.withPackages (p: (lib.attrValues { inherit (p) lxml beautifulsoup4 requests; })))
       (lib.optional pkgs.stdenv.isLinux [
         pkgs.xsel
         pkgs.xdg-utils
