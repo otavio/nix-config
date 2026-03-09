@@ -46,6 +46,8 @@ in
     dotDir = "${config.xdg.configHome}/zsh";
     history.path = "${config.xdg.stateHome}/zsh_history";
     initContent = lib.mkOrder 500 ''
+      stty -ixon
+
       # Nix
       if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
           . '/nix/var/nix/profiles/default/etc/profile.d/nix.sh'
