@@ -32,6 +32,9 @@
       set -sg terminal-overrides ",*:RGB"
       set -sg set-clipboard on
 
+      # Mouse copy to system clipboard
+      bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "${pkgs.xclip}/bin/xclip -selection clipboard -i"
+
       # Repeat key press automatically
       set-option -g repeat-time 1000
 
