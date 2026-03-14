@@ -81,7 +81,7 @@ let
   '';
 in
 {
-  home.packages = with pkgs; [ jq ];
+  home.packages = with pkgs; [ jq sox ];
 
   # Place the wrapper at ~/.local/bin/claude so it takes precedence over
   # the Nix profile entry, preventing agent-teams-installed binaries from
@@ -101,6 +101,8 @@ in
         CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
       };
       model = "opus";
+      voiceEnabled = true;
+      skipDangerousModePermissionPrompt = true;
       alwaysThinkingEnabled = true;
       permissions = {
         defaultMode = "bypassPermissions";
