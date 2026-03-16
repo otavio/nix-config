@@ -21,7 +21,7 @@ jobs:
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - uses: webfactory/ssh-agent@v0.9.1
+    - uses: webfactory/ssh-agent@v0.10.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Configure SSH for Nix daemon
@@ -48,7 +48,7 @@ jobs:
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - uses: webfactory/ssh-agent@v0.9.1
+    - uses: webfactory/ssh-agent@v0.10.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Configure SSH for Nix daemon
@@ -72,7 +72,7 @@ jobs:
       with:
         name: otavio-nix-config
         authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - uses: webfactory/ssh-agent@v0.9.1
+    - uses: webfactory/ssh-agent@v0.10.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Configure SSH for Nix daemon
