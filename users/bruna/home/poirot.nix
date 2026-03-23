@@ -1,12 +1,8 @@
 { pkgs, ... }:
 {
-  services.flameshot.enable = true;
+  imports = [ ./default.nix ];
 
-  nixpkgs = {
-    config = {
-      allowUnfree = true;
-    };
-  };
+  services.flameshot.enable = true;
 
   home.packages = with pkgs; [
     chromium
@@ -14,6 +10,4 @@
     system-config-printer
     simple-scan
   ];
-
-  home.stateVersion = "23.11";
 }

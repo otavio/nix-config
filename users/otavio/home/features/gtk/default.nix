@@ -109,6 +109,11 @@
     };
 
     gtk4 = {
+      theme = {
+        name = "Adwaita-Dark";
+        package = pkgs.adwaita-icon-theme;
+      };
+
       extraConfig = {
         gtk-key-theme-name = "Emacs";
         gtk-cursor-theme-name = "capitaine-cursors";
