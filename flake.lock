@@ -7,15 +7,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1774047888,
-        "narHash": "sha256-lUJ5dPga70KM1oj5vFEZm15PbojyrZ2nqJQ3C4bRSiY=",
-        "owner": "ryoppippi",
+        "lastModified": 1774302782,
+        "narHash": "sha256-nLTq9BI1PXFTmczYbWpCRggemtjAmAhl9Laz+ar9nOE=",
+        "owner": "otavio",
         "repo": "claude-code-overlay",
-        "rev": "076a658308611db196d1a250d6fd7fe35ce620ad",
+        "rev": "c65bffcf9828fbdfcf27013a5b842887290667bc",
         "type": "github"
       },
       "original": {
-        "owner": "ryoppippi",
+        "owner": "otavio",
+        "ref": "feat/fhs-package",
         "repo": "claude-code-overlay",
         "type": "github"
       }

@@ -24,7 +24,7 @@
     };
 
     claude-code-overlay = {
-      url = "github:ryoppippi/claude-code-overlay";
+      url = "github:otavio/claude-code-overlay/feat/fhs-package";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
