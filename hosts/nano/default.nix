@@ -17,7 +17,6 @@
     ../features/optional/zram-swap.nix
 
     ./partitioning.nix
-    ./zerotier.nix
   ];
 
   boot = {

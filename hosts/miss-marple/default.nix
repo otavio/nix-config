@@ -19,7 +19,6 @@
 
     ./partitioning.nix
     ./restic.nix
-    ./zerotier.nix
   ];
 
   boot = {
