@@ -168,6 +168,12 @@ in
             repo = "anthropics/claude-plugins-official";
           };
         };
+        freedom-rtos-ai = {
+          source = {
+            source = "github";
+            repo = "FreedomVeiculosEletricos/freedom-rtos-ai";
+          };
+        };
       };
 
       # Enable plugins from the marketplace
