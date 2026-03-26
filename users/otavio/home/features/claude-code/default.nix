@@ -162,6 +162,12 @@ in
             repo = "stefanoginella/claude-code-plugins";
           };
         };
+        claude-plugins-official = {
+          source = {
+            source = "github";
+            repo = "anthropics/claude-plugins-official";
+          };
+        };
       };
 
       # Enable plugins from the marketplace
