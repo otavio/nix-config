@@ -13,6 +13,7 @@
     ../features/optional/docker.nix
     ../features/optional/latest-linux-kernel.nix
     ../features/optional/network-manager.nix
+    ../features/optional/nix-ld.nix
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
     ../features/optional/polkit.nix
