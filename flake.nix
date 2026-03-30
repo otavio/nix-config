@@ -75,12 +75,6 @@
           users = [ "otavio" ];
         };
 
-        nano = mkSystem {
-          hostname = "nano";
-          system = "x86_64-linux";
-          users = [ "otavio" ];
-        };
-
         # My wife devices
         poirot = mkSystem {
           hostname = "poirot";
