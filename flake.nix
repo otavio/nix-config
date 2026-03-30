@@ -39,12 +39,6 @@
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
 
-    talon-nix = {
-      url = "github:fidgetingbits/talon-nix?ref=overrides";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nix-github-actions.follows = "nix-github-actions";
-    };
-
     colmena = {
       url = "github:zhaofengli/colmena";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -52,9 +46,6 @@
       inputs.nix-github-actions.follows = "nix-github-actions";
     };
 
-    nix-secrets = {
-      url = "git+ssh://git@github.com/otavio/nix-secrets?shallow=1";
-    };
   };
 
   outputs = { self, ... }@inputs:
@@ -68,7 +59,11 @@
         ;
       systems = [ "x86_64-linux" "aarch64-linux" ];
       forEachSystem = f: inputs.nixpkgs.lib.genAttrs systems (sys: f pkgsFor.${sys});
-      pkgsFor = inputs.nixpkgs.legacyPackages;
+      pkgsFor = inputs.nixpkgs.lib.genAttrs systems (sys:
+        import inputs.nixpkgs {
+          system = sys;
+          config.allowUnfree = true;
+        });
     in
     {
       overlays = import ./overlays { inherit inputs; };
