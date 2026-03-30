@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 {
   # Udev rules for Talon voice coding (Tobii eye tracker support)

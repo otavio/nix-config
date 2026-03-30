@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 {
   # Adds my custom packages
