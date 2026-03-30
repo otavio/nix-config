@@ -1,4 +1,4 @@
-{ inputs, outputs }:
+{ inputs, flake }:
 
 {
   mkColmenaFromNixOSConfigurations = conf:
@@ -12,62 +12,6 @@
       };
     } // builtins.mapAttrs (_: value: { imports = value._module.args.modules; }) conf);
 
-  mkSystem =
-    { hostname
-    , system
-    , graphical ? true
-    , users ? [ ]
-    }:
-    inputs.nixpkgs.lib.nixosSystem {
-      specialArgs = {
-        inherit inputs outputs hostname;
-      };
-
-      extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
-
-      modules = [
-        { nixpkgs.hostPlatform = system; }
-
-        inputs.disko.nixosModules.disko
-
-        ../hosts/${hostname}
-        {
-          networking.hostName = hostname;
-        }
-
-        {
-          home-manager = {
-            users =
-              builtins.listToAttrs
-                (builtins.map
-                  (u: { name = u; value = import ../users/${u}/home/${hostname}.nix; })
-                  users);
-
-            extraSpecialArgs = {
-              inherit inputs graphical hostname;
-            };
-          };
-        }
-
-        # System wide config for each user
-      ] ++ inputs.nixpkgs.lib.forEach users
-        (u: ../users/${u}/system);
-    };
-
-  mkHome = module: system:
-    inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = inputs.nixpkgs.legacyPackages.${system};
-
-      extraSpecialArgs = {
-        inherit inputs outputs;
-
-        graphical = false;
-        hostname = "unknown";
-      };
-
-      modules = [ module ];
-    };
-
   mkInstallerForSystem =
     { hostname
     , targetConfiguration
@@ -75,7 +19,8 @@
     }:
     (inputs.nixpkgs.lib.nixosSystem {
       specialArgs = {
-        inherit inputs outputs targetConfiguration;
+        inherit inputs targetConfiguration flake;
+        hostName = hostname;
       };
 
       extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
@@ -85,11 +30,7 @@
 
         inputs.disko.nixosModules.disko
 
-        ../hosts/installer
-
-        {
-          networking.hostName = hostname;
-        }
+        ./installer
       ];
     }).config.system.build.isoImage;
 }

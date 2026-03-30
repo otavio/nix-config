@@ -17,9 +17,19 @@
     ../features/optional/quietboot.nix
     ../features/optional/zram-swap.nix
 
+    ../../users/bruna/system
+    ../../users/otavio/system
+
     ./partitioning.nix
     ./restic.nix
   ];
+
+  nixpkgs.hostPlatform = "x86_64-linux";
+
+  home-manager.users = {
+    bruna = import ../../users/bruna/home/miss-marple.nix;
+    otavio = import ../../users/otavio/home/miss-marple.nix;
+  };
 
   boot = {
     loader.systemd-boot.enable = true;

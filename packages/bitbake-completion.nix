@@ -1,8 +1,8 @@
-{ stdenv, fetchFromGitHub }:
+{ pkgs, ... }:
 
-stdenv.mkDerivation {
+pkgs.stdenv.mkDerivation {
   name = "bitbake-completion";
-  src = fetchFromGitHub {
+  src = pkgs.fetchFromGitHub {
     owner = "lukaszgard";
     repo = "bitbake-completion";
     rev = "95e15443b692ebee60a3260b7018e51d2b7716ce";

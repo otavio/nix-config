@@ -1,18 +1,10 @@
-{ lib, stdenv, fetchFromGitHub, bash }:
+{ pkgs, lib, ... }:
 
-# To make use of this derivation, use
-# ```sh
-# programs.zsh.interactiveShellInit = ''
-#    source ${pkgs.kube-ps1}/share/kube-ps1/kube-ps1.sh
-#    PROMPT='$(kube_ps1)'$PROMPT
-# '';
-# ```
-
-stdenv.mkDerivation rec {
+pkgs.stdenv.mkDerivation rec {
   pname = "kube-ps1";
   version = "0.7.0+git";
 
-  src = fetchFromGitHub {
+  src = pkgs.fetchFromGitHub {
     owner = "jonmosco";
     repo = "kube-ps1";
     rev = "db95d30d8f154ac6677a3232745d0326f29d72c4";
@@ -20,7 +12,7 @@ stdenv.mkDerivation rec {
   };
 
   strictDeps = true;
-  buildInputs = [ bash ];
+  buildInputs = [ pkgs.bash ];
   installPhase = ''
     install -D kube-ps1.sh --target-directory=$out/share/kube-ps1
   '';

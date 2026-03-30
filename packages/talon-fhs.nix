@@ -1,49 +1,16 @@
-{ buildFHSEnv
-, writeShellScript
-, lib
-, stdenv
-, dbus
-, fontconfig
-, freetype
-, glib
-, libGL
-, libxkbcommon
-, sqlite
-, zlib
-, libpulseaudio
-, udev
-, libx11
-, libsm
-, libxcursor
-, libice
-, libxrender
-, libxcb
-, libxext
-, libxcomposite
-, libxrandr
-, libxi
-, bzip2
-, ncurses5
-, libuuid
-, gtk3-x11
-, gdk-pixbuf
-, cairo
-, libdrm
-, pango
-, gdbm
-, atk
-, wayland
-, wayland-protocols
-, wlroots
-, xwayland
-, libinput
-, libxml2
-, speechd
-, gfortran
-,
-}:
+{ pkgs, lib, ... }:
+
 let
-  runTalon = writeShellScript "talon-run" ''
+  # red-tape's pkgs doesn't have allowUnfree, so reimport when needed
+  pkgs' =
+    if pkgs.config.allowUnfree or false then pkgs
+    else
+      import pkgs.path {
+        inherit (pkgs.stdenv.hostPlatform) system;
+        config.allowUnfree = true;
+      };
+
+  runTalon = pkgs'.writeShellScript "talon-run" ''
     unset QT_AUTO_SCREEN_SCALE_FACTOR QT_SCALE_FACTOR
     export LC_NUMERIC=C
     export QT_PLUGIN_PATH="/lib/plugins"
@@ -51,10 +18,10 @@ let
     exec "$HOME/.talon-bin/talon" "$@"
   '';
 in
-buildFHSEnv {
+pkgs'.buildFHSEnv {
   name = "talon";
 
-  targetPkgs = _: [
+  targetPkgs = _: with pkgs'; [
     stdenv.cc.cc
     stdenv.cc.libc
     dbus

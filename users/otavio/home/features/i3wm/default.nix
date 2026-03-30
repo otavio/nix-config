@@ -1,7 +1,7 @@
 { config
 , lib
 , pkgs
-, hostname
+, hostName
 , ...
 }:
 let
@@ -174,7 +174,7 @@ in
       startup = [
         { command = "pa-applet"; notification = true; }
         { command = "onboard"; notification = false; }
-      ] ++ pkgs.lib.lists.optionals (hostname == "micro") [
+      ] ++ pkgs.lib.lists.optionals (hostName == "micro") [
         { command = "discord"; notification = true; }
         { command = editor; notification = true; }
         { command = terminal; notification = true; }

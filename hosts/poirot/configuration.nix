@@ -18,9 +18,19 @@
     ../features/optional/quietboot.nix
     ../features/optional/zram-swap.nix
 
+    ../../users/bruna/system
+    ../../users/otavio/system
+
     ./partitioning.nix
     ./restic.nix
   ];
+
+  nixpkgs.hostPlatform = "x86_64-linux";
+
+  home-manager.users = {
+    bruna = import ../../users/bruna/home/poirot.nix;
+    otavio = import ../../users/otavio/home/poirot.nix;
+  };
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
   boot.initrd.kernelModules = [ ];

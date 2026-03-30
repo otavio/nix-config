@@ -1,8 +1,8 @@
-{ stdenv, fetchFromGitHub }:
+{ pkgs, ... }:
 
-stdenv.mkDerivation {
+pkgs.stdenv.mkDerivation {
   name = "base16-shell";
-  src = fetchFromGitHub {
+  src = pkgs.fetchFromGitHub {
     owner = "base16-project";
     repo = "base16-shell";
     rev = "41848241532fd60cdda222cc8f7b2bbead9fb50d";

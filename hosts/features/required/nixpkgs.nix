@@ -1,8 +1,8 @@
-{ outputs, ... }:
+{ flake, ... }:
 
 {
   nixpkgs = {
-    overlays = builtins.attrValues outputs.overlays;
+    overlays = builtins.attrValues flake.overlays;
     config = {
       allowUnfree = true;
     };

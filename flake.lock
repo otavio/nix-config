@@ -1,5 +1,38 @@
 {
   "nodes": {
+    "adios": {
+      "locked": {
+        "lastModified": 1772186395,
+        "narHash": "sha256-NshyMZYZwjKMLKEX0eDf9Fcekq8MFNFk02wW5knzlZU=",
+        "owner": "adisbladis",
+        "repo": "adios",
+        "rev": "6a54071689ec9ec784a16e4eec8ddb864eca2982",
+        "type": "github"
+      },
+      "original": {
+        "owner": "adisbladis",
+        "repo": "adios",
+        "type": "github"
+      }
+    },
+    "adios-flake": {
+      "inputs": {
+        "adios": "adios"
+      },
+      "locked": {
+        "lastModified": 1772646328,
+        "narHash": "sha256-0xwNbjvHON8LqhIx5VMPZpR1B5Unq/7BH6tktELwRyA=",
+        "owner": "Mic92",
+        "repo": "adios-flake",
+        "rev": "6082a7bf428fe6c29b80c8ef4582ffce46cfea77",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "adios-flake",
+        "type": "github"
+      }
+    },
     "claude-code-overlay": {
       "inputs": {
         "nixpkgs": [
@@ -24,12 +57,8 @@
     "colmena": {
       "inputs": {
         "flake-compat": "flake-compat",
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nix-github-actions": [
-          "nix-github-actions"
-        ],
+        "flake-utils": "flake-utils",
+        "nix-github-actions": "nix-github-actions",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -149,6 +178,27 @@
     "nix-github-actions": {
       "inputs": {
         "nixpkgs": [
+          "colmena",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1737420293,
+        "narHash": "sha256-F1G5ifvqTpJq7fdkT34e/Jy9VCyzd5XfJ9TO8fHhJWE=",
+        "owner": "nix-community",
+        "repo": "nix-github-actions",
+        "rev": "f4158fa080ef4503c8f4c820967d946c2af31ec9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nix-github-actions",
+        "type": "github"
+      }
+    },
+    "nix-github-actions_2": {
+      "inputs": {
+        "nixpkgs": [
           "nixpkgs"
         ]
       },
@@ -195,17 +245,38 @@
         "type": "indirect"
       }
     },
+    "red-tape": {
+      "inputs": {
+        "adios-flake": "adios-flake",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774285314,
+        "narHash": "sha256-ad5J3MsK11stsDfR0no6zr6K/c7Rr8HCQFpVw1ixmLA=",
+        "owner": "phaer",
+        "repo": "red-tape",
+        "rev": "5ad2da408cc59621dfedd2d9256e0b6c082256c6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "phaer",
+        "repo": "red-tape",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "claude-code-overlay": "claude-code-overlay",
         "colmena": "colmena",
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",
-        "flake-utils": "flake-utils",
         "home-manager": "home-manager",
-        "nix-github-actions": "nix-github-actions",
+        "nix-github-actions": "nix-github-actions_2",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
+        "red-tape": "red-tape",
         "sops-nix": "sops-nix"
       }
     },

@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ../features/required
+    ../../hosts/features/required
 
     "${modulesPath}/installer/cd-dvd/installation-cd-base.nix"
   ];

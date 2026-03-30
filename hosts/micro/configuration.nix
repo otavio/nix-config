@@ -22,12 +22,18 @@
     ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
 
+    ../../users/otavio/system
+
     ./aichat.nix
     ./msmtp.nix
     ./partitioning.nix
     ./restic.nix
     ./wireguard.nix
   ];
+
+  nixpkgs.hostPlatform = "x86_64-linux";
+
+  home-manager.users.otavio = import ../../users/otavio/home/micro.nix;
 
   boot = {
     loader.systemd-boot.enable = true;
