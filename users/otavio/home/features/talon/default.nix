@@ -1,17 +1,18 @@
-{ inputs, lib, pkgs, ... }:
+{ lib, pkgs, ... }:
 let
   gazeOcr = false;
   eyeTracking = false;
 in
 {
-  nixpkgs.overlays = [ inputs.talon-nix.overlays.default ];
-
   services.snixembed = {
     enable = true;
     beforeUnits = [ "talon.service" ];
   };
 
-  systemd.user.services.snixembed.Unit.After = [ "graphical-session.target" "dbus.service" ];
+  systemd.user.services.snixembed.Unit = {
+    After = lib.mkForce [ "dbus.service" ];
+    PartOf = lib.mkForce [ ];
+  };
 
   home.packages =
     assert (
@@ -79,15 +80,13 @@ in
           Documentation = "https://talonvoice.com/";
           After = [
             "snixembed.service"
-            "graphical-session.target"
             "graphical-session-pre.target"
           ];
-          PartOf = [ "graphical-session.target" ];
         };
         Install.WantedBy = [ "graphical-session.target" ];
 
         Service = {
-          ExecStart = "${lib.getBin pkgs.talon}/bin/talon";
+          ExecStart = "${lib.getBin pkgs.talon-fhs}/bin/talon";
           Restart = "always";
         };
       };
@@ -123,7 +122,6 @@ in
             Description = "Talon Voice Watchdog";
             Documentation = "https://talonvoice.com/";
             After = [ "talon.target" ];
-            PartOf = [ "graphical-session.target" ];
           };
           Service = {
             ExecStart = "${lib.getBin watchdogScript}/bin/talon-watchdog";
