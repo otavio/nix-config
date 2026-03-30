@@ -54,7 +54,6 @@ jobs:
       matrix:
         nixosConfiguration:
           - micro
-          - nano
           - poirot
           - miss-marple
     steps:
