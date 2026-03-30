@@ -11,26 +11,42 @@ on:
       - '**.nix'
       - 'flake.lock'
 
+concurrency:
+  group: ${{ github.repository }}-${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
-  check:
+  nix-matrix:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-    - uses: actions/checkout@v6
-    - uses: DeterminateSystems/nix-installer-action@v22
-    - uses: cachix/cachix-action@v17
-      with:
-        name: otavio-nix-config
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - uses: webfactory/ssh-agent@v0.10.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    - name: Configure SSH for Nix daemon
-      run: |
-        sudo mkdir -p /root/.ssh
-        sudo ssh-keyscan github.com | sudo tee /root/.ssh/known_hosts
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" | sudo tee /root/.ssh/id_ed25519 > /dev/null
-        sudo chmod 600 /root/.ssh/id_ed25519
-    - run: nix flake check
+      - uses: actions/checkout@v6
+      - uses: nixbuild/nix-quick-install-action@v34
+      - id: set-matrix
+        name: Generate Nix Matrix
+        run: |
+          set -euo pipefail
+
+          matrix="$(nix eval --json '.#githubActions.matrix')"
+          echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
+
+  nix-check:
+    needs: nix-matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix: ${{ fromJSON(needs.nix-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: nixbuild/nix-quick-install-action@v34
+      - name: Restore and cache Nix store
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.*') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+      - run: nix build -L ".#${{ matrix.attr }}" --keep-going
 
   nixos:
     runs-on: ubuntu-latest
@@ -42,22 +58,23 @@ jobs:
           - poirot
           - miss-marple
     steps:
-    - uses: actions/checkout@v6
-    - uses: DeterminateSystems/nix-installer-action@v22
-    - uses: cachix/cachix-action@v17
-      with:
-        name: otavio-nix-config
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - uses: webfactory/ssh-agent@v0.10.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    - name: Configure SSH for Nix daemon
-      run: |
-        sudo mkdir -p /root/.ssh
-        sudo ssh-keyscan github.com | sudo tee /root/.ssh/known_hosts
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" | sudo tee /root/.ssh/id_ed25519 > /dev/null
-        sudo chmod 600 /root/.ssh/id_ed25519
-    - run: nix -L build ".#nixosConfigurations.${{ matrix.nixosConfiguration }}.config.system.build.toplevel"
+      - uses: actions/checkout@v6
+      - uses: nixbuild/nix-quick-install-action@v34
+      - name: Restore and cache Nix store
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.*') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+      - uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Configure SSH for Nix daemon
+        run: |
+          sudo mkdir -p /root/.ssh
+          sudo ssh-keyscan github.com | sudo tee /root/.ssh/known_hosts
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | sudo tee /root/.ssh/id_ed25519 > /dev/null
+          sudo chmod 600 /root/.ssh/id_ed25519
+      - run: nix -L build ".#nixosConfigurations.${{ matrix.nixosConfiguration }}.config.system.build.toplevel"
 
   nix:
     runs-on: ubuntu-latest
@@ -66,19 +83,20 @@ jobs:
         homeConfiguration:
           - "otavio@generic-x86"
     steps:
-    - uses: actions/checkout@v6
-    - uses: DeterminateSystems/nix-installer-action@v22
-    - uses: cachix/cachix-action@v17
-      with:
-        name: otavio-nix-config
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-    - uses: webfactory/ssh-agent@v0.10.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-    - name: Configure SSH for Nix daemon
-      run: |
-        sudo mkdir -p /root/.ssh
-        sudo ssh-keyscan github.com | sudo tee /root/.ssh/known_hosts
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" | sudo tee /root/.ssh/id_ed25519 > /dev/null
-        sudo chmod 600 /root/.ssh/id_ed25519
-    - run: nix -L build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
+      - uses: actions/checkout@v6
+      - uses: nixbuild/nix-quick-install-action@v34
+      - name: Restore and cache Nix store
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.*') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+      - uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Configure SSH for Nix daemon
+        run: |
+          sudo mkdir -p /root/.ssh
+          sudo ssh-keyscan github.com | sudo tee /root/.ssh/known_hosts
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | sudo tee /root/.ssh/id_ed25519 > /dev/null
+          sudo chmod 600 /root/.ssh/id_ed25519
+      - run: nix -L build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"

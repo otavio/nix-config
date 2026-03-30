@@ -134,6 +134,12 @@
         '';
       });
 
+      githubActions = inputs.nix-github-actions.lib.mkGithubMatrix {
+        checks = {
+          inherit (self.checks) x86_64-linux;
+        };
+      };
+
       checks = forEachSystem (pkgs: {
         lint = pkgs.runCommand "lint-code" { nativeBuildInputs = with pkgs; [ nixpkgs-fmt deadnix statix ]; } ''
           deadnix --fail ${./.}
