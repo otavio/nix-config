@@ -2,6 +2,13 @@
 let
   notificationSound = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/complete.oga";
 
+  claude-code-fhs = pkgs.buildFHSEnv {
+    name = "claude";
+    inherit (pkgs.claude-code) meta;
+    targetPkgs = _: with pkgs; [ claude-code stdenv.cc.cc.lib zlib ];
+    runScript = pkgs.lib.getExe pkgs.claude-code;
+  };
+
   statuslineScript = pkgs.writeShellScript "statusline-command.sh" ''
     # Read JSON input from stdin
     input=$(cat)
@@ -81,7 +88,7 @@ in
 
   programs.claude-code = {
     enable = true;
-    package = pkgs.claude-code-fhs;
+    package = claude-code-fhs;
     settings = {
       env = {
         CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
