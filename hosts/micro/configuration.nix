@@ -16,7 +16,6 @@
     ../features/optional/nix-ld.nix
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
-    ../features/optional/polkit.nix
     ../features/optional/quietboot.nix
     ../features/optional/voice-coding.nix
     ../features/optional/x11.nix
@@ -60,6 +59,7 @@
   networking.domain = "casa.salvador";
 
   security.pam.services.swaylock = { };
+  security.polkit.enable = true;
 
   networking.firewall.trustedInterfaces = [ "virbr0" ];
   virtualisation.libvirtd.enable = true;
