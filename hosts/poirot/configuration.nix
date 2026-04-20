@@ -28,7 +28,7 @@
   nixpkgs.hostPlatform = "x86_64-linux";
 
   home-manager.users = {
-    bruna = import ../../users/bruna/home/poirot.nix;
+    bruna = import ../../users/bruna/home;
     otavio = import ../../users/otavio/home/poirot.nix;
   };
 
