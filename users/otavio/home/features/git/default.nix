@@ -40,6 +40,11 @@
         rebase = true;
       };
 
+      sendemail = {
+        aliasesfile = "~/.gitaliases";
+        aliasfiletype = "mutt";
+      };
+
       rebase = {
         autoStash = true;
         autoSquash = true;
