@@ -28,7 +28,7 @@
 
   home-manager.users = {
     bruna = import ../../users/bruna/home;
-    otavio = import ../../users/otavio/home/miss-marple.nix;
+    otavio = import ../../users/otavio/home/features/global;
   };
 
   boot = {
