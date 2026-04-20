@@ -17,6 +17,7 @@
     ../features/optional/network-manager.nix
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
+    ../features/optional/pt-br-locale.nix
     ../features/optional/quietboot.nix
     ../features/optional/zram-swap.nix
 
@@ -46,12 +47,6 @@
   boot.loader.efi.efiSysMountPoint = "/efi";
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.grub.device = "nodev";
-
-  i18n.defaultLocale = "pt_BR.UTF-8";
-  console = {
-    font = "Lat2-Terminus16";
-    keyMap = "br-abnt2";
-  };
 
   deployment = {
     targetUser = "otavio";
