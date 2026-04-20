@@ -12,8 +12,6 @@
   services.xserver = {
     enable = true;
 
-    xkb.layout = "br";
-
     displayManager.lightdm.greeters = {
       slick.enable = true;
       pantheon.enable = false;
