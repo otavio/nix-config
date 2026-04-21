@@ -1,10 +1,10 @@
 {
   services.resolved = {
     enable = true;
-    dnssec = "allow-downgrade";
-    dnsovertls = "opportunistic";
-    domains = [ "~." ];
     settings.Resolve = {
+      DNSSEC = "allow-downgrade";
+      DNSOverTLS = "opportunistic";
+      Domains = [ "~." ];
       DNS = [
         "1.1.1.1#cloudflare-dns.com"
         "1.0.0.1#cloudflare-dns.com"
