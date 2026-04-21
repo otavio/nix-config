@@ -48,6 +48,37 @@ in
           "WebFetch(domain:mynixos.com)"
           "WebSearch"
         ];
+        deny = [
+          # .env files
+          "Read(.env*)"
+          "Edit(.env*)"
+          "Bash(cat *.env*)"
+          "Bash(head *.env*)"
+          "Bash(tail *.env*)"
+          "Bash(less *.env*)"
+          "Bash(more *.env*)"
+
+          # secrets/ directory (sops-nix)
+          "Read(secrets/**)"
+          "Edit(secrets/**)"
+          "Read(**/secrets/**)"
+          "Edit(**/secrets/**)"
+          "Bash(cat *secrets/*)"
+          "Bash(head *secrets/*)"
+          "Bash(tail *secrets/*)"
+          "Bash(less *secrets/*)"
+          "Bash(more *secrets/*)"
+
+          # common secret / private-key files
+          "Read(**/*.pem)"
+          "Read(**/*.key)"
+          "Read(**/id_rsa)"
+          "Read(**/id_ed25519)"
+          "Edit(**/*.pem)"
+          "Edit(**/*.key)"
+          "Edit(**/id_rsa)"
+          "Edit(**/id_ed25519)"
+        ];
       };
       statusLine = {
         type = "command";
