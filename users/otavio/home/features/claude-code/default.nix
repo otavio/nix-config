@@ -153,6 +153,12 @@ in
             repo = "FreedomVeiculosEletricos/freedom-rtos-ai";
           };
         };
+        anthropic-agent-skills = {
+          source = {
+            source = "github";
+            repo = "anthropics/skills";
+          };
+        };
       };
 
       # Enable plugins from the marketplace
