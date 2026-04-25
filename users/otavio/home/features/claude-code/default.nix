@@ -159,8 +159,6 @@ in
       enabledPlugins = {
         "ossystems-commit@ossystems" = true;
         "ossystems-refactor-claude-md@ossystems" = true;
-        "ui-ux-pro-max@ui-ux-pro-max-skill" = true;
-        "legal@knowledge-work-plugins" = true;
         # auto-bmad@custom-claude-code-plugins is installed per-project
       };
     };
