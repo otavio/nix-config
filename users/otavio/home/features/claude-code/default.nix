@@ -29,7 +29,6 @@ in
     package = claude-code-fhs;
     settings = {
       env = {
-        CLAUDE_CODE_DISABLE_1M_CONTEXT = "1";
         CLAUDE_CODE_EFFORT_LEVEL = "high";
         CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
         CLAUDE_CODE_NO_FLICKER = "1";
