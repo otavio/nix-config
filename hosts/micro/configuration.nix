@@ -23,7 +23,6 @@
 
     ../../users/otavio/system
 
-    ./aichat.nix
     ./msmtp.nix
     ./partitioning.nix
     ./restic.nix
