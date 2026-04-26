@@ -4,15 +4,9 @@ let
   eyeTracking = false;
 in
 {
-  services.snixembed = {
-    enable = true;
-    beforeUnits = [ "talon.service" ];
-  };
+  imports = [ ../snixembed ];
 
-  systemd.user.services.snixembed.Unit = {
-    After = lib.mkForce [ "dbus.service" ];
-    PartOf = lib.mkForce [ ];
-  };
+  services.snixembed.beforeUnits = [ "talon.service" ];
 
   home.packages =
     assert (
