@@ -32,6 +32,7 @@
     extraConfig = ''
       set -sg terminal-overrides ",*:RGB"
       set -sg set-clipboard on
+      set -g focus-events on
 
       # Mouse copy to system clipboard
       bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "${pkgs.xclip}/bin/xclip -selection clipboard -i"
