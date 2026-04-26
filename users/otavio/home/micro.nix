@@ -17,6 +17,7 @@
     ./features/ossystems-specific
     ./features/unclutter
     ./features/talon
+    ./features/whisrs
     ./features/xdg
     ./features/zathura
     ./features/zsh

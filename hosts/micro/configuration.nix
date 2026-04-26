@@ -26,6 +26,7 @@
     ./msmtp.nix
     ./partitioning.nix
     ./restic.nix
+    ./whisrs.nix
     ./wireguard.nix
   ];
 

@@ -1,0 +1,121 @@
+{ inputs, lib, pkgs, ... }:
+
+let
+  whisrs = inputs.whisrs.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+    preCheck = (old.preCheck or "") + ''
+      export HOME=$(mktemp -d)
+    '';
+  });
+
+  # Sentence-style context prepended to the vocabulary list when sent to the
+  # transcription backend (whisrs PR #13). Steers the model toward the right
+  # technical register and tells it to follow the spoken language rather than
+  # translating into English — which lets a single daemon handle both en/pt.
+  basePrompt = ''
+    Otavio Salvador speaking. Professional, technical register with
+    emphasis on engineering, computer science, embedded Linux, the
+    Yocto Project, and general business terms. Speech is in English or
+    Brazilian Portuguese; transcribe in the language spoken, never
+    translate.
+  '';
+
+  vocabulary = [
+    "Nix"
+    "NixOS"
+    "nixpkgs"
+    "Home Manager"
+    "Colmena"
+    "flake"
+    "SOPS"
+    "sops-nix"
+    "whisrs"
+    "Talon"
+    "snixembed"
+    "i3wm"
+    "Emacs"
+    "OpenAI"
+    "Anthropic"
+    "Claude"
+    "GitHub"
+    "Yocto"
+    "BitBake"
+    "Buildroot"
+    "U-Boot"
+    "OpenEmbedded"
+    "O.S. Systems"
+    "Otavio"
+    "Otávio"
+    "Salvador"
+    "Bruna"
+    "São Paulo"
+    "Rio Grande do Sul"
+  ];
+
+  configFile = (pkgs.formats.toml { }).generate "whisrs-config.toml" {
+    general = {
+      backend = "openai";
+      language = "auto";
+      silence_timeout_ms = 2000;
+      notify = true;
+      remove_filler_words = true;
+      audio_feedback = true;
+      audio_feedback_volume = 0.2;
+      inherit vocabulary;
+      prompt = basePrompt;
+    };
+    input = {
+      # Raised from the 2ms default to balance accuracy in Node/Ink TUIs
+      # (e.g. Claude Code) without making typing feel sluggish (whisrs
+      # PR #14, issue #12).
+      key_delay_ms = 30;
+    };
+    openai = {
+      # Required by the deserializer; left empty so whisrs falls back to
+      # WHISRS_OPENAI_API_KEY (injected by the systemd wrapper below).
+      api_key = "";
+      # whisper-1 honours the `prompt` field as a language hint more
+      # reliably than gpt-4o-mini-transcribe — needed for the single-daemon
+      # auto-detect path to stay on en/pt and not drift to other languages.
+      model = "whisper-1";
+    };
+  };
+
+  whisrsd-start = pkgs.writeShellApplication {
+    name = "whisrsd-start";
+    text = ''
+      WHISRS_OPENAI_API_KEY="$(< /run/secrets/openai_api_key)"
+      export WHISRS_OPENAI_API_KEY
+      exec ${lib.getExe' whisrs "whisrsd"}
+    '';
+  };
+in
+{
+  imports = [ ../snixembed ];
+
+  xdg.configFile."whisrs/config.toml".source = configFile;
+
+  home.packages = [ whisrs ];
+
+  services.snixembed.beforeUnits = [ "whisrs.service" ];
+
+  systemd.user.services.whisrs = {
+    Unit = {
+      Description = "whisrs speech-to-text daemon";
+      After = [ "graphical-session-pre.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = lib.getExe whisrsd-start;
+      Restart = "on-failure";
+      # whisrs auto-detects only Hyprland/Sway; under X11/i3 it falls back to
+      # xkbcommon's default (us, no variant). Mirror the active X11 layout so
+      # dead keys (', ", `, ^, ~ on us:intl) get routed through clipboard
+      # paste instead of arriving as combining accents on the next character.
+      Environment = [
+        "XKB_DEFAULT_LAYOUT=us"
+        "XKB_DEFAULT_VARIANT=intl"
+      ];
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+}
