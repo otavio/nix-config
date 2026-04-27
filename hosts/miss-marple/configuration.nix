@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, flake, ... }:
 
 {
   imports = with inputs.nixos-hardware.nixosModules; [
@@ -23,9 +23,12 @@
     ../../users/bruna/system
     ../../users/otavio/system
 
+    flake.nixosModules.restic-r2
+
     ./partitioning.nix
-    ./restic.nix
   ];
+
+  my.backup.user = "bruna";
 
   nixpkgs.hostPlatform = "x86_64-linux";
 

@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ inputs, flake, pkgs, ... }:
 
 {
   imports = with inputs.nixos-hardware.nixosModules; [
@@ -23,12 +23,22 @@
 
     ../../users/otavio/system
 
+    flake.nixosModules.restic-r2
+
     ./msmtp.nix
     ./partitioning.nix
-    ./restic.nix
     ./whisrs.nix
     ./wireguard.nix
   ];
+
+  my.backup = {
+    user = "otavio";
+    extraExcludes = [
+      "--exclude='.direnv'"
+      "--exclude='target'"
+      "--exclude='build*/**/tmp'"
+    ];
+  };
 
   nixpkgs.hostPlatform = "x86_64-linux";
 
