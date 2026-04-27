@@ -4,7 +4,8 @@
     ../home-manager
     ../nix
     ../ssh
-    ../systemd
     ../tmux
   ];
+
+  systemd.user.startServices = "sd-switch";
 }

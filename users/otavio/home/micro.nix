@@ -5,7 +5,6 @@
     ./features/global
     ./features/alacritty
     ./features/android
-    ./features/brave
     ./features/claude-code
     ./features/dunst
     ./features/emacs
@@ -15,13 +14,20 @@
     ./features/i3wm
     ./features/irssi
     ./features/ossystems-specific
-    ./features/unclutter
     ./features/talon
     ./features/whisrs
     ./features/xdg
-    ./features/zathura
     ./features/zsh
   ];
+
+  programs.brave.enable = true;
+  programs.zathura.enable = true;
+
+  services.unclutter.enable = true;
+
+  xdg.mimeApps.defaultApplications = {
+    "application/pdf" = [ "org.pwmt.zathura.desktop" ];
+  };
 
   home.packages = with pkgs; [
     (writeShellApplication {
