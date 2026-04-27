@@ -128,7 +128,7 @@ in
 
         "Control+Alt+h" = "exec ${copyq} toggle";
 
-        "Mod1+Right" = "exec whisrs toggle";
+        "Mod1+Left" = "exec whisrs toggle";
 
         # Hide dunst notification.
         "Control+Shift+space" = "exec ${dunstCloseNotification}";
