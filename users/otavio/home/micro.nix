@@ -2,12 +2,12 @@
 
 {
   imports = [
-    ./features/global
+    ./generic.nix
+
     ./features/alacritty
     ./features/android
     ./features/claude-code
     ./features/dunst
-    ./features/emacs
     ./features/flameshot
     ./features/gpg
     ./features/gtk
