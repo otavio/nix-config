@@ -29,6 +29,15 @@
     "application/pdf" = [ "org.pwmt.zathura.desktop" ];
   };
 
+  xsession.windowManager.i3.config.startup = [
+    { command = "discord"; notification = true; }
+    { command = "emacs -nw"; notification = true; }
+    { command = "i3-sensible-terminal --class=term"; notification = true; }
+    { command = "brave"; notification = true; }
+    { command = "slack"; notification = true; }
+    { command = "Telegram"; notification = true; }
+  ];
+
   home.packages = with pkgs; [
     (writeShellApplication {
       name = "open-windoze";

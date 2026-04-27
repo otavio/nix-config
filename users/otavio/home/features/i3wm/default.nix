@@ -1,14 +1,12 @@
 { config
 , lib
 , pkgs
-, hostName
 , ...
 }:
 let
   modifier = "Mod4";
 
   copyq = "copyq";
-  editor = "emacs -nw";
   terminal = "i3-sensible-terminal --class=term";
   menu = "i3-sensible-terminal -t 'fzf-menu' --class 'fzf-menu' -e ${fzf-menu}/bin/i3-fzf-menu";
 
@@ -176,13 +174,6 @@ in
       startup = [
         { command = "pa-applet"; notification = true; }
         { command = "onboard"; notification = false; }
-      ] ++ pkgs.lib.lists.optionals (hostName == "micro") [
-        { command = "discord"; notification = true; }
-        { command = editor; notification = true; }
-        { command = terminal; notification = true; }
-        { command = "brave"; notification = true; }
-        { command = "slack"; notification = true; }
-        { command = "Telegram"; notification = true; }
       ];
     };
   };
