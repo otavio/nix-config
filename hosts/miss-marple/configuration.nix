@@ -48,7 +48,6 @@
   };
 
   deployment = {
-    targetUser = "otavio";
     targetHost = "10.4.0.51";
     buildOnTarget = true;
   };

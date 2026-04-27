@@ -52,7 +52,6 @@
   boot.loader.grub.device = "nodev";
 
   deployment = {
-    targetUser = "otavio";
     targetHost = "10.121.15.18";
     buildOnTarget = true;
   };

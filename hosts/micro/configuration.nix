@@ -79,8 +79,5 @@
     cntr
   ];
 
-  deployment = {
-    targetUser = "otavio";
-    allowLocalDeployment = true;
-  };
+  deployment.allowLocalDeployment = true;
 }

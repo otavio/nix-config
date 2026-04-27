@@ -3,6 +3,7 @@
     inputs.disko.nixosModules.disko
     inputs.colmena.nixosModules.deploymentOptions
 
+    ./colmena.nix
     ./console.nix
     ./disable-global-dhcp.nix
     ./firmware.nix
