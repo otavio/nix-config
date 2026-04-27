@@ -9,7 +9,7 @@
     ../features/required
 
     ../features/optional/bluetooth.nix
-    ../features/optional/desktop.nix
+    ../features/optional/desktop-i3.nix
     ../features/optional/docker.nix
     ../features/optional/latest-linux-kernel.nix
     ../features/optional/network-manager.nix
@@ -18,7 +18,6 @@
     ../features/optional/pipewire.nix
     ../features/optional/quietboot.nix
     ../features/optional/voice-coding.nix
-    ../features/optional/x11.nix
     ../features/optional/zram-swap.nix
 
     ../../users/otavio/system

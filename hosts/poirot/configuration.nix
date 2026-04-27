@@ -11,8 +11,9 @@
 
     ../features/optional/anydesk.nix
     ../features/optional/auto-upgrade.nix
+    ../features/optional/bluetooth.nix
+    ../features/optional/desktop-cinnamon.nix
     ../features/optional/epson-l495.nix
-    ../features/optional/graphical-workstation.nix
     ../features/optional/latest-linux-kernel.nix
     ../features/optional/network-manager.nix
     ../features/optional/no-mitigations.nix

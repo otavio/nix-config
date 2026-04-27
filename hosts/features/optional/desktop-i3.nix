@@ -1,4 +1,6 @@
 {
+  imports = [ ./desktop.nix ];
+
   services.xserver = {
     enable = true;
 

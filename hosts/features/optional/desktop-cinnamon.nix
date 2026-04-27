@@ -1,4 +1,6 @@
 {
+  imports = [ ./desktop.nix ];
+
   services.switcherooControl.enable = false;
 
   services.libinput.enable = true;
