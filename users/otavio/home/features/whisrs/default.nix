@@ -7,19 +7,24 @@ let
     '';
   });
 
-  # Sentence-style context prepended to the vocabulary list when sent to the
-  # transcription backend (whisrs PR #13). Steers the model toward the right
-  # technical register and tells it to follow the spoken language rather than
-  # translating into English — which lets a single daemon handle both en/pt.
+  # Combined prompt+vocabulary must stay under whisper's 244-token cap;
+  # excess gets silently truncated from the front, eating the framing.
   basePrompt = ''
-    Otavio Salvador speaking. Professional, technical register with
-    emphasis on engineering, computer science, embedded Linux, the
-    Yocto Project, and general business terms. Speech is in English or
-    Brazilian Portuguese; transcribe in the language spoken, never
-    translate.
+    Otavio Salvador speaking. Professional, technical register: software
+    engineering, embedded Linux, the Yocto Project, AI agent workflows.
+    Speech is in English or Brazilian Portuguese; transcribe in the
+    spoken language. When speaking Portuguese, keep borrowed English
+    technical terms in English (commit, deploy, build, merge, branch,
+    push, log, prompt, agent). Preserve technical tokens verbatim:
+    file paths, CLI flags like --foo, file extensions, camelCase and
+    snake_case identifiers. Keep proper nouns in canonical casing
+    (NixOS, GitHub, Yocto, Claude, Codex). Render spoken punctuation
+    cues ("comma"/"vírgula", "period"/"ponto", "new line"/"nova linha")
+    as the punctuation itself, not as the word.
   '';
 
   vocabulary = [
+    # nix / personal stack
     "Nix"
     "NixOS"
     "nixpkgs"
@@ -33,15 +38,40 @@ let
     "snixembed"
     "i3wm"
     "Emacs"
+    # AI / agent workflows
     "OpenAI"
     "Anthropic"
     "Claude"
-    "GitHub"
+    "Codex"
+    "sub-agent"
+    "tool call"
+    "MCP"
+    "slash command"
+    "prompt cache"
+    "context window"
+    # git / PR workflow
+    "rebase"
+    "cherry-pick"
+    "fixup"
+    "force-push"
+    "fast-forward"
+    "hunk"
+    "upstream"
+    "fork"
+    # embedded Linux / Yocto
     "Yocto"
     "BitBake"
     "Buildroot"
     "U-Boot"
     "OpenEmbedded"
+    "device tree"
+    "rootfs"
+    "initramfs"
+    "BSP"
+    "SPL"
+    "TF-A"
+    "bbappend"
+    # people / places
     "O.S. Systems"
     "Otavio"
     "Otávio"
@@ -73,10 +103,10 @@ let
       # Required by the deserializer; left empty so whisrs falls back to
       # WHISRS_OPENAI_API_KEY (injected by the systemd wrapper below).
       api_key = "";
-      # whisper-1 honours the `prompt` field as a language hint more
-      # reliably than gpt-4o-mini-transcribe — needed for the single-daemon
-      # auto-detect path to stay on en/pt and not drift to other languages.
-      model = "whisper-1";
+      # gpt-4o-mini-transcribe is more accurate than whisper-1 but follows
+      # the `prompt` field as a language hint less reliably, so short
+      # utterances can drift off en/pt under language="auto".
+      model = "gpt-4o-mini-transcribe";
     };
   };
 
