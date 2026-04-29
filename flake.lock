@@ -409,16 +409,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1777245288,
-        "narHash": "sha256-Dtbg9/jSZXv8+ljVOGAT4JOhsWpUhhSa0JDAdGqALao=",
-        "owner": "otavio",
+        "lastModified": 1777406999,
+        "narHash": "sha256-Hl3kZdecg6hrbgCIhbiqCygAfx6mCXsgRakUeMIUtRc=",
+        "owner": "y0sif",
         "repo": "whisrs",
-        "rev": "785ae24f834a3510db6b2ac8a5c9159cde0f96ec",
+        "rev": "22de1133e847fdc26facb83f810cd4a477b55770",
         "type": "github"
       },
       "original": {
-        "owner": "otavio",
-        "ref": "pending",
+        "owner": "y0sif",
         "repo": "whisrs",
         "type": "github"
       }

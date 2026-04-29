@@ -53,7 +53,7 @@
     };
 
     whisrs = {
-      url = "github:otavio/whisrs/pending";
+      url = "github:y0sif/whisrs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
