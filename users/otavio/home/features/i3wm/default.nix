@@ -214,6 +214,12 @@ in
             format = " $icon $name{ $percentage|} ";
           }
           {
+            block = "bluetooth";
+            mac = "F0:5E:CD:E2:1C:A0";
+            disconnected_format = " $icon $name ";
+            format = " $icon $name{ $percentage|} ";
+          }
+          {
             block = "disk_space";
             path = "/";
             info_type = "available";
