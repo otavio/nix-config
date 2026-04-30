@@ -17,7 +17,10 @@ let
 
 in
 {
-  home.packages = with pkgs; [ jq sox ];
+  home.packages = with pkgs; [ jq rtk sox ];
+
+  home.file.".claude/RTK.md".source = "${pkgs.rtk.src}/hooks/claude/rtk-awareness.md";
+  home.file.".claude/CLAUDE.md".text = "@RTK.md\n";
 
   nixpkgs = {
     overlays = [ inputs.claude-code-overlay.overlays.default ];
@@ -108,6 +111,17 @@ in
               {
                 type = "command";
                 command = "${pkgs.pulseaudio}/bin/paplay ${notificationSound} 2>/dev/null || true";
+              }
+            ];
+          }
+        ];
+        PreToolUse = [
+          {
+            matcher = "Bash";
+            hooks = [
+              {
+                type = "command";
+                command = "rtk hook claude";
               }
             ];
           }

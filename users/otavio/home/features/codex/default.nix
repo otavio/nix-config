@@ -13,7 +13,11 @@ in
     bubblewrap
     codexPackage
     ripgrep
+    rtk
   ];
 
   xdg.configFile."codex/config.toml".source = configFile;
+
+  home.file.".codex/RTK.md".source = "${pkgs.rtk.src}/hooks/codex/rtk-awareness.md";
+  home.file.".codex/AGENTS.md".text = "@RTK.md\n";
 }
