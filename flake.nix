@@ -53,7 +53,9 @@
     };
 
     whisrs = {
-      url = "github:y0sif/whisrs";
+      # Pinned to the fork's fix/prompt-echo branch until upstreamed; drops
+      # empty/silent recordings and prompt-echo hallucinations.
+      url = "github:otavio/whisrs/fix/prompt-echo";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
