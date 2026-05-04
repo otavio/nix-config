@@ -7,8 +7,6 @@ let
     '';
   });
 
-  # Combined prompt+vocabulary must stay under whisper's 244-token cap;
-  # excess gets silently truncated from the front, eating the framing.
   basePrompt = ''
     Otavio Salvador speaking. Professional, technical register: software
     engineering, embedded Linux, the Yocto Project, AI agent workflows.
@@ -18,9 +16,15 @@ let
     push, log, prompt, agent). Preserve technical tokens verbatim:
     file paths, CLI flags like --foo, file extensions, camelCase and
     snake_case identifiers. Keep proper nouns in canonical casing
-    (NixOS, GitHub, Yocto, Claude, Codex). Render spoken punctuation
-    cues ("comma"/"vírgula", "period"/"ponto", "new line"/"nova linha")
-    as the punctuation itself, not as the word.
+    (NixOS, GitHub, Yocto, Yocto Project, Claude, Codex); when "Yocto"
+    is followed by "Project", always capitalize Project. Render spoken
+    punctuation cues ("comma"/"vírgula", "period"/"ponto", "new
+    line"/"nova linha") as the punctuation itself, not as the word.
+    Transcribe verbatim. Fix obvious punctuation (commas, periods,
+    question marks); do not rephrase, reformat, summarize, or correct
+    word choice. Apply other edits only when the speaker explicitly
+    asks for them in the audio (e.g. "make this a bullet list",
+    "rewrite this sentence as ...").
   '';
 
   vocabulary = [
@@ -60,6 +64,7 @@ let
     "fork"
     # embedded Linux / Yocto
     "Yocto"
+    "Yocto Project"
     "BitBake"
     "Buildroot"
     "U-Boot"
