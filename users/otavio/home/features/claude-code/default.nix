@@ -133,7 +133,7 @@ in
         ossystems = {
           source = {
             source = "github";
-            repo = "OSSystems/claude-code-plugin";
+            repo = "OSSystems/ai-plugins";
           };
         };
         ui-ux-pro-max-skill = {
@@ -177,7 +177,7 @@ in
       # Enable plugins from the marketplace
       enabledPlugins = {
         "ossystems-commit@ossystems" = true;
-        "ossystems-refactor-claude-md@ossystems" = true;
+        "ossystems-refactor-agent-instructions@ossystems" = true;
         # auto-bmad@custom-claude-code-plugins is installed per-project
       };
     };
