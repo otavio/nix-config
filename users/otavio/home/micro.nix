@@ -4,10 +4,9 @@
   imports = [
     ./generic.nix
 
+    ./features/ai-assistants
     ./features/alacritty
     ./features/android
-    ./features/claude-code
-    ./features/codex
     ./features/dunst
     ./features/flameshot
     ./features/gpg

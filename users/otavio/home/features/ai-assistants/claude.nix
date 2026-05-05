@@ -17,10 +17,7 @@ let
 
 in
 {
-  home.packages = with pkgs; [ jq rtk sox ];
-
-  home.file.".claude/RTK.md".source = "${pkgs.rtk.src}/hooks/claude/rtk-awareness.md";
-  home.file.".claude/CLAUDE.md".text = "@RTK.md\n";
+  home.packages = with pkgs; [ sox ];
 
   nixpkgs = {
     overlays = [ inputs.claude-code-overlay.overlays.default ];
