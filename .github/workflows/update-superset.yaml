@@ -1,0 +1,36 @@
+name: update-superset
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1' # runs weekly on Monday at 06:00 UTC
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v22
+        with:
+          extra-conf: |
+            extra-substituters = https://cache.nixos.org
+            accept-flake-config = true
+      - name: Run package update script
+        env:
+          NIXPKGS_ALLOW_UNFREE: "1"
+        run: nix run --impure .#superset.passthru.updateScript
+      - name: Open pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
+          commit-message: "feat(superset): update to latest release"
+          title: "feat(superset): update to latest release"
+          body: |
+            Automated update for the Superset Desktop AppImage
+            (https://github.com/superset-sh/superset/releases/latest).
+          branch: automated/superset-update
+          delete-branch: true
+          add-paths: packages/superset.nix
