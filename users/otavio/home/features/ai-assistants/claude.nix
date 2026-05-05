@@ -37,8 +37,10 @@ in
       voiceEnabled = true;
       skipDangerousModePermissionPrompt = true;
       alwaysThinkingEnabled = true;
+      awaySummaryEnabled = false;
       permissions = {
         defaultMode = "bypassPermissions";
+        disableAutoMode = "disable";
         allow = [
           "Bash(find:*)"
           "Bash(ls:*)"
