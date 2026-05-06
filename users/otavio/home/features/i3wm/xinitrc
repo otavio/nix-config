@@ -2,12 +2,10 @@ if test -z "$DBUS_SESSION_BUS_ADDRESS"; then
 	eval $(dbus-launch --exit-with-session --sh-syntax)
 fi
 
-export XDG_SESSION_TYPE=x11
-
-systemctl --user import-environment DISPLAY XAUTHORITY XDG_SESSION_TYPE
+systemctl --user import-environment DISPLAY XAUTHORITY
 
 if command -v dbus-update-activation-environment >/dev/null 2>&1; then
-        dbus-update-activation-environment --systemd DISPLAY XAUTHORITY XDG_SESSION_TYPE
+        dbus-update-activation-environment --systemd DISPLAY XAUTHORITY
 fi
 
 systemctl start --user graphical-session.target
