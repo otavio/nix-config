@@ -169,6 +169,11 @@ in
           criteria = { class = "Onboard"; };
           command = "floating enable, sticky enable, border none";
         }
+
+        {
+          criteria = { class = "flameshot"; };
+          command = "floating enable, border pixel 0, fullscreen disable, focus";
+        }
       ];
 
       startup = [
