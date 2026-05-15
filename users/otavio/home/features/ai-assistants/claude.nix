@@ -60,6 +60,18 @@ in
           "WebFetch(domain:github.com)"
           "WebFetch(domain:mynixos.com)"
           "WebSearch"
+
+          # .envrc is direnv config, not a secret — allow it explicitly
+          # so the broader .env* deny below doesn't block it.
+          "Read(**/.envrc)"
+          "Edit(**/.envrc)"
+          "Write(**/.envrc)"
+
+          # .env.example is a non-secret template — allow it explicitly
+          # so the broader .env* deny below doesn't block it.
+          "Read(**/.env.example)"
+          "Edit(**/.env.example)"
+          "Write(**/.env.example)"
         ];
         deny = [
           # .env files
