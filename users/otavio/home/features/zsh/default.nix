@@ -129,6 +129,13 @@ in
 
           [ -f $HOME/.keychain/$(hostname)-sh ] && source $HOME/.keychain/$(hostname)-sh
           [ -f $HOME/.keychain/$(hostname)-sh-gpg ] && source  $HOME/.keychain/$(hostname)-sh-gpg
+
+          # Bridge to the systemd user env so subsequently launched GUI apps
+          # see the real ssh-agent instead of the gnome-keyring socket i3
+          # inherited from the X session.
+          if [ -n "$SSH_AUTH_SOCK" ] && command -v systemctl >/dev/null 2>&1; then
+              systemctl --user import-environment SSH_AUTH_SOCK SSH_AGENT_PID 2>/dev/null
+          fi
       }
 
       keys-close() {
