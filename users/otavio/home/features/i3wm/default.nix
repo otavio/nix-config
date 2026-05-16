@@ -177,6 +177,7 @@ in
       ];
 
       startup = [
+        { command = "systemctl --user start graphical-session.target"; notification = false; }
         { command = "pa-applet"; notification = true; }
         { command = "onboard"; notification = false; }
       ];
