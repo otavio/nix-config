@@ -8,8 +8,15 @@
     git-review
     git-secret
     gitRepo
-    gh
   ];
+
+  programs.gh = {
+    enable = true;
+    settings.git_protocol = "ssh";
+    # Declarative helper path tracks the home-manager generation, so a
+    # nix-store GC can't strand it the way a one-off `gh auth setup-git` can.
+    gitCredentialHelper.enable = true;
+  };
 
   programs.git = {
     enable = true;
