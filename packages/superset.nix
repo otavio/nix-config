@@ -10,11 +10,11 @@ let
       };
 
   pname = "superset";
-  version = "1.9.1";
+  version = "1.9.6";
 
   src = pkgs'.fetchurl {
     url = "https://github.com/superset-sh/superset/releases/download/desktop-v${version}/Superset-x86_64.AppImage";
-    hash = "sha256-Bncw+Nhz7kxfEX4UMZZwjKF3RADlyUiPpr4l/wpTTzI=";
+    hash = "sha256-Yb/En4hF6NLEh9sQK7JHcbC8HcKtBMLfJC7TaxoLtmo=";
   };
 
   appimageContents = pkgs'.appimageTools.extractType2 { inherit pname version src; };
