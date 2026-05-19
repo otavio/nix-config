@@ -23,7 +23,7 @@ jobs:
           NIXPKGS_ALLOW_UNFREE: "1"
         run: nix run --impure .#superset.passthru.updateScript
       - name: Open pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
           commit-message: "feat(superset): update to latest release"
