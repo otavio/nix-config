@@ -20,6 +20,31 @@ let
   fzf-menu = pkgs.writeScriptBin "i3-fzf-menu" (builtins.readFile (pkgs.replaceVars ./fzf-menu {
     fzf = "${pkgs.fzf}/bin/fzf";
   }));
+
+  # systemd 257+ marks graphical-session.target as RefuseManualStart=yes, so
+  # `systemctl --user start graphical-session.target` from i3's startup is
+  # rejected and units like whisrs.service / snixembed.service stay dormant.
+  # Start a bridge service instead: it Wants= the target, which pulls it in as
+  # a dependency (allowed despite RefuseManualStart) and BindsTo= it so the
+  # bridge tracks the target's lifecycle.
+  #
+  # Also handle the first-login race where user@1000 hasn't finished reaching
+  # its Main User Target by the time i3 runs its startup execs.
+  start-graphical-session = pkgs.writeShellApplication {
+    name = "i3-start-graphical-session";
+    runtimeInputs = [ pkgs.systemd ];
+    text = ''
+      for attempt in $(seq 1 40); do
+        if systemctl --user show-environment >/dev/null 2>&1; then
+          echo "user systemd reachable after $attempt attempt(s)"
+          exec systemctl --user start i3-session.service
+        fi
+        sleep 0.25
+      done
+      echo "user systemd not reachable after 10s; giving up" >&2
+      exit 1
+    '';
+  };
 in
 {
   # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8
@@ -177,7 +202,10 @@ in
       ];
 
       startup = [
-        { command = "systemctl --user start graphical-session.target"; notification = false; }
+        {
+          command = "${pkgs.systemd}/bin/systemd-cat -t i3-startup ${lib.getExe start-graphical-session}";
+          notification = false;
+        }
         { command = "pa-applet"; notification = true; }
         { command = "onboard"; notification = false; }
       ];
@@ -282,4 +310,19 @@ in
   ];
 
   home.file.".xinitrc".source = ./xinitrc;
+
+  systemd.user.services.i3-session = {
+    Unit = {
+      Description = "i3 session bridge to graphical-session.target";
+      BindsTo = [ "graphical-session.target" ];
+      Before = [ "graphical-session.target" ];
+      Wants = [ "graphical-session-pre.target" "graphical-session.target" ];
+      After = [ "graphical-session-pre.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.coreutils}/bin/true";
+    };
+  };
 }
