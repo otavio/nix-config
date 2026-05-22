@@ -1,4 +1,4 @@
-{ inputs, flake, pkgs, ... }:
+{ inputs, flake, lib, pkgs, ... }:
 
 {
   imports = with inputs.nixos-hardware.nixosModules; [
@@ -79,4 +79,28 @@
   ];
 
   deployment.allowLocalDeployment = true;
+
+  # VM-only overrides for `nixos-rebuild build-vm --flake .#micro`. The real
+  # boot sees neither these settings nor the sops secret stub.
+  virtualisation.vmVariant = {
+    services.btrfs.autoScrub.enable = lib.mkForce false;
+    networking.wireguard.interfaces = lib.mkForce { };
+    programs.msmtp.accounts = lib.mkForce { };
+    services.restic.backups = lib.mkForce { };
+    sops.secrets = lib.mkForce { };
+    systemd.tmpfiles.rules = [
+      "f /run/secrets/openai_api_key 0400 otavio users - sk-vm-dummy"
+    ];
+    users.users.otavio.password = lib.mkForce "vm";
+    services.getty.autologinUser = lib.mkForce "otavio";
+
+    services.openssh = {
+      enable = true;
+      settings.PasswordAuthentication = true;
+      settings.PermitRootLogin = "no";
+    };
+    virtualisation.forwardPorts = [
+      { from = "host"; host.port = 2222; guest.port = 22; }
+    ];
+  };
 }
