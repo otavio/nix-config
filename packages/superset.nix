@@ -10,11 +10,11 @@ let
       };
 
   pname = "superset";
-  version = "1.9.6";
+  version = "1.9.9";
 
   src = pkgs'.fetchurl {
     url = "https://github.com/superset-sh/superset/releases/download/desktop-v${version}/Superset-x86_64.AppImage";
-    hash = "sha256-Yb/En4hF6NLEh9sQK7JHcbC8HcKtBMLfJC7TaxoLtmo=";
+    hash = "sha256-wRiHga8B5tjOGbsRZgXdH/KxUCtOri1NA4dwdHSKAj4=";
   };
 
   appimageContents = pkgs'.appimageTools.extractType2 { inherit pname version src; };
@@ -94,7 +94,12 @@ pkgs'.stdenv.mkDerivation {
       fi
       unset _hn
     fi
-    exec "\$shell" -l -c 'exec $wrapped "\$@"' "\$shell" "\$@"
+    # Contain runaway memory inside a transient user scope so a ballooning
+    # renderer/agent gets OOM-killed locally instead of taking down the host
+    # (peak observed in the wild: ~41G RSS + 17G swap).
+    exec ${pkgs'.systemd}/bin/systemd-run --user --scope --quiet --collect \\
+      -p MemoryHigh=24G -p MemoryMax=32G -p MemorySwapMax=4G \\
+      -- "\$shell" -l -c 'exec $wrapped "\$@"' "\$shell" "\$@"
     EOF
     chmod +x $out/bin/${pname}
 
