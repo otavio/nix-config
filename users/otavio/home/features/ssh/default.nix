@@ -16,24 +16,24 @@
     enable = true;
     enableDefaultConfig = false;
 
-    matchBlocks = {
+    settings = {
       "*" = {
-        controlMaster = "auto";
-        hashKnownHosts = false;
+        ControlMaster = "auto";
+        HashKnownHosts = false;
       };
 
       "code.ossystems.com.br" = {
-        hostname = "code.ossystems.io";
+        HostName = "code.ossystems.io";
       };
 
       "*.lab.ossystems" = {
-        forwardAgent = true;
-        forwardX11 = true;
-        forwardX11Trusted = true;
+        ForwardAgent = true;
+        ForwardX11 = true;
+        ForwardX11Trusted = true;
       };
 
       "gitlab.com" = {
-        identityFile = "~/.ssh/id_ed25519";
+        IdentityFile = "~/.ssh/id_ed25519";
       };
     };
   };
