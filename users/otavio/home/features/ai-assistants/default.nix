@@ -19,6 +19,9 @@ in
     mkInstructions { dir = ".claude"; hook = "claude"; indexFile = "CLAUDE.md"; }
     // mkInstructions { dir = ".codex"; hook = "codex"; indexFile = "AGENTS.md"; }
     // {
+      "src/nixpkgs/CLAUDE.md".source = ./projects/nixpkgs.md;
+      "src/nixpkgs/AGENTS.md".source = ./projects/nixpkgs.md;
+
       # Superset spawns terminals with ZDOTDIR=~/.superset/zsh; without
       # this, zsh launches its newuser wizard and skips the real init.
       ".superset/zsh/.zshrc".text = "source ${config.programs.zsh.dotDir}/.zshrc\n";
