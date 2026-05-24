@@ -82,7 +82,7 @@
     };
   };
 
-  security.pam.services.swaylock = { };
+  security.pam.services.i3lock = { };
   security.polkit.enable = true;
 
   networking.firewall.trustedInterfaces = [ "virbr0" ];

@@ -306,8 +306,13 @@ in
     onboard
     pavucontrol
     xclip
-    xss-lock
   ];
+
+  services.screen-locker = {
+    enable = true;
+    inactiveInterval = 10;
+    lockCmd = "${pkgs.i3lock}/bin/i3lock -n -c 000000";
+  };
 
   home.file.".xinitrc".source = ./xinitrc;
 
