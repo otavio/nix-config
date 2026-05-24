@@ -136,7 +136,15 @@ in
   systemd.user.services.whisrs = {
     Unit = {
       Description = "whisrs speech-to-text daemon";
-      After = [ "graphical-session-pre.target" ];
+      # Hard-require snixembed: whisrs's tray code retries
+      # RegisterStatusNotifierItem 10x with backoff and then permanently
+      # disables the tray for the rest of the process lifetime. If snixembed
+      # isn't already up when whisrs starts, the icon stays missing until the
+      # next restart. `services.snixembed.beforeUnits` only adds ordering, so
+      # pin the dependency here too so whisrs is held back until snixembed has
+      # claimed `org.kde.StatusNotifierWatcher`.
+      Requires = [ "snixembed.service" ];
+      After = [ "graphical-session-pre.target" "snixembed.service" ];
       PartOf = [ "graphical-session.target" ];
     };
     Service = {
