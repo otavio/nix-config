@@ -21,6 +21,28 @@ let
     fzf = "${pkgs.fzf}/bin/fzf";
   }));
 
+  i3lockOnboard = pkgs.i3lock.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [ ./i3lock-onboard.patch ];
+  });
+
+  lockScript = pkgs.writeShellScript "i3lock-onboard" ''
+    ${i3lockOnboard}/bin/i3lock -n -c 000000 &
+    lockpid=$!
+    ${pkgs.onboard}/bin/onboard &
+    onboardpid=$!
+    (
+      while kill -0 "$lockpid" 2>/dev/null; do
+        for w in $(${pkgs.xdotool}/bin/xdotool search --name -- "[Oo]nboard" 2>/dev/null); do
+          ${pkgs.xdotool}/bin/xdotool windowraise "$w" 2>/dev/null || true
+        done
+        sleep 1
+      done
+    ) &
+    raiserpid=$!
+    wait "$lockpid"
+    kill "$onboardpid" "$raiserpid" 2>/dev/null || true
+  '';
+
   # systemd 257+ marks graphical-session.target as RefuseManualStart=yes, so
   # `systemctl --user start graphical-session.target` from i3's startup is
   # rejected and units like whisrs.service / snixembed.service stay dormant.
@@ -313,7 +335,14 @@ in
   services.screen-locker = {
     enable = true;
     inactiveInterval = 10;
-    lockCmd = "${pkgs.i3lock}/bin/i3lock -n -c 000000";
+    lockCmd = "${lockScript}";
+  };
+
+  dconf.settings = {
+    "org/onboard".layout = "${pkgs.onboard}/share/onboard/layouts/Full Keyboard.onboard";
+    "org/onboard/window".force-to-top = true;
+    "org/onboard/window".docking-enabled = false;
+    "org/onboard/auto-show".enabled = false;
   };
 
   home.file.".xinitrc".source = ./xinitrc;

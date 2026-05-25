@@ -1,0 +1,71 @@
+--- a/xcb.c
++++ b/xcb.c
+@@ -225,45 +225,11 @@
+         err(EXIT_FAILURE, "gettimeofday");
+     }
+ 
+-    while (tries-- > 0) {
+-        pcookie = xcb_grab_pointer(
+-            conn,
+-            false,               /* get all pointer events specified by the following mask */
+-            screen->root,        /* grab the root window */
+-            XCB_NONE,            /* which events to let through */
+-            XCB_GRAB_MODE_ASYNC, /* pointer events should continue as normal */
+-            XCB_GRAB_MODE_ASYNC, /* keyboard mode */
+-            XCB_NONE,            /* confine_to = in which window should the cursor stay */
+-            cursor,              /* we change the cursor to whatever the user wanted */
+-            XCB_CURRENT_TIME);
+-
+-        if ((preply = xcb_grab_pointer_reply(conn, pcookie, NULL)) &&
+-            preply->status == XCB_GRAB_STATUS_SUCCESS) {
+-            free(preply);
+-            break;
+-        }
+-
+-        /* In case the grab failed, we still need to free the reply */
+-        free(preply);
+-
+-        /* Make this quite a bit slower */
+-        usleep(50);
+-
+-        struct timeval now;
+-        if (gettimeofday(&now, NULL) == -1) {
+-            err(EXIT_FAILURE, "gettimeofday");
+-        }
+-
+-        struct timeval elapsed;
+-        timersub(&now, &start, &elapsed);
+-
+-        if (!redrawn &&
+-            (tries % 100) == 0 &&
+-            elapsed.tv_usec >= screen_redraw_timeout) {
+-            redraw_screen();
+-            redrawn = true;
+-        }
+-    }
++    /* Patched (onboard): skip the pointer grab so an on-screen keyboard can
++       be tapped above the lock screen. The keyboard grab below is kept. */
++    (void)pcookie;
++    (void)preply;
++    (void)cursor;
+ 
+     while (tries-- > 0) {
+         kcookie = xcb_grab_keyboard(
+--- a/i3lock.c
++++ b/i3lock.c
+@@ -512,11 +512,10 @@
+  */
+ static void handle_visibility_notify(xcb_connection_t *conn,
+                                      xcb_visibility_notify_event_t *event) {
+-    if (event->state != XCB_VISIBILITY_UNOBSCURED) {
+-        uint32_t values[] = {XCB_STACK_MODE_ABOVE};
+-        xcb_configure_window(conn, event->window, XCB_CONFIG_WINDOW_STACK_MODE, values);
+-        xcb_flush(conn);
+-    }
++    /* Patched (onboard): do not re-raise the lock window when obscured, so
++       the on-screen keyboard can stay on top of it. */
++    (void)conn;
++    (void)event;
+ }
+ 
+ /*
