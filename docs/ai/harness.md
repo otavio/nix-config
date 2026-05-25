@@ -29,6 +29,12 @@ colmena apply local -n <hostname>  # Deploy locally
 - **Home features:** Import from `users/<user>/home/features/` in host-specific home file
 - **Flake inputs:** Use dotted format for follows, one per line: `inputs.nixpkgs.follows = "nixpkgs";`
 
+## Comments
+
+Avoid useless comments. Do not add comments that restate what the code already
+says or narrate a change. Only comment genuinely non-obvious rationale; put the
+"why" of a change in the commit message, not inline.
+
 ## Reusable Modules With Options
 
 Modules that introduce parameterized behavior across hosts live in
