@@ -70,6 +70,10 @@
   services.greetd = {
     enable = true;
     settings = {
+      initial_session = {
+        command = "${pkgs.zsh}/bin/zsh -lc startx";
+        user = "otavio";
+      };
       default_session = {
         # Wrap in a zsh login shell so /etc/profile and the user's zprofile
         # are sourced — without that, the X session inherits only greetd's
