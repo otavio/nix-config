@@ -82,7 +82,10 @@
     };
   };
 
-  security.pam.services.i3lock = { };
+  security.pam.services.i3lock = {
+    enable = true;
+    rules.auth.unix.settings.try_first_pass = lib.mkForce false;
+  };
   security.polkit.enable = true;
 
   networking.firewall.trustedInterfaces = [ "virbr0" ];

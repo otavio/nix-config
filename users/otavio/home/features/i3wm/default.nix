@@ -149,6 +149,8 @@ in
 
         "${modifier}+o" = "exec onboard";
 
+        "${modifier}+Escape" = "exec ${pkgs.systemd}/bin/loginctl lock-session";
+
         "Print" = "exec flameshot gui";
 
         "Control+Alt+h" = "exec ${copyq} toggle";
