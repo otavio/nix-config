@@ -21,16 +21,22 @@ jobs:
           extra-conf: |
             extra-substituters = https://cache.nixos.org
             accept-flake-config = true
+      - name: Read current version
+        id: before
+        run: echo "version=$(sed -n 's/^[[:space:]]*version = "\(.*\)";/\1/p' packages/superset.nix | head -1)" >> "$GITHUB_OUTPUT"
       - name: Run package update script
         env:
           NIXPKGS_ALLOW_UNFREE: "1"
         run: nix run --impure .#superset.passthru.updateScript
+      - name: Read new version
+        id: after
+        run: echo "version=$(sed -n 's/^[[:space:]]*version = "\(.*\)";/\1/p' packages/superset.nix | head -1)" >> "$GITHUB_OUTPUT"
       - name: Open pull request
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
-          commit-message: "feat(superset): update to latest release"
-          title: "feat(superset): update to latest release"
+          commit-message: "superset: ${{ steps.before.outputs.version }} -> ${{ steps.after.outputs.version }}"
+          title: "superset: ${{ steps.before.outputs.version }} -> ${{ steps.after.outputs.version }}"
           body: |
             Automated update for the Superset Desktop AppImage
             (https://github.com/superset-sh/superset/releases/latest).
