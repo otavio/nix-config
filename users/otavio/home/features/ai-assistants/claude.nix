@@ -135,7 +135,7 @@ in
 
       # Plugin marketplace configuration
       extraKnownMarketplaces = {
-        ossystems = {
+        ossystems-ai-plugins = {
           source = {
             source = "github";
             repo = "OSSystems/ai-plugins";
@@ -181,8 +181,8 @@ in
 
       # Enable plugins from the marketplace
       enabledPlugins = {
-        "ossystems-commit@ossystems" = true;
-        "ossystems-refactor-agent-instructions@ossystems" = true;
+        "ossystems-commit@ossystems-ai-plugins" = true;
+        "ossystems-refactor-agent-instructions@ossystems-ai-plugins" = true;
         # auto-bmad@custom-claude-code-plugins is installed per-project
       };
     };
