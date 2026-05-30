@@ -25,5 +25,15 @@ in
       # Superset spawns terminals with ZDOTDIR=~/.superset/zsh; without
       # this, zsh launches its newuser wizard and skips the real init.
       ".superset/zsh/.zshrc".text = "source ${config.programs.zsh.dotDir}/.zshrc\n";
+
+      # Superset's terminal env omits DISPLAY/XAUTHORITY, breaking xclip clipboard
+      # paste. .zshenv (not .zshrc) also covers non-interactive agent shells; the
+      # X-socket guard keeps it inert when there's no local display.
+      ".superset/zsh/.zshenv".text = ''
+        if [ -z "$DISPLAY" ] && [ -S /tmp/.X11-unix/X0 ]; then
+          export DISPLAY=:0
+          export XAUTHORITY="$HOME/.Xauthority"
+        fi
+      '';
     };
 }
