@@ -173,7 +173,7 @@ in
 
         "${modifier}+Escape" = "exec ${pkgs.systemd}/bin/loginctl lock-session";
 
-        "Print" = "exec flameshot gui";
+        "Print" = "exec flameshot-gui";
 
         "Control+Alt+h" = "exec ${copyq} toggle";
 
