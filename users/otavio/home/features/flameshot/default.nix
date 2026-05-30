@@ -22,7 +22,6 @@ in
         disabledTrayIcon = true;
         showDesktopNotification = false;
         savePath = "${config.home.homeDirectory}/Downloads";
-        useX11LegacyScreenshot = true;
       };
     };
   };
