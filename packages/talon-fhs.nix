@@ -14,7 +14,8 @@ let
     unset QT_AUTO_SCREEN_SCALE_FACTOR QT_SCALE_FACTOR
     export LC_NUMERIC=C
     export QT_PLUGIN_PATH="/lib/plugins"
-    export LD_LIBRARY_PATH="$HOME/.talon-bin/resources/python/lib/python3.11/site-packages/numpy.libs:$HOME/.talon-bin/resources/python/lib:$HOME/.talon-bin/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    numpyLibs=$(echo "$HOME"/.talon-bin/resources/python/lib/python3.*/site-packages/numpy.libs)
+    export LD_LIBRARY_PATH="$numpyLibs:$HOME/.talon-bin/resources/python/lib:$HOME/.talon-bin/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
     exec "$HOME/.talon-bin/talon" "$@"
   '';
 in
