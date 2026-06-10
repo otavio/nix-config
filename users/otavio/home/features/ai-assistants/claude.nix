@@ -2,13 +2,6 @@
 let
   notificationSound = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/complete.oga";
 
-  claude-code-fhs = pkgs.buildFHSEnv {
-    name = "claude";
-    inherit (pkgs.claude-code) meta;
-    targetPkgs = _: with pkgs; [ claude-code stdenv.cc.cc.lib zlib ];
-    runScript = pkgs.lib.getExe pkgs.claude-code;
-  };
-
   statuslineScript = pkgs.writeShellApplication {
     name = "statusline-command";
     runtimeInputs = [ pkgs.jq ];
@@ -35,7 +28,7 @@ in
 
   programs.claude-code = {
     enable = true;
-    package = claude-code-fhs;
+    package = pkgs.claude-code;
     settings = {
       env = {
         CLAUDE_CODE_EFFORT_LEVEL = "high";
