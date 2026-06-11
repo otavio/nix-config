@@ -11,6 +11,7 @@ in
   imports = [
     ./claude.nix
     ./codex.nix
+    ./herdr.nix
   ];
 
   home.packages = with pkgs; [ jq ripgrep rtk superset ];

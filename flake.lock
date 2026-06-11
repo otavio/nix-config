@@ -208,6 +208,26 @@
         "type": "github"
       }
     },
+    "herdr": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1781183764,
+        "narHash": "sha256-rXNgx7stlOjjJCERI02DukFIWDuQjUI12RDknablgz8=",
+        "owner": "ogulcancelik",
+        "repo": "herdr",
+        "rev": "6d763e58454e86cca953b151af1c3be303507cb4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ogulcancelik",
+        "repo": "herdr",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -357,6 +377,7 @@
         "colmena": "colmena",
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",
+        "herdr": "herdr",
         "home-manager": "home-manager",
         "nix-github-actions": "nix-github-actions_2",
         "nixos-hardware": "nixos-hardware",
