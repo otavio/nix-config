@@ -163,6 +163,7 @@ in
       # Enable plugins from the marketplace
       enabledPlugins = {
         "ossystems-commit@ossystems-ai-plugins" = true;
+        "ossystems-herdr@ossystems-ai-plugins" = true;
         "ossystems-refactor-agent-instructions@ossystems-ai-plugins" = true;
         # auto-bmad@custom-claude-code-plugins is installed per-project
       };
