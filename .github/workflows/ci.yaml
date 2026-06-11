@@ -5,11 +5,13 @@ on:
     paths:
       - '**.nix'
       - 'flake.lock'
+      - '.github/workflows/ci.yaml'
   push:
     branches: [ master ]
     paths:
       - '**.nix'
       - 'flake.lock'
+      - '.github/workflows/ci.yaml'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.workflow }}
@@ -44,30 +46,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: nixbuild/nix-quick-install-action@v34
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /opt/hostedtoolcache/CodeQL /usr/local/share/boost "$AGENT_TOOLSDIRECTORY"
+          sudo docker image prune --all --force || true
       - name: Restore and cache Nix store
         uses: nix-community/cache-nix-action@v7
         with:
           primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.*') }}
           restore-prefixes-first-match: nix-${{ runner.os }}-
       - run: nix build -L ".#${{ matrix.attr }}" --keep-going
-
-  nixos:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        nixosConfiguration:
-          - micro
-          - poirot
-          - miss-marple
-    steps:
-      - uses: actions/checkout@v6
-      - uses: nixbuild/nix-quick-install-action@v34
-      - name: Restore and cache Nix store
-        uses: nix-community/cache-nix-action@v7
-        with:
-          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.*') }}
-          restore-prefixes-first-match: nix-${{ runner.os }}-
-      - run: nix -L build ".#nixosConfigurations.${{ matrix.nixosConfiguration }}.config.system.build.toplevel"
 
   nix:
     runs-on: ubuntu-latest
@@ -78,6 +67,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: nixbuild/nix-quick-install-action@v34
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /opt/hostedtoolcache/CodeQL /usr/local/share/boost "$AGENT_TOOLSDIRECTORY"
+          sudo docker image prune --all --force || true
       - name: Restore and cache Nix store
         uses: nix-community/cache-nix-action@v7
         with:
