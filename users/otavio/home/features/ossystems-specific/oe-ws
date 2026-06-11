@@ -86,12 +86,14 @@ derive_customer() {
     printf '%s' "$name"
 }
 
-# Run a sequence of commands in a herdr pane, one after another.
+# Run a sequence of commands in a herdr pane, one after another. Each command is
+# sent with a leading space so histignorespace keeps this setup out of the pane
+# shell's history.
 run_pane() {
     local pane=$1 cmd
     shift
     for cmd in "$@"; do
-        herdr pane run "$pane" "$cmd" >/dev/null
+        herdr pane run "$pane" " $cmd" >/dev/null
     done
 }
 
