@@ -1,0 +1,217 @@
+#!/usr/bin/env bash
+#
+# Dispatch a herdr workspace for an OSSystems/Yocto customer project.
+#
+# Successor to create-yp-project-home: instead of writing a tmuxp profile it
+# drives herdr directly, opening ~/src/oe/<customer>/<branch> as a workspace
+# with three even panes (build / editor / claude). It can also initialize a new
+# checkout (repo init + sync) before opening it.
+
+set -euo pipefail
+
+usage() {
+    cat <<EOF
+Dispatch a herdr workspace for an OSSystems/Yocto customer project.
+
+USAGE
+
+  oe-ws [start] [customer] [branch]   Open a workspace. customer/branch are
+                                      picked interactively (fzf) when omitted.
+  oe-ws init                          Initialize a new checkout (repo init +
+                                      sync), then open its workspace. Prompts
+                                      for customer, branch and manifest URL.
+  oe-ws                               Pick the action (start/init) first.
+
+A workspace opens ~/src/oe/<customer>/<branch> with three even panes:
+
+  1. build    yocto-env dev shell + sourced build environment (focused)
+  2. editor   sources/ with \$EDITOR
+  3. claude   sources/ with Claude Code inside the yocto-env dev shell
+EOF
+    exit "${1:-0}"
+}
+
+die() {
+    echo "$@" >&2
+    exit 1
+}
+
+oe_root="$HOME/src/oe"
+
+# Branch dirs (basenames) under a customer that look like Yocto checkouts,
+# i.e. contain a setup-environment script. Filters out logs/, stray files, etc.
+list_branches() {
+    find "$1" -mindepth 1 -maxdepth 1 -type d \
+        -exec test -e '{}/setup-environment' ';' -printf '%f\n' 2>/dev/null | sort
+}
+
+# Customers (basenames) under ~/src/oe that hold at least one checkout.
+list_customers() {
+    find "$oe_root" -mindepth 3 -maxdepth 3 -name setup-environment -printf '%P\n' 2>/dev/null |
+        cut -d/ -f1 | sort -u
+}
+
+# Ask the user to choose one of the given candidates with fzf. A single
+# candidate is auto-selected; cancelling yields empty output.
+pick_one() {
+    local prompt=$1
+    shift
+    printf '%s\n' "$@" |
+        fzf --prompt="$prompt" --height=40% --reverse --no-multi --select-1 --exit-0
+}
+
+# Read a required, non-empty value into the named variable, offering an
+# editable default (pre-filled on the line; the user can accept or change it).
+read_value() {
+    local var=$1 prompt=$2 default=${3:-} value
+    read -e -i "$default" -r -p "$prompt" value || true
+    [ -n "$value" ] || die "aborted: $var is required"
+    printf -v "$var" '%s' "$value"
+}
+
+# Guess a customer name from a manifest repo URL: the repository basename minus
+# a .git suffix and the usual manifest-repo suffixes. Only a seed; the user edits.
+derive_customer() {
+    local name=${1%%[?#]*}
+    name=${name%/}
+    name=${name##*/}
+    name=${name%.git}
+    local suffix
+    for suffix in -platform -manifests -manifest -bsp -yocto -distro; do
+        if [ "${name%"$suffix"}" != "$name" ]; then
+            name=${name%"$suffix"}
+            break
+        fi
+    done
+    printf '%s' "$name"
+}
+
+# Run a sequence of commands in a herdr pane, one after another.
+run_pane() {
+    local pane=$1 cmd
+    shift
+    for cmd in "$@"; do
+        herdr pane run "$pane" "$cmd" >/dev/null
+    done
+}
+
+# Enable Claude's embedded plugin and disable its commit plugin (they would
+# otherwise both provide a /commit command and conflict). Merged with jq so any
+# pre-existing settings are preserved.
+ensure_claude_settings() {
+    local dir=$1/.claude file
+    file=$dir/settings.json
+    mkdir -p "$dir"
+    [ -f "$file" ] || echo '{}' >"$file"
+    jq '.enabledPlugins["ossystems-embedded@ossystems-ai-plugins"] = true
+      | .enabledPlugins["ossystems-commit@ossystems-ai-plugins"] = false' \
+        "$file" >"$file.tmp" && mv "$file.tmp" "$file"
+}
+
+# Open the three-pane herdr workspace for a concrete customer/branch checkout.
+start_workspace() {
+    local customer=$1 branch=$2
+    local project_home="$oe_root/$customer/$branch"
+    local label="$customer-$branch"
+
+    [ -d "$project_home" ] || die "error: $project_home does not exist"
+    herdr status server >/dev/null 2>&1 ||
+        die "error: herdr server is not running; start it with 'herdr'"
+
+    # Reuse an existing workspace with the same label instead of duplicating it.
+    local existing
+    existing=$(herdr workspace list |
+        jq -r --arg l "$label" \
+            'first(.result.workspaces[] | select(.label == $l) | .workspace_id) // empty')
+    if [ -n "$existing" ]; then
+        herdr workspace focus "$existing" >/dev/null
+        echo "Workspace '$label' already open; focused it."
+        return 0
+    fi
+
+    ensure_claude_settings "$project_home/sources"
+
+    local nixdev="nix develop github:OSSystems/yocto-env.nix"
+    local alias_cmd="alias cd='HOME=$project_home cd'"
+    local ws
+    ws=$(herdr workspace create --cwd "$project_home" --label "$label" |
+        jq -r '.result.workspace.workspace_id')
+
+    # Even thirds, natural left-to-right order: 1=build, 2=editor, 3=claude.
+    herdr pane split "$ws-1" --direction right --ratio 0.333 >/dev/null
+    herdr pane split "$ws-2" --direction right --ratio 0.5 >/dev/null
+
+    run_pane "$ws-1" "$alias_cmd" "$nixdev" "source setup-environment build"
+    run_pane "$ws-2" "$alias_cmd" 'cd sources && touch .projectile && eval $EDITOR'
+    run_pane "$ws-3" "$alias_cmd" "cd sources" "$nixdev" "claude"
+
+    # Bring the workspace forward and focus the build pane (left of the editor).
+    herdr workspace focus "$ws" >/dev/null
+    herdr pane focus --direction left --pane "$ws-2" >/dev/null
+
+    echo "Opened workspace '$label' at $project_home"
+}
+
+# Resolve customer/branch (interactively when omitted), then open the workspace.
+cmd_start() {
+    local customer=${1:-} branch=${2:-}
+
+    if [ -z "$customer" ]; then
+        mapfile -t customers < <(list_customers)
+        [ "${#customers[@]}" -gt 0 ] || die "error: no Yocto checkouts found under $oe_root"
+        customer=$(pick_one "Customer> " "${customers[@]}") || true
+        [ -n "$customer" ] || die "aborted: no customer selected"
+    fi
+
+    local customer_home="$oe_root/$customer"
+    [ -d "$customer_home" ] || die "error: $customer_home does not exist"
+
+    if [ -z "$branch" ]; then
+        mapfile -t branches < <(list_branches "$customer_home")
+        case "${#branches[@]}" in
+            0) die "error: no Yocto checkout under $customer_home" ;;
+            1) branch=${branches[0]} ;;
+            *)
+                branch=$(pick_one "Branch> " "${branches[@]}") || true
+                [ -n "$branch" ] || die "aborted: no branch selected"
+                ;;
+        esac
+    fi
+
+    start_workspace "$customer" "$branch"
+}
+
+# Prompt for a new checkout's coordinates, run repo init + sync, then open it.
+# The URL is asked first and seeds the customer-name prompt.
+cmd_init() {
+    local url customer branch
+    read_value url "Manifest repo URL: "
+    read_value customer "Customer: " "$(derive_customer "$url")"
+    read_value branch "Branch (manifest branch): " master
+
+    local project_home="$oe_root/$customer/$branch"
+    [ -e "$project_home/.repo" ] &&
+        die "error: $project_home is already initialized; use 'oe-ws start $customer $branch'"
+
+    echo "Initializing $customer/$branch from $url (repo sync can take a while)..."
+    mkdir -p "$project_home"
+    (cd "$project_home" && repo init -b "$branch" -u "$url" && repo sync) ||
+        die "error: repo init/sync failed for $project_home"
+
+    start_workspace "$customer" "$branch"
+}
+
+case "${1:-}" in
+    -h | --help) usage 0 ;;
+    start)
+        shift
+        cmd_start "$@"
+        ;;
+    init) cmd_init ;;
+    "")
+        action=$(pick_one "Action> " start init) || true
+        [ -n "$action" ] || die "aborted: no action selected"
+        "cmd_$action"
+        ;;
+    *) cmd_start "$@" ;;
+esac

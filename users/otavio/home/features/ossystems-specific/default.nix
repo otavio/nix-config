@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 
 let
   ossystems-scripts = pkgs.stdenv.mkDerivation {
@@ -9,6 +9,22 @@ let
       cp -r * $out/bin
     '';
   };
+
+  # oe-ws calls these directly (repo init/sync inline, herdr/jq/fzf throughout),
+  # so wrap it with them on PATH instead of relying on the ambient profile.
+  oe-ws = pkgs.runCommandLocal "oe-ws"
+    {
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+    } ''
+    install -Dm755 ${./oe-ws} $out/bin/oe-ws
+    wrapProgram $out/bin/oe-ws \
+      --prefix PATH : ${pkgs.lib.makeBinPath [
+        inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
+        pkgs.jq
+        pkgs.fzf
+        pkgs.gitRepo
+      ]}
+  '';
 in
 {
   nixpkgs.config.permittedInsecurePackages =
@@ -18,6 +34,7 @@ in
   home.packages = with pkgs; [
     awscli2
     obsidian
+    oe-ws
   ];
 
   home.file = {
