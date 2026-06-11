@@ -102,7 +102,6 @@ in
       };
       hooks = {
         Notification = [ (notifySoundHook // { matcher = ""; }) ];
-        Stop = [ notifySoundHook ];
         SessionStart = [
           {
             matcher = "*";
