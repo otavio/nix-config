@@ -10,13 +10,6 @@ let
 
   notifySoundCommand = "${pkgs.pulseaudio}/bin/paplay ${notificationSound} 2>/dev/null || true";
   notifySoundHook = { hooks = [{ type = "command"; command = notifySoundCommand; }]; };
-
-  # Pre-baked so Superset's setupAgentHooks finds them and doesn't
-  # try to overwrite the (HM-managed, read-only) settings.json.
-  supersetNotify = ''[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/hooks/notify.sh" ] && "$SUPERSET_HOME_DIR/hooks/notify.sh" || true'';
-  supersetHook = { hooks = [{ type = "command"; command = supersetNotify; }]; };
-  supersetMatcherHook = supersetHook // { matcher = "*"; };
-
 in
 {
   home.packages = with pkgs; [ sox ];
@@ -107,7 +100,7 @@ in
       };
       hooks = {
         Notification = [ (notifySoundHook // { matcher = ""; }) ];
-        Stop = [ notifySoundHook supersetHook ];
+        Stop = [ notifySoundHook ];
         PreToolUse = [
           {
             matcher = "Bash";
@@ -119,10 +112,6 @@ in
             ];
           }
         ];
-        UserPromptSubmit = [ supersetHook ];
-        PostToolUse = [ supersetMatcherHook ];
-        PostToolUseFailure = [ supersetMatcherHook ];
-        PermissionRequest = [ supersetMatcherHook ];
       };
 
       # Plugin marketplace configuration
