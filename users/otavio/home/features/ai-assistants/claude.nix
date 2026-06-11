@@ -10,6 +10,8 @@ let
 
   notifySoundCommand = "${pkgs.pulseaudio}/bin/paplay ${notificationSound} 2>/dev/null || true";
   notifySoundHook = { hooks = [{ type = "command"; command = notifySoundCommand; }]; };
+
+  herdrHooks = import ./herdr-hooks.nix { inherit pkgs inputs; };
 in
 {
   home.packages = with pkgs; [ sox ];
@@ -101,6 +103,16 @@ in
       hooks = {
         Notification = [ (notifySoundHook // { matcher = ""; }) ];
         Stop = [ notifySoundHook ];
+        SessionStart = [
+          {
+            matcher = "*";
+            hooks = [{
+              type = "command";
+              command = "bash ${herdrHooks}/claude-hook.sh session";
+              timeout = 10;
+            }];
+          }
+        ];
         PreToolUse = [
           {
             matcher = "Bash";
