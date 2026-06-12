@@ -12,6 +12,8 @@ let
   notifySoundHook = { hooks = [{ type = "command"; command = notifySoundCommand; }]; };
 
   herdrHooks = import ./herdr-hooks.nix { inherit pkgs inputs; };
+
+  credentialGuard = import ./credential-guard.nix { inherit pkgs; };
 in
 {
   home.packages = with pkgs; [ sox ];
@@ -28,7 +30,7 @@ in
       env = {
         CLAUDE_CODE_EFFORT_LEVEL = "high";
         CLAUDE_CODE_NO_FLICKER = "1";
-      };
+      } // credentialGuard.mkAgentEnv "claude";
       model = "opus";
       voiceEnabled = true;
       skipDangerousModePermissionPrompt = true;
