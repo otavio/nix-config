@@ -11,9 +11,6 @@ let
     model = "gpt-5.3-codex";
     model_reasoning_effort = "high";
     features.hooks = true;
-    # inherit = "all" keeps GPG_TTY available so the pinentry guard can surface
-    # its notice on the agent's terminal; default secret excludes still apply.
-    shell_environment_policy."inherit" = "all";
     shell_environment_policy.set = credentialGuard.mkAgentEnv "codex";
   };
 

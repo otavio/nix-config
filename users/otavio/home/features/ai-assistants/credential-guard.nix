@@ -17,9 +17,13 @@
 let
   realPinentry = pkgs.lib.getExe' pkgs.pinentry-curses "pinentry-curses";
 
-  # Minimal Assuan pinentry. Speaks just enough of the protocol to capture the
-  # caller's tty (forwarded by gpg) so it can surface a human-readable notice
-  # there, then cancels the request.
+  # Minimal Assuan pinentry: acknowledge the handshake/options, then refuse the
+  # first passphrase or confirmation with a canceled error (GPG_ERR_CANCELED,
+  # which stops gpg retrying). It deliberately does not write to the caller's
+  # tty — pinentry is spawned by the detached gpg-agent, so that tty is the
+  # agent's own terminal and a raw write corrupts a full-screen TUI; gpg
+  # surfaces the refusal on the failing command's stderr instead. It exits
+  # immediately rather than looping for a BYE that gpg-agent may never send.
   pinentry = pkgs.writeShellApplication {
     name = "pinentry";
     text = ''
@@ -31,15 +35,11 @@ let
       notice="GPG passphrase entry is disabled inside AI agents. Ask the user to run this command or unlock the key (gpg/gpg-agent) themselves; do not retry."
 
       printf 'OK Pleased to meet you\n'
-      tty=""
       while IFS= read -r line; do
         case "$line" in
-          "OPTION ttyname="*) tty="''${line#OPTION ttyname=}"; printf 'OK\n' ;;
           GETPIN* | CONFIRM*)
-            if [ -n "$tty" ] && [ "$tty" != "not a tty" ]; then
-              printf '\n%s\n' "$notice" >"$tty" 2>/dev/null || true
-            fi
-            printf 'ERR 83886179 Operation cancelled - %s\n' "$notice" ;;
+            printf 'ERR 83886179 Operation cancelled - %s\n' "$notice"
+            exit 0 ;;
           BYE*) printf 'OK closing connection\n'; exit 0 ;;
           *) printf 'OK\n' ;;
         esac
