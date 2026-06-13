@@ -21,42 +21,21 @@ permissions:
   contents: read
 
 jobs:
-  nix-matrix:
+  nix-build:
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: nixbuild/nix-quick-install-action@v34
-      - id: set-matrix
-        name: Generate Nix Matrix
-        run: |
-          set -euo pipefail
-
-          matrix="$(nix eval --json '.#githubActions.matrix')"
-          echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
-
-  nix-check:
-    needs: nix-matrix
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      max-parallel: 10
-      matrix: ${{ fromJSON(needs.nix-matrix.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@v6
-      - uses: nixbuild/nix-quick-install-action@v34
       - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
             /opt/hostedtoolcache/CodeQL /usr/local/share/boost "$AGENT_TOOLSDIRECTORY"
           sudo docker image prune --all --force || true
-      - name: Restore and cache Nix store
-        uses: nix-community/cache-nix-action@v7
+      - uses: ossystems/nix-actions@v1
         with:
-          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.*') }}
-          restore-prefixes-first-match: nix-${{ runner.os }}-
-      - run: nix build -L ".#${{ matrix.attr }}" --keep-going
+          install-nix: true
+          flake-check: false
+          build-hosts: false
+          build-devshells: false
+          build-attrs: matrix
 
   nix:
     runs-on: ubuntu-latest
@@ -65,16 +44,15 @@ jobs:
         homeConfiguration:
           - "otavio@generic-x86"
     steps:
-      - uses: actions/checkout@v6
-      - uses: nixbuild/nix-quick-install-action@v34
       - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
             /opt/hostedtoolcache/CodeQL /usr/local/share/boost "$AGENT_TOOLSDIRECTORY"
           sudo docker image prune --all --force || true
-      - name: Restore and cache Nix store
-        uses: nix-community/cache-nix-action@v7
+      - uses: ossystems/nix-actions@v1
         with:
-          primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.*') }}
-          restore-prefixes-first-match: nix-${{ runner.os }}-
+          install-nix: true
+          flake-check: false
+          build-hosts: false
+          build-devshells: false
       - run: nix -L build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
