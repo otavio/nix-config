@@ -17,4 +17,6 @@ jobs:
           base-branch: master
           install-nix: true
           auto-merge: false
-          pr-labels: ""
+          token-owner: otavio
+          app-id: ${{ secrets.FLAKE_UPDATE_APP_ID }}
+          app-private-key: ${{ secrets.FLAKE_UPDATE_APP_PRIVATE_KEY }}
