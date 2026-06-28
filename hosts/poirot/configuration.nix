@@ -9,7 +9,6 @@
   ] ++ [
     ../features/required
 
-    ../features/optional/anydesk.nix
     ../features/optional/auto-upgrade.nix
     ../features/optional/bluetooth.nix
     ../features/optional/desktop-cinnamon.nix
