@@ -31,6 +31,17 @@ in
 {
   nixpkgs.overlays = [
     inputs.emacs-overlay.overlay
+    # projectile now ships projectile-consult.el, which requires consult, but
+    # the MELPA recipe doesn't declare it, so native-compile fails. Drop this
+    # once the overlay/recipe declares consult as a dependency.
+    (_: prev: {
+      emacsPackagesFor = emacs:
+        (prev.emacsPackagesFor emacs).overrideScope (_: eprev: {
+          projectile = eprev.projectile.overrideAttrs (old: {
+            packageRequires = (old.packageRequires or [ ]) ++ [ eprev.consult ];
+          });
+        });
+    })
   ];
 
   home.packages = with pkgs; [
