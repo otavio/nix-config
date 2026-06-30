@@ -1,5 +1,5 @@
 { pkgs, inputs, ... }:
-pkgs.mkShell {
+pkgs.mkShellNoCC {
   buildInputs = [
     inputs.colmena.packages.${pkgs.stdenv.hostPlatform.system}.colmena
     pkgs.home-manager
