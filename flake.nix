@@ -53,8 +53,9 @@
     };
 
     colmena = {
+      # No nixpkgs follows: keep colmena's pin so it hits the cachix cache
+      # instead of rebuilding from source on every nixpkgs bump.
       url = "github:zhaofengli/colmena";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     whisrs = {
