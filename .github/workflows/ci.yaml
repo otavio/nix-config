@@ -33,7 +33,7 @@ jobs:
           haskell: true
           large-packages: true
           docker-images: true
-          swap-storage: false
+          swap-storage: true
       - uses: ossystems/nix-actions@v1
         with:
           install-nix: true
@@ -58,7 +58,7 @@ jobs:
           haskell: true
           large-packages: true
           docker-images: true
-          swap-storage: false
+          swap-storage: true
       - uses: ossystems/nix-actions@v1
         with:
           install-nix: true
