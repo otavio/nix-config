@@ -34,6 +34,11 @@ in
       General = {
         disabledTrayIcon = true;
         showDesktopNotification = false;
+        # Flameshot v14 captures through xdg-desktop-portal's Screenshot
+        # interface, which no backend implements on plain i3/X11, so the call
+        # hangs and the screen just flashes. Bypass it with Qt's native X11
+        # grab (flameshot-org/flameshot#4737).
+        useX11LegacyScreenshot = true;
         savePath = "${config.home.homeDirectory}/Downloads";
       };
     };
