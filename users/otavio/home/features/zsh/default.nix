@@ -117,30 +117,33 @@ in
       keys-load() {
           mkdir -p /tmp/otavio/keys
           if [ -z "$1" ]; then
-              unset SSH_AUTH_SOCK
               echo Decriptando particao...
               sudo ${cryptsetup} -v luksOpen /dev/disk/by-uuid/faae5ddb-df82-4a23-8a24-eedd6356ccff keys && \
                   sudo mount /dev/mapper/keys /tmp/otavio/keys && \
                   echo done || echo ERROR
 
               echo Carregando chave SSH ...
-              DISPLAY="" ${keychain} --agents gpg,ssh id_rsa id_ed25519 EB70FEF3CDFC6E4F 306736ED8C77E0D5
+              ssh-add "$HOME/.ssh/id_rsa" "$HOME/.ssh/id_ed25519"
+
+              echo Carregando chave GPG ...
+              DISPLAY="" ${keychain} --agents gpg EB70FEF3CDFC6E4F 306736ED8C77E0D5
           fi
 
-          [ -f $HOME/.keychain/$(hostname)-sh ] && source $HOME/.keychain/$(hostname)-sh
-          [ -f $HOME/.keychain/$(hostname)-sh-gpg ] && source  $HOME/.keychain/$(hostname)-sh-gpg
+          [ -f $HOME/.keychain/$(hostname)-sh-gpg ] && source $HOME/.keychain/$(hostname)-sh-gpg
 
-          # Bridge to the systemd user env so subsequently launched GUI apps
-          # see the real ssh-agent instead of the gnome-keyring socket i3
-          # inherited from the X session.
+          # Bridge the fixed ssh-agent socket to the systemd user env so
+          # GUI apps see it instead of the gnome-keyring socket i3 inherited
+          # from the X session.
           if [ -n "$SSH_AUTH_SOCK" ] && command -v systemctl >/dev/null 2>&1; then
-              systemctl --user import-environment SSH_AUTH_SOCK SSH_AGENT_PID 2>/dev/null
+              systemctl --user import-environment SSH_AUTH_SOCK 2>/dev/null
           fi
       }
 
       keys-close() {
           echo Descarregando chave SSH
-          ${keychain} --stop mine
+          ssh-add -D
+          echo Descarregando chave GPG
+          gpgconf --kill gpg-agent
           echo -n Desligando particao encriptada...
           sudo umount /tmp/otavio/keys > /dev/null
           sudo ${cryptsetup} -v luksClose keys && \
