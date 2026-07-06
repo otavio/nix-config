@@ -17,6 +17,7 @@
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
     ../features/optional/quietboot.nix
+    ../features/optional/tailscale.nix
     ../features/optional/voice-coding.nix
     ../features/optional/zram-swap.nix
 
