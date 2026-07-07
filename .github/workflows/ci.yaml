@@ -40,6 +40,9 @@ jobs:
           flake-check: false
           build-hosts: false
           build-devshells: false
+          # Skip building the flake's packages; the installer ISOs are huge
+          # and validated separately by the `installers` job.
+          build-packages: false
           build-attrs: matrix
 
   nix:
@@ -65,4 +68,36 @@ jobs:
           flake-check: false
           build-hosts: false
           build-devshells: false
+          build-packages: false
       - run: nix -L build ".#homeConfigurations.${{ matrix.homeConfiguration }}.activationPackage"
+
+  installers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+      - uses: ossystems/nix-actions@v1
+        with:
+          install-nix: true
+          flake-check: false
+          build-hosts: false
+          build-devshells: false
+          build-packages: false
+      # Only validate that the installer ISOs evaluate; building and caching
+      # the full images is not worth the runner time.
+      - name: Evaluate installer ISOs
+        run: |
+          for attr in $(nix eval --json '.#packages.x86_64-linux' --apply builtins.attrNames \
+            | jq -r '.[] | select(startswith("installer-iso-"))'); do
+            echo "==> $attr"
+            nix eval --raw ".#packages.x86_64-linux.$attr.drvPath"
+            echo
+          done
