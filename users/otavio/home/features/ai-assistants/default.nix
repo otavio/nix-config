@@ -12,6 +12,8 @@ in
     ./claude.nix
     ./codex.nix
     ./herdr.nix
+    ./herdr-plugins.nix
+    ./herdr-config.nix
   ];
 
   home.packages = with pkgs; [ jq ripgrep rtk ];

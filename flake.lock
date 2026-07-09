@@ -229,6 +229,22 @@
         "type": "github"
       }
     },
+    "herdr-plugin-hunk": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1782242062,
+        "narHash": "sha256-Ug5809kj7y4TJ2ViRG76jb5gLFbhdpyWNIL/vNbpgFo=",
+        "owner": "edmundmiller",
+        "repo": "herdr-plugin-hunk",
+        "rev": "11ba5dcca4358203ca68f160becf6870cf016c18",
+        "type": "github"
+      },
+      "original": {
+        "owner": "edmundmiller",
+        "repo": "herdr-plugin-hunk",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -394,6 +410,7 @@
         "disko": "disko",
         "emacs-overlay": "emacs-overlay",
         "herdr": "herdr",
+        "herdr-plugin-hunk": "herdr-plugin-hunk",
         "home-manager": "home-manager",
         "nix-github-actions": "nix-github-actions_2",
         "nixos-hardware": "nixos-hardware",
