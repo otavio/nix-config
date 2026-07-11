@@ -13,9 +13,9 @@
   programs.gh = {
     enable = true;
     settings.git_protocol = "ssh";
-    # Declarative helper path tracks the home-manager generation, so a
-    # nix-store GC can't strand it the way a one-off `gh auth setup-git` can.
-    gitCredentialHelper.enable = true;
+    # Off because it emits gh's store path; the helper is set by bare command
+    # in programs.git.settings (see the note there).
+    gitCredentialHelper.enable = false;
   };
 
   programs.git = {
@@ -23,13 +23,18 @@
 
     signing.format = null;
 
+    # Everything here is referenced by bare command name, never a
+    # `${pkgs.*}/bin` store path: the `repo` tool caches this config and never
+    # refreshes it (home-manager renders it into a store file whose mtime is
+    # frozen at the epoch), so a pinned path breaks once GC removes the
+    # superseded generation. Bare names resolve via PATH to the live generation.
     settings = {
       user = {
         name = "Otavio Salvador";
         email = "otavio@ossystems.com.br";
       };
 
-      aliases = let git = "${pkgs.git}/bin/git"; in {
+      aliases = let git = "git"; in {
         st = "status";
         wlog = "log --color-words";
         wdiff = "diff --color-words";
@@ -39,7 +44,22 @@
         prune-local-branches = "!${git} branch -vv | grep ': gone]' | grep -v '\\*' | awk '{ print $1; }' | xargs -r ${git} branch -d";
       };
 
-      core.sshCommand = "${pkgs.openssh}/bin/ssh -F ~/.ssh/config";
+      core.sshCommand = "ssh -F ~/.ssh/config";
+
+      credential =
+        let helper = [ "" "gh auth git-credential" ]; in {
+          "https://github.com".helper = helper;
+          "https://gist.github.com".helper = helper;
+        };
+
+      pager = {
+        blame = "delta";
+        diff = "delta";
+        log = "delta";
+        show = "delta";
+      };
+      interactive.diffFilter = "delta --color-only";
+      delta.syntax-theme = "base16-256";
 
       github.user = "otavio";
 
@@ -63,9 +83,7 @@
     ignores = [ ".direnv" ];
   };
 
-  programs.delta = {
-    enable = true;
-    enableGitIntegration = true;
-    options.syntax-theme = "base16-256";
-  };
+  # Integration left off because it emits delta's store path; delta is wired
+  # into git by bare command in settings above (see the note there).
+  programs.delta.enable = true;
 }
