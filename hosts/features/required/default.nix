@@ -1,4 +1,4 @@
-{ inputs, hostName, ... }: {
+{ inputs, hostName, lib, ... }: {
   imports = [
     inputs.disko.nixosModules.disko
     inputs.colmena.nixosModules.deploymentOptions
@@ -19,6 +19,8 @@
   ];
 
   networking.hostName = hostName;
+
+  boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
 
   system.stateVersion = "26.11";
 }
