@@ -134,42 +134,49 @@ in
             source = "github";
             repo = "OSSystems/ai-plugins";
           };
+          autoUpdate = true;
         };
         ui-ux-pro-max-skill = {
           source = {
             source = "github";
             repo = "nextlevelbuilder/ui-ux-pro-max-skill";
           };
+          autoUpdate = true;
         };
         knowledge-work-plugins = {
           source = {
             source = "github";
             repo = "anthropics/knowledge-work-plugins";
           };
+          autoUpdate = true;
         };
         custom-claude-code-plugins = {
           source = {
             source = "github";
             repo = "stefanoginella/claude-code-plugins";
           };
+          autoUpdate = true;
         };
         claude-plugins-official = {
           source = {
             source = "github";
             repo = "anthropics/claude-plugins-official";
           };
+          autoUpdate = true;
         };
         freedom-rtos-ai = {
           source = {
             source = "github";
             repo = "FreedomVeiculosEletricos/freedom-rtos-ai";
           };
+          autoUpdate = true;
         };
         anthropic-agent-skills = {
           source = {
             source = "github";
             repo = "anthropics/skills";
           };
+          autoUpdate = true;
         };
       };
 
