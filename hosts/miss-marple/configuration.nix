@@ -44,7 +44,7 @@
     initrd.availableKernelModules = [ "nvme" "xhci_pci" "usbhid" ];
     initrd.kernelModules = [ ];
 
-    kernelModules = [ "kvm-amd" ];
+    kernelModules = [ "kvm-intel" ];
   };
 
   deployment = {
