@@ -40,8 +40,6 @@
     ];
   };
 
-  nixpkgs.hostPlatform = "x86_64-linux";
-
   home-manager.users.otavio = import ../../users/otavio/home/micro.nix;
 
   boot = {

@@ -31,8 +31,6 @@
 
   my.backup.user = "bruna";
 
-  nixpkgs.hostPlatform = "x86_64-linux";
-
   home-manager.users = {
     bruna = import ../../users/bruna/home;
     otavio = import ../../users/otavio/home/features/global;
