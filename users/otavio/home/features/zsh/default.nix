@@ -10,6 +10,7 @@ in
 {
   home.packages = with pkgs; [
     tree
+    fd
     nix-differ
     zsh-completions
     nettools # for ifconfig
@@ -218,6 +219,10 @@ in
     '';
 
     shellAliases = {
+      # Use bat in place of cat/less: no paging for cat, always page for less.
+      cat = "bat --paging=never";
+      less = "bat --paging=always";
+
       # Paste from command line.
       tb = "nc termbin.com 9999";
 
