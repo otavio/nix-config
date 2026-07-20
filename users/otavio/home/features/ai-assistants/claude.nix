@@ -36,6 +36,12 @@ in
       skipDangerousModePermissionPrompt = true;
       alwaysThinkingEnabled = true;
       awaySummaryEnabled = false;
+
+      # Trim unused tool schemas from every request; they ship each turn
+      # whether or not the tools are used.
+      disableClaudeAiConnectors = true; # Gmail/Calendar/Drive MCP tools
+      disableArtifact = true;
+
       permissions = {
         defaultMode = "bypassPermissions";
         disableAutoMode = "disable";
@@ -63,6 +69,11 @@ in
           "Write(**/.env.example)"
         ];
         deny = [
+          # Drop these unused tool schemas from every request; bare names
+          # remove the definition, not just block the call.
+          "DesignSync"
+          "NotebookEdit"
+
           # .env files
           "Read(.env*)"
           "Edit(.env*)"
