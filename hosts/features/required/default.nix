@@ -12,6 +12,7 @@
     ./network.nix
     ./nix.nix
     ./nixpkgs.nix
+    ./oomd.nix
     ./openssh.nix
     ./sops.nix
     ./sudo.nix
