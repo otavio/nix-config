@@ -4,7 +4,7 @@ let
 
   statuslineScript = pkgs.writeShellApplication {
     name = "statusline-command";
-    runtimeInputs = [ pkgs.jq ];
+    runtimeInputs = [ pkgs.jq pkgs.git pkgs.coreutils ];
     text = builtins.readFile ./statusline-command.sh;
   };
 
