@@ -105,10 +105,10 @@ let
       # Required by the deserializer; left empty so whisrs falls back to
       # WHISRS_OPENAI_API_KEY (injected by the systemd wrapper below).
       api_key = "";
-      # gpt-4o-mini-transcribe is more accurate than whisper-1 but follows
-      # the `prompt` field as a language hint less reliably, so short
-      # utterances can drift off en/pt under language="auto".
-      model = "gpt-4o-mini-transcribe";
+      # Dated snapshot rather than the floating alias: it is tuned for short
+      # utterances and background noise, which is where en/pt drift under
+      # language="auto" showed up. Same price as the alias.
+      model = "gpt-4o-mini-transcribe-2025-12-15";
     };
   };
 
