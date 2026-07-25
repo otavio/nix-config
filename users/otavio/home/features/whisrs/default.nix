@@ -146,6 +146,11 @@ in
       Requires = [ "snixembed.service" ];
       After = [ "graphical-session-pre.target" "snixembed.service" ];
       PartOf = [ "graphical-session.target" ];
+      # whisrs reads config.toml only at startup, and sd-switch restarts a unit
+      # only when the unit file changes. Without the config's store path here,
+      # editing it leaves the unit identical and the daemon keeps the old
+      # settings until the next manual restart.
+      X-Restart-Triggers = [ "${configFile}" ];
     };
     Service = {
       ExecStart = lib.getExe whisrsd-start;
