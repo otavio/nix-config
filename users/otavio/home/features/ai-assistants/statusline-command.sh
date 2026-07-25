@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-# Read JSON input from stdin
 input=$(cat)
 
-# Extract values from JSON
 current_dir=$(echo "$input" | jq -r '.workspace.current_dir // .workspace.project_dir')
 path_disp=${current_dir/#"$HOME"/\~}
 model_name=$(echo "$input" | jq -r '.model.display_name')

@@ -179,7 +179,6 @@ in
 
         "Mod1+Prior" = "exec whisrs toggle";
 
-        # Hide dunst notification.
         "Control+Shift+space" = "exec ${dunstCloseNotification}";
       };
 
