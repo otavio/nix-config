@@ -98,12 +98,9 @@ let
       inherit vocabulary;
       prompt = basePrompt;
     };
-    input = {
-      # Raised from the 2ms default to balance accuracy in Node/Ink TUIs
-      # (e.g. Claude Code) without making typing feel sluggish (whisrs
-      # PR #14, issue #12).
-      key_delay_ms = 30;
-    };
+    # Pinned to whisrs's own default so an upstream change to it can't silently
+    # slow typing back down.
+    input.key_delay_ms = 2;
     openai = {
       # Required by the deserializer; left empty so whisrs falls back to
       # WHISRS_OPENAI_API_KEY (injected by the systemd wrapper below).
