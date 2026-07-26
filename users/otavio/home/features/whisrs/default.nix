@@ -1,11 +1,7 @@
 { inputs, lib, pkgs, ... }:
 
 let
-  whisrs = inputs.whisrs.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
-    preCheck = (old.preCheck or "") + ''
-      export HOME=$(mktemp -d)
-    '';
-  });
+  whisrs = inputs.whisrs.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
   basePrompt = ''
     Otavio Salvador speaking. Professional, technical register: software
