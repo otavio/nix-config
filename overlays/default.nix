@@ -37,5 +37,14 @@ _:
     linuxPackages_latest = prev.linuxPackages_latest.extend (_: prev: {
       rtl88x2bu = prev.callPackage ./rtl88x2bu { };
     });
+
+    rtk = prev.rtk.overrideAttrs (oa: {
+      # rustc now reports unused `pub` items in binary crates, and 0.43.0 was
+      # tagged one day before the upstream commit that puts FILTERS_TOML and
+      # TomlFilterRegistry::load to use, so the test build trips -D warnings.
+      # Same workaround nixpkgs master already carries; drop it once the
+      # nixpkgs pin advances or rtk tags a release after 0.43.0.
+      env = (oa.env or { }) // { RUSTFLAGS = "--cap-lints warn"; };
+    });
   };
 }
