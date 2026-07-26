@@ -60,13 +60,11 @@ in
           # so the broader .env* deny below doesn't block it.
           "Read(**/.envrc)"
           "Edit(**/.envrc)"
-          "Write(**/.envrc)"
 
           # .env.example is a non-secret template — allow it explicitly
           # so the broader .env* deny below doesn't block it.
           "Read(**/.env.example)"
           "Edit(**/.env.example)"
-          "Write(**/.env.example)"
         ];
         deny = [
           # Drop these unused tool schemas from every request; bare names
