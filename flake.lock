@@ -516,16 +516,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1777649353,
-        "narHash": "sha256-/xUhqchciTcGqrGnCvDxT6vn0fUwWTDvSVrwyx5EUVU=",
-        "owner": "otavio",
+        "lastModified": 1784839075,
+        "narHash": "sha256-08ijEtX7ksY63XlGViGWBM6Lu/6cVx0HbCPXLgBoSCU=",
+        "owner": "y0sif",
         "repo": "whisrs",
-        "rev": "e66a7ae79462e00ee4f1dd6c8fcd00aeef182bce",
+        "rev": "fa88fab176b7c9989fe7f506d44df09e022545af",
         "type": "github"
       },
       "original": {
-        "owner": "otavio",
-        "ref": "fix/prompt-echo",
+        "owner": "y0sif",
         "repo": "whisrs",
         "type": "github"
       }
