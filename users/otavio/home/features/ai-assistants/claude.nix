@@ -56,7 +56,6 @@ in
     package = pkgs.claude-code;
     settings = {
       env = {
-        CLAUDE_CODE_EFFORT_LEVEL = "high";
         CLAUDE_CODE_NO_FLICKER = "1";
       } // credentialGuard.mkAgentEnv "claude";
       model = "opus";
