@@ -1,6 +1,13 @@
-{ inputs, pkgs, ... }:
+{ config, inputs, lib, pkgs, ... }:
 let
   notificationSound = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/complete.oga";
+
+  settingsPath = "${config.programs.claude-code.configDir}/settings.json";
+  # The store path home-manager would otherwise have symlinked into place.
+  settingsSource = config.home.file.${settingsPath}.source;
+  # Records which store path was last deployed, as a symlink so the activation
+  # script can compare with readlink and never needs a shell redirection.
+  deployedMarker = "${config.xdg.stateHome}/nix-config/claude-settings";
 
   statuslineScript = pkgs.writeShellApplication {
     name = "statusline-command";
@@ -17,6 +24,27 @@ let
 in
 {
   home.packages = with pkgs; [ sox ];
+
+  # Claude Code rewrites settings.json in place -- /config, permission grants,
+  # plugin toggles -- which a read-only store symlink forbids. Deploy a real
+  # copy instead, and replace it only when the Nix-side content actually
+  # changes, so edits made inside the harness survive unrelated activations.
+  home.file.${settingsPath}.enable = false;
+
+  home.activation.claudeCodeSettings =
+    lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      if [ ! -f ${lib.escapeShellArg settingsPath} ] \
+        || [ -L ${lib.escapeShellArg settingsPath} ] \
+        || [ "$(readlink ${lib.escapeShellArg deployedMarker} 2>/dev/null)" \
+             != ${lib.escapeShellArg settingsSource} ]; then
+        run rm -f ${lib.escapeShellArg settingsPath}
+        run install -Dm600 ${lib.escapeShellArg settingsSource} \
+          ${lib.escapeShellArg settingsPath}
+      fi
+      run mkdir -p ${lib.escapeShellArg (builtins.dirOf deployedMarker)}
+      run ln -sfn ${lib.escapeShellArg settingsSource} \
+        ${lib.escapeShellArg deployedMarker}
+    '';
 
   nixpkgs = {
     overlays = [ inputs.claude-code-overlay.overlays.default ];
