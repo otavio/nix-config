@@ -27,23 +27,10 @@ in
       (lib.optional eyeTracking pkgs.v4l-utils)
     ];
 
-  # NOTE: If instead you use the git entry in the home.packages list above, you well encounter in error:
-  # ```
-  # error: collision between `/nix/store/sjrpbscvbwa3djc1fhgrcjc7q1qf9638-git-with-svn-2.42.0/bin/git-receive-pack'
-  # and `/nix/store/gj71wiyzb6x8sxkkd7xxymk6m4jp3s1m-git-2.42.0/bin/git-receive-pack'
-  # ```
+  # Enabled through the module rather than added to home.packages, where a
+  # second git derivation collides with git-with-svn on git-receive-pack.
   programs.git.enable = true;
 
-  # Installing collected packages: pytz, tzdata, tifffile, six, screen-ocr, scipy, pytesseract, networkx, lazy-loader, imageio, scikit-image, python-
-  # dateutil, pandas
-  # ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the fo
-  # llowing dependency conflicts.
-  # torch 2.0.1+cpu requires filelock, which is not installed.
-  # torch 2.0.1+cpu requires jinja2, which is not installed.
-  # torch 2.0.1+cpu requires sympy, which is not installed.
-  # 2024-04-24 08:12:35.281  INFO Talon OCR not available, will rely on external support.
-  # 2024-04-24 08:12:35.284 DEBUG Dispatched launch events at 7.7976s, done at 14.2285s
-  # 2024-04-24 08:12:35.310 ERROR cron interval error <function _rescan at 0x7f87cf7ae160>
   home.activation.talonInstallTesseract = lib.mkIf gazeOcr ''
     if ! ~/.talon/bin/pip show screen-ocr\[tesseract\] >/dev/null 2>&1; then
       ~/.talon/bin/pip install screen-ocr\[tesseract\]
