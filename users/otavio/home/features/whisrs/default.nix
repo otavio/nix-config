@@ -1,8 +1,6 @@
-{ inputs, lib, pkgs, ... }:
+{ inputs, pkgs, ... }:
 
 let
-  whisrs = inputs.whisrs.packages.${pkgs.stdenv.hostPlatform.system}.default;
-
   basePrompt = ''
     Otavio Salvador speaking. Professional, technical register: software
     engineering, embedded Linux, the Yocto Project, AI agent workflows.
@@ -81,82 +79,39 @@ let
     "São Paulo"
     "Rio Grande do Sul"
   ];
+in
+{
+  imports = [ ./module.nix ../snixembed ];
 
-  configFile = (pkgs.formats.toml { }).generate "whisrs-config.toml" {
-    general = {
-      backend = "openai";
-      language = "auto";
-      silence_timeout_ms = 2000;
-      notify = true;
-      remove_filler_words = true;
-      audio_feedback = true;
-      audio_feedback_volume = 0.2;
-      inherit vocabulary;
-      prompt = basePrompt;
+  services.whisrs = {
+    enable = true;
+    package = inputs.whisrs.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    openai.apiKeyFile = "/run/secrets/openai_api_key";
+
+    xkb = {
+      layout = "us";
+      variant = "intl";
     };
-    # Pinned to whisrs's own default so an upstream change to it can't silently
-    # slow typing back down.
-    input.key_delay_ms = 2;
-    openai = {
-      # Required by the deserializer; left empty so whisrs falls back to
-      # WHISRS_OPENAI_API_KEY (injected by the systemd wrapper below).
-      api_key = "";
+
+    settings = {
+      general = {
+        backend = "openai";
+        language = "auto";
+        silence_timeout_ms = 2000;
+        notify = true;
+        remove_filler_words = true;
+        audio_feedback = true;
+        audio_feedback_volume = 0.2;
+        inherit vocabulary;
+        prompt = basePrompt;
+      };
+      # Pinned to whisrs's own default so an upstream change to it can't
+      # silently slow typing back down.
+      input.key_delay_ms = 2;
       # Dated snapshot rather than the floating alias: it is tuned for short
       # utterances and background noise, which is where en/pt drift under
       # language="auto" showed up. Same price as the alias.
-      model = "gpt-4o-mini-transcribe-2025-12-15";
+      openai.model = "gpt-4o-mini-transcribe-2025-12-15";
     };
-  };
-
-  whisrsd-start = pkgs.writeShellApplication {
-    name = "whisrsd-start";
-    text = ''
-      WHISRS_OPENAI_API_KEY="$(< /run/secrets/openai_api_key)"
-      export WHISRS_OPENAI_API_KEY
-      exec ${lib.getExe' whisrs "whisrsd"}
-    '';
-  };
-in
-{
-  imports = [ ../snixembed ];
-
-  xdg.configFile."whisrs/config.toml".source = configFile;
-
-  home.packages = [ whisrs ];
-
-  services.snixembed.beforeUnits = [ "whisrs.service" ];
-
-  systemd.user.services.whisrs = {
-    Unit = {
-      Description = "whisrs speech-to-text daemon";
-      # Hard-require snixembed: whisrs's tray code retries
-      # RegisterStatusNotifierItem 10x with backoff and then permanently
-      # disables the tray for the rest of the process lifetime. If snixembed
-      # isn't already up when whisrs starts, the icon stays missing until the
-      # next restart. `services.snixembed.beforeUnits` only adds ordering, so
-      # pin the dependency here too so whisrs is held back until snixembed has
-      # claimed `org.kde.StatusNotifierWatcher`.
-      Requires = [ "snixembed.service" ];
-      After = [ "graphical-session-pre.target" "snixembed.service" ];
-      PartOf = [ "graphical-session.target" ];
-      # whisrs reads config.toml only at startup, and sd-switch restarts a unit
-      # only when the unit file changes. Without the config's store path here,
-      # editing it leaves the unit identical and the daemon keeps the old
-      # settings until the next manual restart.
-      X-Restart-Triggers = [ "${configFile}" ];
-    };
-    Service = {
-      ExecStart = lib.getExe whisrsd-start;
-      Restart = "on-failure";
-      # whisrs auto-detects only Hyprland/Sway; under X11/i3 it falls back to
-      # xkbcommon's default (us, no variant). Mirror the active X11 layout so
-      # dead keys (', ", `, ^, ~ on us:intl) get routed through clipboard
-      # paste instead of arriving as combining accents on the next character.
-      Environment = [
-        "XKB_DEFAULT_LAYOUT=us"
-        "XKB_DEFAULT_VARIANT=intl"
-      ];
-    };
-    Install.WantedBy = [ "graphical-session.target" ];
   };
 }
