@@ -105,9 +105,6 @@ in
         inherit vocabulary;
         prompt = basePrompt;
       };
-      # Dated snapshot rather than the floating alias: it is tuned for short
-      # utterances and background noise, which is where en/pt drift under
-      # language="auto" showed up. Same price as the alias.
       openai.model = "gpt-4o-mini-transcribe-2025-12-15";
     };
   };
