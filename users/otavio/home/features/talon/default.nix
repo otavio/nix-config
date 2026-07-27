@@ -6,8 +6,6 @@ in
 {
   imports = [ ../snixembed ];
 
-  services.snixembed.beforeUnits = [ "talon.service" ];
-
   home.packages =
     assert (
       lib.assertMsg
@@ -72,8 +70,9 @@ in
         Unit = {
           Description = "Talon Voice";
           Documentation = "https://talonvoice.com/";
+          Wants = [ "tray.target" ];
           After = [
-            "snixembed.service"
+            "tray.target"
             "graphical-session-pre.target"
           ];
         };
