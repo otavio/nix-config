@@ -67,7 +67,6 @@ in
       # Trim unused tool schemas from every request; they ship each turn
       # whether or not the tools are used.
       disableClaudeAiConnectors = true; # Gmail/Calendar/Drive MCP tools
-      disableArtifact = true;
 
       permissions = {
         defaultMode = "bypassPermissions";
