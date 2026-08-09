@@ -13,6 +13,7 @@
     ../features/optional/desktop-cinnamon.nix
     ../features/optional/epson-l495.nix
     ../features/optional/latest-linux-kernel.nix
+    ../features/optional/msmtp.nix
     ../features/optional/network-manager.nix
     ../features/optional/no-mitigations.nix
     ../features/optional/pipewire.nix
@@ -28,7 +29,10 @@
     ./partitioning.nix
   ];
 
-  my.backup.user = "bruna";
+  my.backup = {
+    user = "bruna";
+    prune = true;
+  };
 
   home-manager.users = {
     bruna = import ../../users/bruna/home;

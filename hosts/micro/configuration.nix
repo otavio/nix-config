@@ -12,6 +12,7 @@
     ../features/optional/desktop-i3.nix
     ../features/optional/docker.nix
     ../features/optional/latest-linux-kernel.nix
+    ../features/optional/msmtp.nix
     ../features/optional/network-manager.nix
     ../features/optional/nix-ld.nix
     ../features/optional/no-mitigations.nix
@@ -25,7 +26,6 @@
 
     flake.nixosModules.restic-r2
 
-    ./msmtp.nix
     ./partitioning.nix
     ./whisrs.nix
     ./wireguard.nix
