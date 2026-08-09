@@ -1,10 +1,13 @@
-{ pkgs, ... }:
+{ pkgs, flake, ... }:
 
 let
+  # The whole directory is deployed, not just the referenced file, so links
+  # between these documents resolve the same way they do in the repository.
   mkInstructions = { dir, hook, indexFile }: {
     "${dir}/USER.md".source = ./USER.md;
     "${dir}/RTK.md".source = "${pkgs.rtk.src}/hooks/${hook}/rtk-awareness.md";
-    "${dir}/${indexFile}".text = "@USER.md\n@RTK.md\n";
+    "${dir}/docs".source = "${flake}/docs/ai";
+    "${dir}/${indexFile}".text = "@USER.md\n@RTK.md\n@docs/reusable-modules.md\n";
   };
 in
 {
