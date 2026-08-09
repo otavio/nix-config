@@ -48,7 +48,7 @@
   boot.loader.efi.efiSysMountPoint = "/efi";
   boot.loader.grub.device = "nodev";
 
-  deployment = {
+  my.deployment = {
     targetHost = "10.121.15.18";
     buildOnTarget = true;
   };

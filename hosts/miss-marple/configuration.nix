@@ -44,7 +44,7 @@
     kernelModules = [ "kvm-intel" ];
   };
 
-  deployment = {
+  my.deployment = {
     targetHost = "10.4.0.51";
     buildOnTarget = true;
   };

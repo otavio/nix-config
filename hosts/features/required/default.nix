@@ -1,7 +1,6 @@
 { inputs, hostName, lib, ... }: {
   imports = [
     inputs.disko.nixosModules.disko
-    inputs.colmena.nixosModules.deploymentOptions
 
     ./colmena.nix
     ./console.nix

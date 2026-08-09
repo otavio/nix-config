@@ -98,7 +98,7 @@
     cntr
   ];
 
-  deployment.allowLocalDeployment = true;
+  my.deployment.allowLocalDeployment = true;
 
   # VM-only overrides for `nixos-rebuild build-vm --flake .#micro`. The real
   # boot sees neither these settings nor the sops secret stub.
