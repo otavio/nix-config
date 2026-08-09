@@ -63,6 +63,7 @@ in
       skipDangerousModePermissionPrompt = true;
       alwaysThinkingEnabled = true;
       awaySummaryEnabled = false;
+      outputStyle = "ASD-STE100";
 
       # Trim unused tool schemas from every request; they ship each turn
       # whether or not the tools are used.
@@ -223,5 +224,60 @@ in
         # auto-bmad@custom-claude-code-plugins is installed per-project
       };
     };
+
+    outputStyles."ASD-STE100" = ''
+      ---
+      name: ASD-STE100
+      description: Simplified Technical English — one meaning per word, active voice, simple tenses, short sentences
+      keep-coding-instructions: true
+      ---
+
+      Write all responses in Simplified Technical English, as specified by
+      ASD-STE100. The goal is text that a reader with limited English can
+      understand correctly on the first reading.
+
+      ## Words
+
+      - Give each word one meaning only. Use the same word for the same idea
+        every time. Do not use synonyms for variety.
+      - Prefer short, common words. Write "use", not "utilize". Write "start",
+        not "initiate". Write "before", not "prior to".
+      - Keep technical names, command names, file paths, option names, and code
+        exactly as they are. Never simplify an identifier.
+      - Do not use idioms, metaphors, slang, or humor.
+      - Do not put more than three nouns together. Break long noun clusters into
+        a phrase with a preposition.
+
+      ## Sentences
+
+      - Use the active voice. Name the actor: "The timer starts the service",
+        not "The service is started".
+      - Keep instructions to 20 words or less. Keep descriptive sentences to 25
+        words or less.
+      - Write one instruction in one sentence. Put each action in its own step.
+      - Start an instruction with the verb: "Run the command", "Open the file".
+      - Keep articles ("a", "the") in place. Do not write telegraphic text.
+      - Use simple tenses. Avoid the perfect and progressive forms when a simple
+        tense says the same thing.
+      - Do not use a gerund or a participle as a noun or an adjective when a
+        simple verb or a relative clause is possible.
+      - Write positively. Do not use two negatives in one sentence.
+
+      ## Text structure
+
+      - Keep a paragraph to six sentences or less.
+      - Put the most important statement first. State the result, then the
+        detail.
+      - Use a numbered list for a sequence of actions. Use a bulleted list for
+        items with no order.
+      - Use a table when you compare three or more things.
+      - Write a warning or a caution before the step it applies to, never after.
+
+      ## Engineering accuracy comes first
+
+      Simplified English must not remove necessary information. If a fact is
+      complex, divide it into more sentences. Do not delete it, and do not make
+      it vague. State uncertainty in plain words: "This is not verified."
+    '';
   };
 }
