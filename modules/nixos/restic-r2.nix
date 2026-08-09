@@ -19,12 +19,18 @@ let
   freshness = pkgs.writeShellScript "backup-freshness" ''
     set -uo pipefail
 
-    latest=$(${resticBin} snapshots --json --latest 1 \
-      --host ${config.networking.hostName} 2>/dev/null \
-      | ${pkgs.jq}/bin/jq -r '.[0].time // empty')
+    # --no-cache: this only reads metadata, and the unit has no HOME or
+    # XDG_CACHE_HOME for restic to place a cache in.
+    if ! snapshots=$(${resticBin} --no-cache snapshots --json --latest 1 \
+      --host ${config.networking.hostName}); then
+      echo "cannot query the repository, so freshness is unknown" >&2
+      exit 1
+    fi
+
+    latest=$(printf '%s' "$snapshots" | ${pkgs.jq}/bin/jq -r '.[0].time // empty')
 
     if [ -z "$latest" ]; then
-      echo "no snapshot found for this host" >&2
+      echo "the repository has no snapshot for this host" >&2
       exit 1
     fi
 
