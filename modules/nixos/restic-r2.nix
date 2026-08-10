@@ -117,8 +117,10 @@ in
       extraBackupArgs = [
         "--exclude-caches"
         "--exclude-if-present .backup-ignore"
+        # The pruning host holds an exclusive lock for as long as the prune
+        # takes. Wait it out instead of failing the run.
         "--retry-lock"
-        "15m"
+        "3h"
       ] ++ cfg.extraExcludes;
     };
 
