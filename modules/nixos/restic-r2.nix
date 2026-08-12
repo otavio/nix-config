@@ -19,9 +19,10 @@ let
   freshness = pkgs.writeShellScript "backup-freshness" ''
     set -uo pipefail
 
-    # --no-cache: this only reads metadata, and the unit has no HOME or
-    # XDG_CACHE_HOME for restic to place a cache in.
-    if ! snapshots=$(${resticBin} --no-cache snapshots --json --latest 1 \
+    # --no-cache: the unit has no HOME or XDG_CACHE_HOME for a cache.
+    # --no-lock: reading metadata needs no lock, and the pruning host holds an
+    # exclusive one for as long as the prune takes.
+    if ! snapshots=$(${resticBin} --no-cache --no-lock snapshots --json --latest 1 \
       --host ${config.networking.hostName}); then
       echo "cannot query the repository, so freshness is unknown" >&2
       exit 1
@@ -102,6 +103,9 @@ in
       backupPrepareCommand = "${resticBin} unlock || true";
 
       pruneOpts = lib.optionals cfg.prune [
+        # Backups on other hosts hold a lock while they run, and the prune
+        # needs an exclusive one. Wait for them as they wait for it.
+        "--retry-lock 3h"
         "--keep-daily 7"
         "--keep-weekly 5"
         "--keep-monthly 6"
