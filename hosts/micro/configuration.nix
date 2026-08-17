@@ -26,6 +26,7 @@
 
     flake.nixosModules.restic-r2
 
+    ./openweathermap.nix
     ./partitioning.nix
     ./whisrs.nix
     ./wireguard.nix

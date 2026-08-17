@@ -43,6 +43,20 @@ let
     kill "$onboardpid" "$raiserpid" 2>/dev/null || true
   '';
 
+  openweathermapKeyFile = "/run/secrets/openweathermap/api-key";
+
+  # i3status-rs reads the OpenWeatherMap key from the environment when the
+  # weather block omits `service.api_key`, which keeps the key out of the
+  # world-readable config file in the Nix store.
+  i3statusRustBottom = pkgs.writeShellScript "i3status-rs-bottom" ''
+    if [ -r ${openweathermapKeyFile} ]; then
+      OPENWEATHERMAP_API_KEY="$(< ${openweathermapKeyFile})"
+      export OPENWEATHERMAP_API_KEY
+    fi
+    exec ${config.programs.i3status-rust.package}/bin/i3status-rs \
+      "$HOME/.config/i3status-rust/config-bottom.toml"
+  '';
+
   # systemd 257+ marks graphical-session.target as RefuseManualStart=yes, so
   # `systemctl --user start graphical-session.target` from i3's startup is
   # rejected and units like whisrs.service / snixembed.service stay dormant.
@@ -97,7 +111,7 @@ in
       bars = [
         {
           position = "bottom";
-          statusCommand = "${config.programs.i3status-rust.package}/bin/i3status-rs ${config.home.homeDirectory}/.config/i3status-rust/config-bottom.toml";
+          statusCommand = "${i3statusRustBottom}";
           fonts = {
             names = [ "FontAwesome" "Iosevka" ];
             size = 9.0;
@@ -248,7 +262,6 @@ in
             format = " $icon $weather ($location) $temp, $wind m/s $direction ";
             service = {
               name = "openweathermap";
-              api_key = "0f9d6aa5c9af7b7249a0320d1032ddd2";
               city_id = "3454244";
               units = "metric";
             };
