@@ -24,9 +24,12 @@ USAGE
 
 A workspace opens ~/src/oe/<customer>/<branch> with three even panes:
 
-  1. build    yocto-env dev shell + sourced build environment (focused)
+  1. build    sourced build environment (focused)
   2. editor   sources/ with \$EDITOR
-  3. claude   sources/ with Claude Code inside the yocto-env dev shell
+  3. claude   sources/ with Claude Code
+
+A .envrc at the top of the checkout makes direnv enter the yocto-env dev shell
+in every pane, and in any other shell that enters the checkout.
 EOF
     exit "${1:-0}"
 }
@@ -110,6 +113,16 @@ ensure_claude_settings() {
         "$file" >"$file.tmp" && mv "$file.tmp" "$file"
 }
 
+# Write the checkout's .envrc and approve it. direnv searches upwards, so this
+# one file covers sources/ and build/ too. An .envrc that came with the checkout
+# stays as it is, and stays unapproved: the script only vouches for what it wrote.
+ensure_envrc() {
+    local dir=$1
+    [ -e "$dir/.envrc" ] && return 0
+    echo 'use flake github:OSSystems/yocto-env.nix' >"$dir/.envrc"
+    direnv allow "$dir"
+}
+
 # Open the three-pane herdr workspace for a concrete customer/branch checkout.
 start_workspace() {
     local customer=$1 branch=$2
@@ -132,8 +145,8 @@ start_workspace() {
     fi
 
     ensure_claude_settings "$project_home/sources"
+    ensure_envrc "$project_home"
 
-    local nixdev="nix develop github:OSSystems/yocto-env.nix"
     local alias_cmd="alias cd='HOME=$project_home cd'"
     local ws
     ws=$(herdr workspace create --cwd "$project_home" --label "$label" |
@@ -143,9 +156,9 @@ start_workspace() {
     herdr pane split "$ws-1" --direction right --ratio 0.333 >/dev/null
     herdr pane split "$ws-2" --direction right --ratio 0.5 >/dev/null
 
-    run_pane "$ws-1" "$alias_cmd" "$nixdev" "source setup-environment build"
+    run_pane "$ws-1" "$alias_cmd" "source setup-environment build"
     run_pane "$ws-2" "$alias_cmd" 'cd sources && touch .projectile && eval $EDITOR'
-    run_pane "$ws-3" "$alias_cmd" "cd sources" "$nixdev" "claude"
+    run_pane "$ws-3" "$alias_cmd" "cd sources" "claude"
 
     # Bring the workspace forward and focus the build pane (left of the editor).
     herdr workspace focus "$ws" >/dev/null
