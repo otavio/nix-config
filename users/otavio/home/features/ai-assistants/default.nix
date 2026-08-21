@@ -14,6 +14,7 @@ in
   imports = [
     ./claude.nix
     ./codex.nix
+    ./opencode.nix
     ./herdr.nix
     ./herdr-plugins.nix
     ./herdr-config.nix
