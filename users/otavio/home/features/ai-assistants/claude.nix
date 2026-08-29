@@ -63,7 +63,7 @@ in
       skipDangerousModePermissionPrompt = true;
       alwaysThinkingEnabled = true;
       awaySummaryEnabled = false;
-      outputStyle = "ASD-STE100";
+      outputStyle = "Concise";
 
       # Trim unused tool schemas from every request; they ship each turn
       # whether or not the tools are used.
