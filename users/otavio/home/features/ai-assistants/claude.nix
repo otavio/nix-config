@@ -68,6 +68,16 @@ in
       # Trim unused tool schemas from every request; they ship each turn
       # whether or not the tools are used.
       disableClaudeAiConnectors = true; # Gmail/Calendar/Drive MCP tools
+      disableWorkflows = true; # multi-agent orchestration
+      disableBundledSkills = true; # ships the marketplace plugins instead
+      enableArtifact = false; # claude.ai-hosted pages
+      disableRemoteControl = true; # claude.ai/code driving this session
+      disableAgentView = true; # claude agents, --bg, /background, the daemon
+      todoFeatureEnabled = false; # the todo panel and its tool
+
+      # The built-in commit/PR workflow prompt is superseded by the
+      # ossystems-commit skill.
+      includeGitInstructions = false;
 
       permissions = {
         defaultMode = "bypassPermissions";
@@ -98,6 +108,17 @@ in
           # remove the definition, not just block the call.
           "DesignSync"
           "NotebookEdit"
+          "CronCreate"
+          "CronDelete"
+          "CronList"
+          "EnterPlanMode"
+          "ExitPlanMode"
+          "PushNotification"
+          "RemoteTrigger"
+          "ReportFindings"
+          "SendFeedback"
+          "ScheduleWakeup"
+          "AskUserQuestion"
 
           # .env files
           "Read(.env*)"
