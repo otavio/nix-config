@@ -3,6 +3,8 @@
 Otavio Salvador. Embedded Linux engineer (Yocto Project, OpenEmbedded).
 Primary OS is NixOS via Home Manager and Colmena.
 
+You run inside NixOS: no FHS paths, and tools exist only if declared.
+
 Languages: English or Brazilian Portuguese only — never mixed within a
 response, and don't switch between responses unless asked.
 
