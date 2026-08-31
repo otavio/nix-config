@@ -1,3 +1,6 @@
+# Talon is installed by hand into ~/.talon-bin rather than packaged, because its
+# in-app updater rewrites the install directory in place. Talon runs on the beta
+# channel, whose payload bumps its bundled Python independently of nixpkgs.
 { pkgs, lib, ... }:
 
 let
@@ -14,6 +17,7 @@ let
     unset QT_AUTO_SCREEN_SCALE_FACTOR QT_SCALE_FACTOR
     export LC_NUMERIC=C
     export QT_PLUGIN_PATH="/lib/plugins"
+    # Globbed so a beta bump of the bundled Python does not strand this path.
     numpyLibs=$(echo "$HOME"/.talon-bin/resources/python/lib/python3.*/site-packages/numpy.libs)
     export LD_LIBRARY_PATH="$numpyLibs:$HOME/.talon-bin/resources/python/lib:$HOME/.talon-bin/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
     exec "$HOME/.talon-bin/talon" "$@"

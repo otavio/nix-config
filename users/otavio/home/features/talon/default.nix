@@ -63,6 +63,8 @@ in
             "graphical-session-pre.target"
           ];
         };
+        # Wanted by, never PartOf: graphical-session.target sets
+        # StopWhenUnneeded, which would take Talon down with it.
         Install.WantedBy = [ "graphical-session.target" ];
 
         Service = {
