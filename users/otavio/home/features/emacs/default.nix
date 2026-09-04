@@ -55,7 +55,10 @@ in
 
   home.sessionVariables.EDITOR = "emacs -nw";
   home.file = {
-    ".emacs.d/init.el".text = "(org-babel-load-file \"~/.emacs.d/settings.org\")";
+    ".emacs.d/init.el".text = ''
+      ;;; init.el --- Entry point -*- lexical-binding: t; -*-
+      (org-babel-load-file "~/.emacs.d/settings.org")
+    '';
 
     ".emacs.d/settings.org" = {
       source = ./settings.org;
