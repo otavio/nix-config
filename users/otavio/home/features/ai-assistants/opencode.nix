@@ -19,14 +19,11 @@ let
     '';
   };
 
-  # opencode reads AGENTS.md by itself, but it does not follow the @-references
-  # the other agents expand, so the documents are named here instead.
+  # opencode reads AGENTS.md by itself, but it does not follow the @-reference
+  # the other agents expand, so the document is named here instead.
   settings = {
     "$schema" = "https://opencode.ai/config.json";
-    instructions = [
-      "${configDir}/USER.md"
-      "${configDir}/docs/reusable-modules.md"
-    ];
+    instructions = [ "${configDir}/USER.md" ];
   };
 in
 {
