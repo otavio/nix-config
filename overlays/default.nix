@@ -24,6 +24,12 @@ _:
       nixFiles);
 
   modifications = _: prev: {
+    # Python 3.14's configparser rejects keys containing the delimiter, and
+    # timekpr 0.5.8 writes its commented config template through it, so the
+    # daemon dies initialising per-user config. Drop once upstream releases a
+    # fix past 0.5.8.
+    timekpr = prev.timekpr.override { python3Packages = prev.python312Packages; };
+
     fzf = prev.fzf.overrideAttrs (oa: {
       # https://github.com/NixOS/nixpkgs/pull/226847
       postInstall = oa.postInstall + ''
