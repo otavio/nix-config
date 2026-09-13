@@ -8,7 +8,11 @@
   };
 
   home.packages = with pkgs; [
+    extremetuxracer
     gcompris
+    pingus
+    supertux
+    supertuxkart
     tuxpaint
   ];
 
@@ -36,6 +40,10 @@
       favorite-apps = [
         "org.kde.gcompris.desktop"
         "tuxpaint.desktop"
+        "supertux2.desktop"
+        "pingus.desktop"
+        "net.sourceforge.extremetuxracer.desktop"
+        "supertuxkart.desktop"
         "org.gnome.Nautilus.desktop"
       ];
     };
