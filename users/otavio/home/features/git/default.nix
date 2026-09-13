@@ -47,7 +47,7 @@
       core.sshCommand = "ssh -F ~/.ssh/config";
 
       credential =
-        let helper = [ "" "gh auth git-credential" ]; in {
+        let helper = [ "" "!gh auth git-credential" ]; in {
           "https://github.com".helper = helper;
           "https://gist.github.com".helper = helper;
         };
