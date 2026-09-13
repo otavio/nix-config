@@ -26,7 +26,7 @@ in
     ./herdr-config.nix
   ];
 
-  home.packages = with pkgs; [ jq ripgrep rtk ];
+  home.packages = with pkgs; [ fd jq ripgrep rtk ];
 
   home.file =
     mkInstructions { dir = ".claude"; indexFile = "CLAUDE.md"; }
