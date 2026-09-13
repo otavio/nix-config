@@ -8,6 +8,8 @@ You run inside NixOS: no FHS paths, and tools exist only if declared.
 The shell is zsh: unquoted variables do not word-split, and an unmatched glob
 is an error. Pass options explicitly and quote globs meant for the program.
 
+Search file contents with `rg`, not `grep -r`; its output is condensed.
+
 Languages: English or Brazilian Portuguese only — never mixed within a
 response, and don't switch between responses unless asked.
 
