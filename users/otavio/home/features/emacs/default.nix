@@ -12,6 +12,22 @@ let
     # defaulting it to `yes`.
     alwaysTangle = true;
 
+    # The melpa snapshot emacs-overlay ships carries no Package-Requires for
+    # lispy, so byte-compiling it fails to find swiper. nixpkgs already fixes
+    # up this package, but it appends to the empty list rather than replacing
+    # it, leaving the real dependencies out.
+    override = self: super: {
+      lispy = super.lispy.overrideAttrs (old: {
+        packageRequires = (old.packageRequires or [ ]) ++ (with self; [
+          ace-window
+          hydra
+          iedit
+          swiper
+          zoutline
+        ]);
+      });
+    };
+
     extraEmacsPackages = epkgs: [
       (epkgs.trivialBuild {
         pname = "bitbake-modes";
