@@ -24,6 +24,7 @@ in
     ./herdr.nix
     ./herdr-plugins.nix
     ./herdr-config.nix
+    ./t3code.nix
   ];
 
   home.packages = with pkgs; [ fd jq ripgrep rtk ];
