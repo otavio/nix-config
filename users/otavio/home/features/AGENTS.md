@@ -1,0 +1,1 @@
+../../../../docs/ai/home-manager-gotchas.md
