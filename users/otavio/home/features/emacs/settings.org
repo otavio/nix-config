@@ -1482,17 +1482,6 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
 
 #+begin_src emacs-lisp
 
-  (use-package lispy
-    :hook ((emacs-lisp-mode . lispy-mode)
-           (scheme-mode . lispy-mode)))
-
-  (use-package lispyville
-    :hook ((lispy-mode . lispyville-mode))
-    :config
-    (lispyville-set-key-theme '(operators c-w additional
-                                additional-movement slurp/barf-cp
-                                prettify)))
-
   (add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
 
   (use-package helpful
