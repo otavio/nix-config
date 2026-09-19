@@ -5,7 +5,8 @@ NixOS/Home Manager flake managing multiple machines and user configurations.
 ## Commands
 
 ```bash
-colmena apply local -n <hostname>  # Deploy locally
+# colmena is only in the devshell; drop the wrapper if you are already inside it.
+nix develop --command colmena apply-local --sudo --node <hostname>  # Deploy locally
 ```
 
 ## Key Patterns
