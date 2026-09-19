@@ -5,6 +5,7 @@
   };
 
   home.packages = with pkgs; [
+    bb-cli
     git-review
     git-secret
     gitRepo
