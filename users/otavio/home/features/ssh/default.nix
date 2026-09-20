@@ -34,6 +34,12 @@
         ForwardX11Trusted = true;
       };
 
+      # Lab DHCP range: addresses rotate between hosts, so keys must not stick.
+      "10.5.4.*" = {
+        UserKnownHostsFile = "/dev/null";
+        StrictHostKeyChecking = "no";
+      };
+
       "gitlab.com" = {
         IdentityFile = "~/.ssh/id_ed25519";
       };
