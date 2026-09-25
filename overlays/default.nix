@@ -28,6 +28,7 @@ _:
     # upstream PRs rebased onto that tag:
     # https://github.com/pingdotgg/t3code/pull/12095
     # https://github.com/pingdotgg/t3code/pull/11594
+    # https://github.com/pingdotgg/t3code/pull/13708
     t3code =
       let
         unwrapped = (prev.t3code.unwrapped.override {
@@ -42,6 +43,7 @@ _:
           patches = (old.patches or [ ]) ++ [
             ./t3code/context-window-indicator.patch
             ./t3code/chat-width-setting.patch
+            ./t3code/composer-focus-caret.patch
           ];
           pnpmDeps = final.fetchPnpmDeps {
             inherit (finalAttrs) pname version src pnpmWorkspaces;
