@@ -23,7 +23,66 @@ _:
         })
       nixFiles);
 
-  modifications = _: prev: {
+  modifications = final: prev: {
+    # Ahead of nixpkgs (0.0.40) on an upstream preview, carrying my open
+    # upstream PRs rebased onto that tag:
+    # https://github.com/pingdotgg/t3code/pull/12095
+    # https://github.com/pingdotgg/t3code/pull/11594
+    t3code =
+      let
+        unwrapped = (prev.t3code.unwrapped.override {
+          # 0.0.42 moved to Electron 44.
+          electron_43 = final.electron_44;
+        }).overrideAttrs (finalAttrs: old: {
+          version = "0.0.43-preview.20260925.2240";
+          src = old.src.override {
+            tag = "v${finalAttrs.version}";
+            hash = "sha256-hsMflvt7S71pbB8sQ13CM/pzlrsDg0+CpQpGw6FDCpE=";
+          };
+          patches = (old.patches or [ ]) ++ [
+            ./t3code/context-window-indicator.patch
+            ./t3code/chat-width-setting.patch
+          ];
+          pnpmDeps = final.fetchPnpmDeps {
+            inherit (finalAttrs) pname version src pnpmWorkspaces;
+            pnpm = final.pnpm_11;
+            fetcherVersion = 4;
+            hash = "sha256-7y5NCq8gPv3tTr/FyFni2VJ0feEIZNHTQYbBlJv11Hg=";
+          };
+          # The web build's third-party-licenses plugin downloads SPDX license
+          # texts unless they are already in its cache; seed the cache so the
+          # sandboxed build stays offline. Revision and IDs track
+          # scripts/lib/third-party-licenses.ts and
+          # third-party-licenses.config.json.
+          spdxLicenses = final.fetchFromGitHub {
+            owner = "spdx";
+            repo = "license-list-data";
+            rev = "c4a7237ec8f4654e867546f9f409749300f1bf4c";
+            sparseCheckout = map (id: "json/details/${id}.json") [
+              "Apache-2.0"
+              "BSD-2-Clause"
+              "BSD-3-Clause"
+              "CC0-1.0"
+              "ISC"
+              "MIT"
+              "Unlicense"
+            ];
+            hash = "sha256-DnrdJ13M8Vf8Dq8qKlO7Ad5jXa8L9YU9PBlpp7B9BoI=";
+          };
+          preBuild = ''
+            mkdir -p .generated/third-party-licenses/spdx
+            cp -r --no-preserve=mode "$spdxLicenses"/json/details \
+              .generated/third-party-licenses/spdx/v3.28.0
+          '' + old.preBuild;
+        });
+      in
+      prev.t3code.override {
+        t3code-unwrapped = unwrapped;
+        t3code-resource-monitor = prev.t3code.resourceMonitor.override {
+          t3code-unwrapped = unwrapped;
+        };
+      };
+
     # Python 3.14's configparser rejects keys containing the delimiter, and
     # timekpr 0.5.8 writes its commented config template through it, so the
     # daemon dies initialising per-user config. Upstream dropped configparser

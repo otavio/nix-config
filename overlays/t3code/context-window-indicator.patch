@@ -1,0 +1,148 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Wed, 16 Sep 2026 11:38:19 -0300
+Subject: [PATCH 1/2] fix(web): move context window indicator out of legacy
+ settings
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The toggle lived under Settings → General → Legacy features, which made a
+supported feature look deprecated and hard to find. It now sits with the
+other composer settings, keeping its default and persisted value.
+
+Fixes #9352
+
+Backport of https://github.com/pingdotgg/t3code/pull/12095 onto
+v0.0.43-preview.20260925.2240.
+---
+ .../components/settings/SettingsPanels.tsx    | 41 ++++++++++++-------
+ .../settings/settingsSearch.test.ts           |  2 +-
+ .../src/components/settings/settingsSearch.ts | 12 +++---
+ packages/contracts/src/settings.ts            |  4 +-
+ 4 files changed, 36 insertions(+), 23 deletions(-)
+
+diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
+index fb6b587653..dc3475345c 100644
+--- a/apps/web/src/components/settings/SettingsPanels.tsx
++++ b/apps/web/src/components/settings/SettingsPanels.tsx
+@@ -2007,7 +2007,6 @@ function AutoSettleDaysInput({
+ // expand the section before its target can mount and scroll.
+ const LEGACY_FEATURE_TARGET_IDS: ReadonlySet<string> = new Set([
+   "legacy-plan-mode",
+-  "legacy-context-window-indicator",
+   "legacy-sidebar",
+ ]);
+ 
+@@ -2062,19 +2061,6 @@ function LegacyFeaturesSection() {
+                 />
+               }
+             />
+-            <SettingsRow
+-              {...searchableSetting("legacy-context-window-indicator")}
+-              description="Shows context window usage as a circular indicator in the composer."
+-              control={
+-                <Switch
+-                  checked={settings.contextWindowMeterEnabled}
+-                  onCheckedChange={(checked) =>
+-                    updateSettings({ contextWindowMeterEnabled: Boolean(checked) })
+-                  }
+-                  aria-label="Context window indicator (legacy)"
+-                />
+-              }
+-            />
+             <SettingsRow
+               {...searchableSetting("legacy-sidebar")}
+               description="Restore per-project thread trees instead of the default flat sidebar."
+@@ -2693,6 +2679,33 @@ export function GeneralSettingsPanel() {
+           }
+         />
+ 
++        <SettingsRow
++          {...searchableSetting("context-window-indicator")}
++          description="Show context window usage as a circular indicator in the composer."
++          resetAction={
++            settings.contextWindowMeterEnabled !==
++            DEFAULT_UNIFIED_SETTINGS.contextWindowMeterEnabled ? (
++              <SettingResetButton
++                label="context window indicator"
++                onClick={() =>
++                  updateSettings({
++                    contextWindowMeterEnabled: DEFAULT_UNIFIED_SETTINGS.contextWindowMeterEnabled,
++                  })
++                }
++              />
++            ) : null
++          }
++          control={
++            <Switch
++              checked={settings.contextWindowMeterEnabled}
++              onCheckedChange={(checked) =>
++                updateSettings({ contextWindowMeterEnabled: Boolean(checked) })
++              }
++              aria-label="Context window indicator"
++            />
++          }
++        />
++
+         <SettingsRow
+           {...searchableSetting("follow-up-behavior")}
+           description={
+diff --git a/apps/web/src/components/settings/settingsSearch.test.ts b/apps/web/src/components/settings/settingsSearch.test.ts
+index c92e2d05ef..2f3bec64c2 100644
+--- a/apps/web/src/components/settings/settingsSearch.test.ts
++++ b/apps/web/src/components/settings/settingsSearch.test.ts
+@@ -398,7 +398,7 @@ describe("settings search targets", () => {
+     const streaming = getSettingsSearchTargetScope("response-streaming")!;
+     expect(streaming.scope).toBe("project-defaults");
+     expect(isSettingsSearchScopeAvailable(streaming.scope, "project")).toBe(true);
+-    for (const id of ["legacy-plan-mode", "legacy-context-window-indicator", "legacy-sidebar"]) {
++    for (const id of ["legacy-plan-mode", "legacy-sidebar", "context-window-indicator"]) {
+       expect(getSettingsSearchTargetScope(id)!.scope).toBeNull();
+     }
+   });
+diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
+index f5d3c16ba7..183ff0569b 100644
+--- a/apps/web/src/components/settings/settingsSearch.ts
++++ b/apps/web/src/components/settings/settingsSearch.ts
+@@ -382,6 +382,12 @@ export const SETTINGS_SEARCH_ITEMS = [
+     to: "/settings/general",
+     searchTerms: ["enter return command ctrl multiline prompt new line composer"],
+   },
++  {
++    id: "context-window-indicator",
++    title: "Context window indicator",
++    to: "/settings/general",
++    searchTerms: ["composer meter usage tokens circle compact"],
++  },
+   {
+     id: "follow-up-behavior",
+     title: "Follow-up behavior",
+@@ -490,12 +496,6 @@ export const SETTINGS_SEARCH_ITEMS = [
+     to: "/settings/general",
+     searchTerms: ["build plan composer old"],
+   },
+-  {
+-    id: "legacy-context-window-indicator",
+-    title: "Context window indicator (legacy)",
+-    to: "/settings/general",
+-    searchTerms: ["composer meter usage tokens circle old"],
+-  },
+   {
+     id: "legacy-sidebar",
+     title: "Sidebar (legacy)",
+diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
+index b46dcf4af5..6740adf8f3 100644
+--- a/packages/contracts/src/settings.ts
++++ b/packages/contracts/src/settings.ts
+@@ -434,8 +434,8 @@ export const ClientSettingsSchema = Schema.Struct({
+   // default UI; this beta flag restores it (plus the /plan and /default slash
+   // commands) for users who still rely on the old workflow.
+   planModeEnabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
+-  // Legacy context window meter. The composer hides it by default; users who
+-  // still want the old usage indicator can restore it from Settings.
++  // Context window meter in the composer. Off by default; users who want to
++  // track context usage enable it from Settings → General.
+   contextWindowMeterEnabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
+   // Desktop resting composer: scrolling an existing thread's conversation
+   // settles the composer into its single-line layout. Losing focus never does.

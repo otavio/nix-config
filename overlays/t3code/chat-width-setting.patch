@@ -1,0 +1,481 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Otavio Salvador <otavio@ossystems.com.br>
+Date: Fri, 25 Sep 2026 11:08:12 -0300
+Subject: [PATCH 2/2] feat(web): add chat width setting for wide screens
+
+Backport of https://github.com/pingdotgg/t3code/pull/11594 onto
+v0.0.43-preview.20260925.2240. The setting overrides the upstream
+--chat-content-max-width variable instead of introducing its own.
+---
+ .../components/chat/MessagesTimeline.logic.ts | 53 +++++++++++++------
+ .../components/chat/MessagesTimeline.test.tsx | 38 +++++++++----
+ .../src/components/chat/MessagesTimeline.tsx  | 26 +++++++--
+ .../components/settings/SettingsPanels.tsx    | 43 +++++++++++++++
+ .../src/components/settings/settingsSearch.ts |  6 +++
+ apps/web/src/index.css                        | 10 ++++
+ apps/web/src/routes/__root.tsx                |  5 ++
+ packages/contracts/src/settings.test.ts       | 17 ++++++
+ packages/contracts/src/settings.ts            |  6 +++
+ 9 files changed, 174 insertions(+), 30 deletions(-)
+
+diff --git a/apps/web/src/components/chat/MessagesTimeline.logic.ts b/apps/web/src/components/chat/MessagesTimeline.logic.ts
+index 6f0f73a115..492657aacf 100644
+--- a/apps/web/src/components/chat/MessagesTimeline.logic.ts
++++ b/apps/web/src/components/chat/MessagesTimeline.logic.ts
+@@ -157,7 +157,6 @@ export function workEntryIsVisibleInGroup(
+ const TIMELINE_MINIMAP_ITEM_SPACING = 8;
+ export const TIMELINE_MINIMAP_MIN_ITEMS = 2;
+ const TIMELINE_MINIMAP_MAX_HEIGHT_CSS = "calc(100vh - 18rem)";
+-const TIMELINE_CONTENT_MAX_WIDTH = 768;
+ const TIMELINE_MINIMAP_PERSISTENT_GUTTER = 48;
+ 
+ export interface WorkGroupScrollAnchor {
+@@ -282,14 +281,25 @@ export function resolveTimelineMinimapCurrentIndex(input: {
+   return precedingIndex;
+ }
+ 
+-export function resolveTimelineMinimapHasPersistentGutter(viewportWidth: number): boolean {
+-  if (!Number.isFinite(viewportWidth) || viewportWidth <= 0) {
+-    return false;
++/**
++ * Side gutter between the viewport edge and the centered content column.
++ * `contentWidth` is the rendered column width, which follows the Chat width
++ * setting, so callers measure it rather than assume a fixed maximum.
++ */
++function resolveTimelineSideGutter(viewportWidth: number, contentWidth: number): number {
++  if (!Number.isFinite(viewportWidth) || viewportWidth <= 0 || !Number.isFinite(contentWidth)) {
++    return 0;
+   }
++  return Math.max(0, (viewportWidth - Math.min(viewportWidth, contentWidth)) / 2);
++}
+ 
+-  const contentWidth = Math.min(viewportWidth, TIMELINE_CONTENT_MAX_WIDTH);
+-  const sideGutter = Math.max(0, (viewportWidth - contentWidth) / 2);
+-  return sideGutter >= TIMELINE_MINIMAP_PERSISTENT_GUTTER;
++export function resolveTimelineMinimapHasPersistentGutter(
++  viewportWidth: number,
++  contentWidth: number,
++): boolean {
++  return (
++    resolveTimelineSideGutter(viewportWidth, contentWidth) >= TIMELINE_MINIMAP_PERSISTENT_GUTTER
++  );
+ }
+ 
+ const TIMELINE_MINIMAP_HIT_STRIP_LEFT = 12;
+@@ -298,18 +308,16 @@ const TIMELINE_MINIMAP_EXPANDED_HIT_STRIP_WIDTH = "22rem";
+ 
+ /**
+  * The minimap overlays the viewport's left edge while the content column is
+- * centered, so the side gutter between them shrinks under browser zoom or a
+- * narrow pane. A fixed-width hover strip would then sit on top of the message
++ * centered, so the side gutter between them shrinks under browser zoom, a
++ * narrow pane, or a wider Chat width setting. A fixed-width hover strip would then sit on top of the message
+  * text and swallow its pointer events. Cap the strip's width so it never
+  * extends past the gutter into the content column; 0 disables the strip.
+  */
+-export function resolveTimelineMinimapHitStripWidth(viewportWidth: number): number {
+-  if (!Number.isFinite(viewportWidth) || viewportWidth <= 0) {
+-    return 0;
+-  }
+-
+-  const contentWidth = Math.min(viewportWidth, TIMELINE_CONTENT_MAX_WIDTH);
+-  const sideGutter = Math.max(0, (viewportWidth - contentWidth) / 2);
++export function resolveTimelineMinimapHitStripWidth(
++  viewportWidth: number,
++  contentWidth: number,
++): number {
++  const sideGutter = resolveTimelineSideGutter(viewportWidth, contentWidth);
+   return Math.max(
+     0,
+     Math.min(
+@@ -319,6 +327,19 @@ export function resolveTimelineMinimapHitStripWidth(viewportWidth: number): numb
+   );
+ }
+ 
++// The prev/next buttons are centered 4px into the strip and 20px wide, so
++// their hitbox reaches 14px past the strip's left edge.
++const TIMELINE_MINIMAP_NAVIGATION_REACH = 14;
++
++/**
++ * The prev/next buttons hang outside the strip's height, so the strip's own
++ * width cap does not cover them. Keep them inert to the pointer unless the
++ * gutter can hold them; keyboard focus still reaches them.
++ */
++export function resolveTimelineMinimapNavigationInteractive(collapsedWidth: number): boolean {
++  return collapsedWidth >= TIMELINE_MINIMAP_NAVIGATION_REACH;
++}
++
+ /**
+  * Once the preview is open, keep the full preview and the space leading to it
+  * interactive. The collapsed strip remains gutter-capped so it cannot block
+diff --git a/apps/web/src/components/chat/MessagesTimeline.test.tsx b/apps/web/src/components/chat/MessagesTimeline.test.tsx
+index daeef34f90..892f2dddfd 100644
+--- a/apps/web/src/components/chat/MessagesTimeline.test.tsx
++++ b/apps/web/src/components/chat/MessagesTimeline.test.tsx
+@@ -739,6 +739,7 @@ describe("MessagesTimeline", () => {
+       resolveTimelineMinimapHitStripWidth,
+       resolveTimelineMinimapIndexFromPointer,
+       resolveTimelineMinimapInteractiveWidth,
++      resolveTimelineMinimapNavigationInteractive,
+       resolveTimelineMinimapTopPercent,
+     } = await import("./MessagesTimeline.logic");
+ 
+@@ -793,22 +794,39 @@ describe("MessagesTimeline", () => {
+         pointerY: 999,
+       }),
+     ).toBe(100);
+-    expect(resolveTimelineMinimapHasPersistentGutter(832)).toBe(false);
+-    expect(resolveTimelineMinimapHasPersistentGutter(863)).toBe(false);
+-    expect(resolveTimelineMinimapHasPersistentGutter(864)).toBe(true);
++    // Comfortable width: the column is capped at 768px.
++    expect(resolveTimelineMinimapHasPersistentGutter(832, 768)).toBe(false);
++    expect(resolveTimelineMinimapHasPersistentGutter(863, 768)).toBe(false);
++    expect(resolveTimelineMinimapHasPersistentGutter(864, 768)).toBe(true);
++    // Wider Chat width settings consume the gutter the minimap relies on.
++    expect(resolveTimelineMinimapHasPersistentGutter(1400, 1152)).toBe(true);
++    expect(resolveTimelineMinimapHasPersistentGutter(1200, 1152)).toBe(false);
++    expect(resolveTimelineMinimapHasPersistentGutter(2560, 2560)).toBe(false);
+ 
+     // No usable gutter (zoomed in / narrow pane): the strip must go inert
+     // instead of overlaying the centered content column.
+-    expect(resolveTimelineMinimapHitStripWidth(768)).toBe(0);
+-    expect(resolveTimelineMinimapHitStripWidth(792)).toBe(0);
++    expect(resolveTimelineMinimapHitStripWidth(768, 768)).toBe(0);
++    expect(resolveTimelineMinimapHitStripWidth(792, 768)).toBe(0);
+     // Partial gutter: strip shrinks to what fits between the viewport edge
+     // and the content column.
+-    expect(resolveTimelineMinimapHitStripWidth(820)).toBe(14);
++    expect(resolveTimelineMinimapHitStripWidth(820, 768)).toBe(14);
+     // Full gutter: unchanged 40px-wide strip.
+-    expect(resolveTimelineMinimapHitStripWidth(872)).toBe(40);
+-    expect(resolveTimelineMinimapHitStripWidth(1400)).toBe(40);
+-    expect(resolveTimelineMinimapHitStripWidth(0)).toBe(0);
+-    expect(resolveTimelineMinimapHitStripWidth(Number.NaN)).toBe(0);
++    expect(resolveTimelineMinimapHitStripWidth(872, 768)).toBe(40);
++    expect(resolveTimelineMinimapHitStripWidth(1400, 768)).toBe(40);
++    // Full Chat width: the column spans the viewport, so the strip is inert
++    // however wide the window gets.
++    expect(resolveTimelineMinimapHitStripWidth(2560, 2560)).toBe(0);
++    // Wide Chat width on a window just wider than the column: partial strip.
++    expect(resolveTimelineMinimapHitStripWidth(1204, 1152)).toBe(14);
++    expect(resolveTimelineMinimapHitStripWidth(0, 0)).toBe(0);
++    expect(resolveTimelineMinimapHitStripWidth(Number.NaN, 768)).toBe(0);
++
++    // Prev/next buttons reach 14px past the strip's left edge; a narrower
++    // strip means they would sit on the content column.
++    expect(resolveTimelineMinimapNavigationInteractive(40)).toBe(true);
++    expect(resolveTimelineMinimapNavigationInteractive(14)).toBe(true);
++    expect(resolveTimelineMinimapNavigationInteractive(8)).toBe(false);
++    expect(resolveTimelineMinimapNavigationInteractive(0)).toBe(false);
+ 
+     // The collapsed target stays narrow, but an open preview keeps its full
+     // 20rem width plus the 2rem offset from the minimap rail interactive.
+diff --git a/apps/web/src/components/chat/MessagesTimeline.tsx b/apps/web/src/components/chat/MessagesTimeline.tsx
+index 1ade3af638..2cc717a87c 100644
+--- a/apps/web/src/components/chat/MessagesTimeline.tsx
++++ b/apps/web/src/components/chat/MessagesTimeline.tsx
+@@ -190,6 +190,7 @@ import {
+   resolveTimelineMinimapHitStripWidth,
+   resolveTimelineMinimapIndexFromPointer,
+   resolveTimelineMinimapInteractiveWidth,
++  resolveTimelineMinimapNavigationInteractive,
+   resolveTimelineMinimapTopPercent,
+   resolveWorkGroupScrollIndex,
+   shouldFollowWorkGroupAppend,
+@@ -240,6 +241,7 @@ import { chatMarkdownClipboardPayload } from "../../markdown-clipboard";
+ import { ContextChip, ContextChipLabel, type ContextChipKind } from "../ContextChip";
+ import { createContextPresentationRegistry } from "../contextPresentationRegistry";
+ import { useOpenPrLink } from "~/lib/openPullRequestLink";
++import { useClientSettings } from "~/hooks/useSettings";
+ import type { ChatMarkdownContextReference } from "../ChatMarkdown";
+ import { useMediaQuery } from "~/hooks/useMediaQuery";
+ import { cn } from "~/lib/utils";
+@@ -900,6 +902,8 @@ export const MessagesTimeline = memo(function MessagesTimeline({
+   const [timelineViewportElement, setTimelineViewportElement] = useState<HTMLDivElement | null>(
+     null,
+   );
++  // Re-measure the minimap gutter when the chat column changes width without a viewport resize.
++  const chatWidth = useClientSettings((settings) => settings.chatWidth);
+   const {
+     target: readyCitationRequest,
+     positioning: citationPositioning,
+@@ -1090,11 +1094,19 @@ export const MessagesTimeline = memo(function MessagesTimeline({
+ 
+     const measure = () => {
+       const viewportWidth = timelineViewportElement.getBoundingClientRect().width;
+-      const nextHasPersistentGutter = resolveTimelineMinimapHasPersistentGutter(viewportWidth);
++      // Without a mounted row, treat the column as full width so the strip stays inert.
++      const contentWidth =
++        timelineViewportElement
++          .querySelector<HTMLElement>("[data-timeline-root]")
++          ?.getBoundingClientRect().width ?? viewportWidth;
++      const nextHasPersistentGutter = resolveTimelineMinimapHasPersistentGutter(
++        viewportWidth,
++        contentWidth,
++      );
+       setMinimapHasPersistentGutter((current) =>
+         current === nextHasPersistentGutter ? current : nextHasPersistentGutter,
+       );
+-      setMinimapHitStripWidth(resolveTimelineMinimapHitStripWidth(viewportWidth));
++      setMinimapHitStripWidth(resolveTimelineMinimapHitStripWidth(viewportWidth, contentWidth));
+       reportContentOverflow();
+     };
+ 
+@@ -1107,7 +1119,7 @@ export const MessagesTimeline = memo(function MessagesTimeline({
+       cancelAnimationFrame(frame);
+       observer.disconnect();
+     };
+-  }, [timelineViewportElement, rows.length, reportContentOverflow]);
++  }, [timelineViewportElement, rows.length, reportContentOverflow, chatWidth]);
+ 
+   const sharedState = useMemo<TimelineRowSharedState>(
+     () => ({
+@@ -1442,6 +1454,7 @@ function TimelineMinimap({
+       ),
+     [items, resolvedActiveIndex],
+   );
++  const navigationInteractive = resolveTimelineMinimapNavigationInteractive(hitStripWidth);
+   const activeTopPercent =
+     resolvedActiveIndex === null
+       ? 0
+@@ -1522,6 +1535,7 @@ function TimelineMinimap({
+           <TimelineMinimapNavigationButton
+             direction="previous"
+             disabled={previousItem === null}
++            interactive={navigationInteractive}
+             onClick={() => {
+               if (previousItem) onSelect(previousItem);
+             }}
+@@ -1647,6 +1661,7 @@ function TimelineMinimap({
+           <TimelineMinimapNavigationButton
+             direction="next"
+             disabled={nextItem === null}
++            interactive={navigationInteractive}
+             onClick={() => {
+               if (nextItem) onSelect(nextItem);
+             }}
+@@ -1660,10 +1675,12 @@ function TimelineMinimap({
+ function TimelineMinimapNavigationButton({
+   direction,
+   disabled,
++  interactive,
+   onClick,
+ }: {
+   direction: "previous" | "next";
+   disabled: boolean;
++  interactive: boolean;
+   onClick: () => void;
+ }) {
+   const previous = direction === "previous";
+@@ -1676,7 +1693,8 @@ function TimelineMinimapNavigationButton({
+         render={
+           <span
+             className={cn(
+-              "absolute left-1 z-10 inline-flex -translate-x-1/2 opacity-0 pointer-events-auto transition-opacity duration-150 hover:opacity-100 focus-within:opacity-100",
++              "absolute left-1 z-10 inline-flex -translate-x-1/2 opacity-0 transition-opacity duration-150 hover:opacity-100 focus-within:opacity-100",
++              interactive ? "pointer-events-auto" : "pointer-events-none",
+               previous ? "bottom-[calc(100%+2px)]" : "top-[calc(100%+2px)]",
+             )}
+           />
+diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
+index dc3475345c..07a0fbbb7d 100644
+--- a/apps/web/src/components/settings/SettingsPanels.tsx
++++ b/apps/web/src/components/settings/SettingsPanels.tsx
+@@ -23,6 +23,7 @@ import {
+ import {
+   DEFAULT_ENVIRONMENT_IDENTIFICATION_MODE,
+   DEFAULT_UNIFIED_SETTINGS,
++  type ChatWidth,
+   type DiffLayout,
+   type EnvironmentIdentificationMode,
+   MAX_APPEARANCE_CONTRAST,
+@@ -186,6 +187,12 @@ const TIMESTAMP_FORMAT_LABELS = {
+   "24-hour": "24-hour",
+ } as const;
+ 
++const CHAT_WIDTH_LABELS: Record<ChatWidth, string> = {
++  comfortable: "Comfortable",
++  wide: "Wide",
++  full: "Full",
++};
++
+ const DIFF_LAYOUT_LABELS: Record<DiffLayout, string> = {
+   stacked: "Stacked",
+   split: "Split",
+@@ -521,6 +528,7 @@ export function useSettingsRestore(onRestored?: () => void) {
+       ...(settings.diffColorScheme !== DEFAULT_UNIFIED_SETTINGS.diffColorScheme
+         ? ["Diff colors"]
+         : []),
++      ...(settings.chatWidth !== DEFAULT_UNIFIED_SETTINGS.chatWidth ? ["Chat width"] : []),
+       ...(settings.panelAnimationDurationMs !== DEFAULT_UNIFIED_SETTINGS.panelAnimationDurationMs
+         ? ["Panel animations"]
+         : []),
+@@ -640,6 +648,7 @@ export function useSettingsRestore(onRestored?: () => void) {
+       settings.browserAutoShowFloatingPreview,
+       settings.appearanceContrast,
+       settings.diffColorScheme,
++      settings.chatWidth,
+       settings.enableAgentBrowserAccess,
+       settings.confirmQuit,
+       settings.confirmThreadArchive,
+@@ -754,6 +763,7 @@ export function useSettingsRestore(onRestored?: () => void) {
+     updateSettings({
+       appearanceContrast: DEFAULT_UNIFIED_SETTINGS.appearanceContrast,
+       diffColorScheme: DEFAULT_UNIFIED_SETTINGS.diffColorScheme,
++      chatWidth: DEFAULT_UNIFIED_SETTINGS.chatWidth,
+       timestampFormat: DEFAULT_UNIFIED_SETTINGS.timestampFormat,
+       notificationMode: DEFAULT_UNIFIED_SETTINGS.notificationMode,
+       inAppNotificationsEnabled: DEFAULT_UNIFIED_SETTINGS.inAppNotificationsEnabled,
+@@ -1379,6 +1389,39 @@ export function AppearanceSettingsPanel() {
+             />
+           }
+         />
++
++        <SettingsRow
++          {...searchableSetting("chat-width")}
++          description="Set how wide messages and the composer can grow on large screens."
++          resetAction={
++            settings.chatWidth !== DEFAULT_UNIFIED_SETTINGS.chatWidth ? (
++              <SettingResetButton
++                label="chat width"
++                onClick={() => updateSettings({ chatWidth: DEFAULT_UNIFIED_SETTINGS.chatWidth })}
++              />
++            ) : null
++          }
++          control={
++            <div className="w-full sm:w-40">
++              <Select
++                value={settings.chatWidth}
++                onValueChange={(value) => {
++                  if (value === "comfortable" || value === "wide" || value === "full")
++                    updateSettings({ chatWidth: value });
++                }}
++              >
++                <SelectTrigger size="sm" className="w-full min-w-0" aria-label="Chat width">
++                  <SelectValue>{CHAT_WIDTH_LABELS[settings.chatWidth]}</SelectValue>
++                </SelectTrigger>
++                <SelectPopup align="end" alignItemWithTrigger={false}>
++                  <SelectItem value="comfortable">Comfortable (default)</SelectItem>
++                  <SelectItem value="wide">Wide</SelectItem>
++                  <SelectItem value="full">Full</SelectItem>
++                </SelectPopup>
++              </Select>
++            </div>
++          }
++        />
+       </SettingsSection>
+ 
+       <SettingsSection id="motion" title="Motion">
+diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
+index 183ff0569b..c967de1f3c 100644
+--- a/apps/web/src/components/settings/settingsSearch.ts
++++ b/apps/web/src/components/settings/settingsSearch.ts
+@@ -211,6 +211,12 @@ export const SETTINGS_SEARCH_ITEMS = [
+     to: "/settings/appearance",
+     searchTerms: ["red green blue orange additions deletions changes counts palette colorblind"],
+   },
++  {
++    id: "chat-width",
++    title: "Chat width",
++    to: "/settings/appearance",
++    searchTerms: ["wide full width column layout messages composer monitor"],
++  },
+   {
+     id: "panel-animations",
+     title: "Panel animations",
+diff --git a/apps/web/src/index.css b/apps/web/src/index.css
+index 6a17bc1665..e090960e8f 100644
+--- a/apps/web/src/index.css
++++ b/apps/web/src/index.css
+@@ -2014,6 +2014,16 @@ code {
+   --diff-deletion-foreground: light-dark(var(--color-red-600), var(--color-red-400));
+ }
+ 
++/* Chat timeline and composer column width, set from the Chat width setting.
++   "comfortable" keeps the default --chat-content-max-width. */
++:root[data-chat-width="wide"] {
++  --chat-content-max-width: 72rem;
++}
++
++:root[data-chat-width="full"] {
++  --chat-content-max-width: 100%;
++}
++
+ :root[data-diff-color-scheme="blue-orange"] {
+   --diff-addition: light-dark(var(--color-blue-600), var(--color-blue-400));
+   --diff-deletion: light-dark(var(--color-orange-600), var(--color-orange-400));
+diff --git a/apps/web/src/routes/__root.tsx b/apps/web/src/routes/__root.tsx
+index 47169febdc..92427083f8 100644
+--- a/apps/web/src/routes/__root.tsx
++++ b/apps/web/src/routes/__root.tsx
+@@ -266,6 +266,11 @@ function ContrastAppearanceSync() {
+     document.documentElement.dataset.diffColorScheme = diffColorScheme;
+   }, [diffColorScheme]);
+ 
++  const chatWidth = useClientSettings((settings) => settings.chatWidth);
++  useEffect(() => {
++    document.documentElement.dataset.chatWidth = chatWidth;
++  }, [chatWidth]);
++
+   useEffect(() => {
+     applyAppearanceContrast(document.documentElement, appearanceContrast);
+   }, [appearanceContrast]);
+diff --git a/packages/contracts/src/settings.test.ts b/packages/contracts/src/settings.test.ts
+index 0a8970cfbf..f4a1432f43 100644
+--- a/packages/contracts/src/settings.test.ts
++++ b/packages/contracts/src/settings.test.ts
+@@ -329,6 +329,23 @@ describe("ClientSettings diff colors", () => {
+   });
+ });
+ 
++describe("ClientSettings chat width", () => {
++  it("keeps the comfortable width for existing settings without a saved width", () => {
++    expect(decodeClientSettings({}).chatWidth).toBe("comfortable");
++  });
++
++  it.each(["comfortable", "wide", "full"])("round-trips the %s width", (chatWidth) => {
++    const settings = decodeClientSettings({ chatWidth });
++    expect(encodeClientSettings(settings).chatWidth).toBe(chatWidth);
++    expect(decodeClientSettingsPatch({ chatWidth }).chatWidth).toBe(chatWidth);
++  });
++
++  it("rejects unsupported widths", () => {
++    expect(() => decodeClientSettings({ chatWidth: "huge" })).toThrow();
++    expect(() => decodeClientSettingsPatch({ chatWidth: "huge" })).toThrow();
++  });
++});
++
+ describe("ClientSettings load balancing", () => {
+   it("requires opt-in when settings are new or omit load balancing", () => {
+     expect(decodeClientSettings({}).loadBalancingEnabled).toBe(false);
+diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
+index 6740adf8f3..9c297f845a 100644
+--- a/packages/contracts/src/settings.ts
++++ b/packages/contracts/src/settings.ts
+@@ -288,6 +288,10 @@ export const LoadBalancingWeights = Schema.Record(
+ 
+ export const DiffColorScheme = Schema.Literals(["red-green", "blue-orange"]);
+ 
++/** Maximum width of the chat timeline and composer on wide screens. */
++export const ChatWidth = Schema.Literals(["comfortable", "wide", "full"]);
++export type ChatWidth = typeof ChatWidth.Type;
++
+ export const ClientSettingsSchema = Schema.Struct({
+   notificationMode: NotificationMode.pipe(
+     Schema.withDecodingDefault(Effect.succeed("off" as const)),
+@@ -296,6 +300,7 @@ export const ClientSettingsSchema = Schema.Struct({
+   diffColorScheme: DiffColorScheme.pipe(
+     Schema.withDecodingDefault(Effect.succeed("red-green" as const)),
+   ),
++  chatWidth: ChatWidth.pipe(Schema.withDecodingDefault(Effect.succeed("comfortable" as const))),
+   loadBalancingEnabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
+   loadBalancingWeights: LoadBalancingWeights.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
+   appearanceContrast: AppearanceContrast.pipe(
+@@ -1666,6 +1671,7 @@ export const ClientSettingsPatch = Schema.Struct({
+   notificationMode: Schema.optionalKey(NotificationMode),
+   inAppNotificationsEnabled: Schema.optionalKey(Schema.Boolean),
+   diffColorScheme: Schema.optionalKey(DiffColorScheme),
++  chatWidth: Schema.optionalKey(ChatWidth),
+   loadBalancingEnabled: Schema.optionalKey(Schema.Boolean),
+   loadBalancingWeights: Schema.optionalKey(LoadBalancingWeights),
+   appearanceContrast: Schema.optionalKey(AppearanceContrast),
