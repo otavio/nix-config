@@ -41,6 +41,7 @@ _:
     # https://github.com/pingdotgg/t3code/pull/11594
     # https://github.com/pingdotgg/t3code/pull/13708
     # https://github.com/pingdotgg/t3code/pull/13734
+    # https://github.com/pingdotgg/t3code/pull/13755
     t3code =
       let
         unwrapped =
@@ -60,6 +61,7 @@ _:
                   ./t3code/chat-width-setting.patch
                   ./t3code/composer-focus-caret.patch
                   ./t3code/right-panel-default-width.patch
+                  ./t3code/direnv-environment.patch
                 ];
                 pnpmDeps = final.fetchPnpmDeps {
                   inherit (finalAttrs)
