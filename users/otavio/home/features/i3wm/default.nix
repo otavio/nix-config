@@ -243,7 +243,6 @@ in
           command = "${pkgs.systemd}/bin/systemd-cat -t i3-startup ${lib.getExe start-graphical-session}";
           notification = false;
         }
-        { command = "pa-applet"; notification = true; }
         { command = "onboard"; notification = false; }
       ];
     };
@@ -312,6 +311,22 @@ in
             block = "load";
             interval = 1;
             format = " $icon 1min avg: $1m.eng(w:4) ";
+          }
+          {
+            block = "sound";
+            device_kind = "sink";
+            step_width = 5;
+            max_vol = 100;
+            headphones_indicator = true;
+            format = " $icon {$volume.eng(w:2)|} ";
+            click = [{ button = "left"; cmd = "pavucontrol --tab=3"; }];
+          }
+          {
+            block = "sound";
+            device_kind = "source";
+            step_width = 5;
+            format = " $icon {$volume.eng(w:2)|} ";
+            click = [{ button = "left"; cmd = "pavucontrol --tab=4"; }];
           }
           {
             block = "time";
