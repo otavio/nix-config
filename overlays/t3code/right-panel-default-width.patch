@@ -1,0 +1,34 @@
+diff --git a/apps/web/src/hooks/usePreviewPanelInlineSize.ts b/apps/web/src/hooks/usePreviewPanelInlineSize.ts
+index f4621669..1387414d 100644
+--- a/apps/web/src/hooks/usePreviewPanelInlineSize.ts
++++ b/apps/web/src/hooks/usePreviewPanelInlineSize.ts
+@@ -20,7 +20,17 @@ const PREVIEW_PANEL_MAX_WIDTH_FRACTION = 0.7;
+  * composer overflows, so the panel yields instead.
+  */
+ const SIBLING_COLUMN_MIN_WIDTH = 360;
+-const PREVIEW_PANEL_DEFAULT_WIDTH = 540;
++/** Floor for the untouched default; wide screens open at half the viewport. */
++const PREVIEW_PANEL_MIN_DEFAULT_WIDTH = 540;
++const PREVIEW_PANEL_DEFAULT_WIDTH_FRACTION = 0.5;
++
++/** Initial width before the user resizes; the max-width clamp still applies. */
++export function getPreviewPanelDefaultWidth(viewportWidth: number): number {
++  return Math.max(
++    PREVIEW_PANEL_MIN_DEFAULT_WIDTH,
++    Math.floor(viewportWidth * PREVIEW_PANEL_DEFAULT_WIDTH_FRACTION),
++  );
++}
+ 
+ export function usePreviewPanelInlineSize(
+   hostRef?: RefObject<HTMLElement | null>,
+@@ -39,7 +49,9 @@ export function usePreviewPanelInlineSize(
+   );
+   return useResizableWidth({
+     storageKey: options.widthStorageKey ?? PREVIEW_PANEL_WIDTH_STORAGE_KEY,
+-    defaultWidth: options.defaultWidth ?? PREVIEW_PANEL_DEFAULT_WIDTH,
++    defaultWidth:
++      options.defaultWidth ??
++      getPreviewPanelDefaultWidth(typeof window === "undefined" ? 0 : window.innerWidth),
+     minWidth: PREVIEW_PANEL_MIN_WIDTH,
+     maxWidth,
+     edge: "left",
