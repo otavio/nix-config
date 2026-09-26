@@ -9,6 +9,19 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    pedantix = {
+      url = "github:Swarsel/pedantix";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        treefmt-nix.follows = "treefmt-nix";
+      };
+    };
+
     nix-github-actions = {
       url = "github:nix-community/nix-github-actions";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -53,8 +66,10 @@
 
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nixpkgs-stable.follows = "nixpkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        nixpkgs-stable.follows = "nixpkgs";
+      };
     };
 
     colmena = {
@@ -69,29 +84,36 @@
     };
   };
 
-  outputs = { self, ... }@inputs:
+  outputs =
+    { self, ... }@inputs:
     inputs.red-tape.mkFlake {
       inherit inputs self;
       src = ./.;
-      systems = [ "x86_64-linux" "aarch64-linux" ];
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
 
       flake = {
         overlays = import ./overlays { };
 
         colmenaHive =
-          (import ./lib { inherit inputs; flake = self; }).mkColmenaFromNixOSConfigurations self.nixosConfigurations;
+          (import ./lib {
+            inherit inputs;
+            flake = self;
+          }).mkColmenaFromNixOSConfigurations
+            self.nixosConfigurations;
 
-        homeConfigurations."otavio@generic-x86" =
-          inputs.home-manager.lib.homeManagerConfiguration {
-            pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
-            extraSpecialArgs = {
-              inherit inputs;
-              flake = self;
-              graphical = false;
-              hostName = "unknown";
-            };
-            modules = [ ./users/otavio/home/generic.nix ];
+        homeConfigurations."otavio@generic-x86" = inputs.home-manager.lib.homeManagerConfiguration {
+          pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
+          extraSpecialArgs = {
+            inherit inputs;
+            flake = self;
+            graphical = false;
+            hostName = "unknown";
           };
+          modules = [ ./users/otavio/home/generic.nix ];
+        };
 
         githubActions = inputs.nix-github-actions.lib.mkGithubMatrix {
           checks = { inherit (self.checks) x86_64-linux; };
@@ -104,24 +126,28 @@
           inherit (pkgs.stdenv.hostPlatform) system;
         in
         {
-          packages = builtins.foldl'
-            (acc: hostname:
-              let
-                cfg = self.nixosConfigurations.${hostname};
-                hostSystem = cfg.config.nixpkgs.hostPlatform.system;
-              in
-              if hostSystem == system then
-                acc // {
-                  "installer-iso-${hostname}" =
-                    (import ./lib { inherit inputs; flake = self; }).mkInstallerForSystem {
+          packages = builtins.foldl' (
+            acc: hostname:
+            let
+              cfg = self.nixosConfigurations.${hostname};
+              hostSystem = cfg.config.nixpkgs.hostPlatform.system;
+            in
+            if hostSystem == system then
+              acc
+              // {
+                "installer-iso-${hostname}" =
+                  (import ./lib {
+                    inherit inputs;
+                    flake = self;
+                  }).mkInstallerForSystem
+                    {
                       inherit hostname system;
                       targetConfiguration = cfg;
                     };
-                }
-              else
-                acc)
-            { }
-            (builtins.attrNames self.nixosConfigurations);
+              }
+            else
+              acc
+          ) { } (builtins.attrNames self.nixosConfigurations);
         };
     };
 }

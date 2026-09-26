@@ -83,7 +83,7 @@ let
   };
 in
 {
-  inherit pinentry askpass;
+  inherit askpass pinentry;
 
   mkAgentEnv = marker: {
     PINENTRY_USER_DATA = "agent:${marker}";

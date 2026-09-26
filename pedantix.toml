@@ -1,0 +1,20 @@
+formatter = "nixfmt"
+
+[args]
+sort = true
+first = ["self", "inputs", "config", "lib", "pkgs"]
+last = ["<defaulted>", "..."]
+
+[attrs]
+sort = false
+merge = true
+name-style = "identifier"
+
+[inherits]
+sort = true
+
+[lets]
+sort = false
+
+[lists]
+sort = false

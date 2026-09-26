@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ lib, pkgs, ... }:
 
 # Hunk ships only as prebuilt per-platform binaries on npm; hunkdiff-linux-x64
 # is a bun single-file executable (the bun runtime with the app appended after

@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ lib, pkgs, ... }:
 
 pkgs.stdenv.mkDerivation rec {
   pname = "kube-ps1";

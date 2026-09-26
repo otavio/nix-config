@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   cfg = config.my.backup;
@@ -85,7 +90,6 @@ in
       "backup/repository" = { };
       "backup/password" = { };
     };
-
     services.restic.backups.r2 = {
       user = "root";
       initialize = false;
@@ -125,43 +129,44 @@ in
         # takes. Wait it out instead of failing the run.
         "--retry-lock"
         "3h"
-      ] ++ cfg.extraExcludes;
+      ]
+      ++ cfg.extraExcludes;
     };
+    systemd = {
+      services = {
+        "backup-alert@" = {
+          description = "Report a failed backup unit by mail";
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = "${alert} %i";
+          };
+        };
+        restic-backups-r2.onFailure = [ "backup-alert@restic-backups-r2.service" ];
+        # Failure alerts only fire when a run happens at all; this catches the
+        # quieter case where the timer stops firing and nothing is said.
+        restic-freshness-r2 = {
+          description = "Check that this host has a recent restic snapshot";
+          onFailure = [ "backup-alert@restic-freshness-r2.service" ];
 
-    systemd.services."backup-alert@" = {
-      description = "Report a failed backup unit by mail";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${alert} %i";
+          environment = {
+            RESTIC_REPOSITORY_FILE = config.sops.secrets."backup/repository".path;
+            RESTIC_PASSWORD_FILE = config.sops.secrets."backup/password".path;
+          };
+
+          serviceConfig = {
+            Type = "oneshot";
+            EnvironmentFile = config.sops.secrets."backup/credentials".path;
+            ExecStart = freshness.outPath;
+          };
+        };
       };
-    };
-
-    systemd.services.restic-backups-r2.onFailure = [ "backup-alert@restic-backups-r2.service" ];
-
-    # Failure alerts only fire when a run happens at all; this catches the
-    # quieter case where the timer stops firing and nothing is said.
-    systemd.services.restic-freshness-r2 = {
-      description = "Check that this host has a recent restic snapshot";
-      onFailure = [ "backup-alert@restic-freshness-r2.service" ];
-
-      environment = {
-        RESTIC_REPOSITORY_FILE = config.sops.secrets."backup/repository".path;
-        RESTIC_PASSWORD_FILE = config.sops.secrets."backup/password".path;
-      };
-
-      serviceConfig = {
-        Type = "oneshot";
-        EnvironmentFile = config.sops.secrets."backup/credentials".path;
-        ExecStart = freshness.outPath;
-      };
-    };
-
-    systemd.timers.restic-freshness-r2 = {
-      wantedBy = [ "timers.target" ];
-      timerConfig = {
-        OnCalendar = "daily";
-        Persistent = true;
-        RandomizedDelaySec = "1h";
+      timers.restic-freshness-r2 = {
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "daily";
+          Persistent = true;
+          RandomizedDelaySec = "1h";
+        };
       };
     };
   };

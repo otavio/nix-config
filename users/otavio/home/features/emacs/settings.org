@@ -1567,7 +1567,7 @@ Interactive Emacs functions that create URLs for files and commits in GitHub/Bit
     :after (lsp-mode)
     :demand t
     :custom
-    (lsp-nix-nil-formatter ["nixpkgs-fmt"]))
+    (lsp-nix-nil-formatter ["pedantix"]))
 
   (use-package nix-mode
     :hook (nix-mode . lsp-deferred))

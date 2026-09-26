@@ -1,5 +1,6 @@
 {
-  services.malcontent.enable = true;
-
-  services.timekpr.enable = true;
+  services = {
+    malcontent.enable = true;
+    timekpr.enable = true;
+  };
 }

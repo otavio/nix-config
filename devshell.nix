@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ inputs, pkgs, ... }:
 pkgs.mkShellNoCC {
   buildInputs = [
     inputs.colmena.packages.${pkgs.stdenv.hostPlatform.system}.colmena

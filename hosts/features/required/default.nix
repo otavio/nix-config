@@ -1,4 +1,10 @@
-{ inputs, hostName, lib, ... }: {
+{
+  inputs,
+  lib,
+  hostName,
+  ...
+}:
+{
   imports = [
     inputs.disko.nixosModules.disko
 

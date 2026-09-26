@@ -1,127 +1,147 @@
-{ inputs, flake, lib, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  flake,
+  ...
+}:
 
 {
-  imports = with inputs.nixos-hardware.nixosModules; [
-    common-cpu-amd-pstate
-    common-gpu-amd-sea-islands
-    common-pc-ssd
-  ] ++ [
-    ../features/required
+  imports =
+    with inputs.nixos-hardware.nixosModules;
+    [
+      common-cpu-amd-pstate
+      common-gpu-amd-sea-islands
+      common-pc-ssd
+    ]
+    ++ [
+      ../features/required
 
-    ../features/optional/bluetooth.nix
-    ../features/optional/desktop-i3.nix
-    ../features/optional/docker.nix
-    ../features/optional/latest-linux-kernel.nix
-    ../features/optional/msmtp.nix
-    ../features/optional/network-manager.nix
-    ../features/optional/nix-ld.nix
-    ../features/optional/no-mitigations.nix
-    ../features/optional/pipewire.nix
-    ../features/optional/quietboot.nix
-    ../features/optional/tailscale.nix
-    ../features/optional/voice-coding.nix
-    ../features/optional/zram-swap.nix
+      ../features/optional/bluetooth.nix
+      ../features/optional/desktop-i3.nix
+      ../features/optional/docker.nix
+      ../features/optional/latest-linux-kernel.nix
+      ../features/optional/msmtp.nix
+      ../features/optional/network-manager.nix
+      ../features/optional/nix-ld.nix
+      ../features/optional/no-mitigations.nix
+      ../features/optional/pipewire.nix
+      ../features/optional/quietboot.nix
+      ../features/optional/tailscale.nix
+      ../features/optional/voice-coding.nix
+      ../features/optional/zram-swap.nix
 
-    ../../users/otavio/system
+      ../../users/otavio/system
 
-    flake.nixosModules.restic-r2
+      flake.nixosModules.restic-r2
 
-    ./openweathermap.nix
-    ./partitioning.nix
-    ./whisrs.nix
-    ./wireguard.nix
-  ];
-
-  my.backup = {
-    user = "otavio";
-    extraExcludes = [
-      "--exclude='.direnv'"
-      "--exclude='target'"
-      "--exclude='build*/**/tmp'"
+      ./openweathermap.nix
+      ./partitioning.nix
+      ./whisrs.nix
+      ./wireguard.nix
     ];
+  my = {
+    backup = {
+      user = "otavio";
+      extraExcludes = [
+        "--exclude='.direnv'"
+        "--exclude='target'"
+        "--exclude='build*/**/tmp'"
+      ];
+    };
+    deployment.allowLocalDeployment = true;
   };
-
   home-manager.users.otavio = import ../../users/otavio/home/micro.nix;
-
   boot = {
     loader.systemd-boot.enable = true;
-
-    initrd.availableKernelModules = [ "nvme" "xhci_pci" "usbhid" ];
-    initrd.kernelModules = [ ];
-
+    initrd = {
+      availableKernelModules = [
+        "nvme"
+        "xhci_pci"
+        "usbhid"
+      ];
+      kernelModules = [ ];
+    };
     kernelModules = [ "kvm-amd" ];
   };
+  services = {
+    udev.extraRules = ''
+      # Set scheduler for NVMe
+      ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
+      # Set scheduler for SSD and eMMC
+      ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
+      # Set scheduler for rotating disks
+      ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
 
-  services.udev.extraRules = ''
-    # Set scheduler for NVMe
-    ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
-    # Set scheduler for SSD and eMMC
-    ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
-    # Set scheduler for rotating disks
-    ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
-
-    # Keystone 3 Pro
-    ATTRS{idVendor}=="1209", ATTRS{idProduct}=="3001", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_PORT_IGNORE}="1"
-  '';
-
-  networking.domain = "casa.salvador";
-
-  services.greetd = {
-    enable = true;
-    settings = {
-      initial_session = {
-        command = "${pkgs.zsh}/bin/zsh -lc startx";
-        user = "otavio";
-      };
-      default_session = {
-        # Wrap in a zsh login shell so /etc/profile and the user's zprofile
-        # are sourced — without that, the X session inherits only greetd's
-        # bare PAM-session PATH and i3 can't find alacritty /
-        # i3-sensible-terminal / fzf (all in
-        # /etc/profiles/per-user/$USER/bin).
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd '${pkgs.zsh}/bin/zsh -lc startx'";
-        user = "greeter";
+      # Keystone 3 Pro
+      ATTRS{idVendor}=="1209", ATTRS{idProduct}=="3001", MODE:="0666", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_PORT_IGNORE}="1"
+    '';
+    greetd = {
+      enable = true;
+      settings = {
+        initial_session = {
+          command = "${pkgs.zsh}/bin/zsh -lc startx";
+          user = "otavio";
+        };
+        default_session = {
+          # Wrap in a zsh login shell so /etc/profile and the user's zprofile
+          # are sourced — without that, the X session inherits only greetd's
+          # bare PAM-session PATH and i3 can't find alacritty /
+          # i3-sensible-terminal / fzf (all in
+          # /etc/profiles/per-user/$USER/bin).
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd '${pkgs.zsh}/bin/zsh -lc startx'";
+          user = "greeter";
+        };
       };
     };
   };
-
-  security.pam.services.i3lock = {
-    enable = true;
-    rules.auth.unix.settings.try_first_pass = lib.mkForce false;
+  networking = {
+    domain = "casa.salvador";
+    firewall.trustedInterfaces = [ "virbr0" ];
   };
-  security.polkit.enable = true;
-
-  networking.firewall.trustedInterfaces = [ "virbr0" ];
-  virtualisation.libvirtd.enable = true;
+  security = {
+    pam.services.i3lock = {
+      enable = true;
+      rules.auth.unix.settings.try_first_pass = lib.mkForce false;
+    };
+    polkit.enable = true;
+  };
+  virtualisation = {
+    libvirtd.enable = true;
+    # VM-only overrides for `nixos-rebuild build-vm --flake .#micro`. The real
+    # boot sees neither these settings nor the sops secret stub.
+    vmVariant = {
+      services = {
+        btrfs.autoScrub.enable = lib.mkForce false;
+        restic.backups = lib.mkForce { };
+        getty.autologinUser = lib.mkForce "otavio";
+        openssh = {
+          enable = true;
+          settings = {
+            PasswordAuthentication = true;
+            PermitRootLogin = "no";
+          };
+        };
+      };
+      networking.wireguard.interfaces = lib.mkForce { };
+      programs.msmtp.accounts = lib.mkForce { };
+      sops.secrets = lib.mkForce { };
+      systemd.tmpfiles.rules = [
+        "f /run/secrets/openai_api_key 0400 otavio users - sk-vm-dummy"
+      ];
+      users.users.otavio.password = lib.mkForce "vm";
+      virtualisation.forwardPorts = [
+        {
+          from = "host";
+          host.port = 2222;
+          guest.port = 22;
+        }
+      ];
+    };
+  };
   environment.systemPackages = with pkgs; [
     virt-manager
     virt-viewer
     cntr
   ];
-
-  my.deployment.allowLocalDeployment = true;
-
-  # VM-only overrides for `nixos-rebuild build-vm --flake .#micro`. The real
-  # boot sees neither these settings nor the sops secret stub.
-  virtualisation.vmVariant = {
-    services.btrfs.autoScrub.enable = lib.mkForce false;
-    networking.wireguard.interfaces = lib.mkForce { };
-    programs.msmtp.accounts = lib.mkForce { };
-    services.restic.backups = lib.mkForce { };
-    sops.secrets = lib.mkForce { };
-    systemd.tmpfiles.rules = [
-      "f /run/secrets/openai_api_key 0400 otavio users - sk-vm-dummy"
-    ];
-    users.users.otavio.password = lib.mkForce "vm";
-    services.getty.autologinUser = lib.mkForce "otavio";
-
-    services.openssh = {
-      enable = true;
-      settings.PasswordAuthentication = true;
-      settings.PermitRootLogin = "no";
-    };
-    virtualisation.forwardPorts = [
-      { from = "host"; host.port = 2222; guest.port = 22; }
-    ];
-  };
 }

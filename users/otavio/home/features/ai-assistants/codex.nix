@@ -3,7 +3,7 @@
 let
   codexPackage = inputs.codex-nix.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
-  herdrHooks = import ./herdr-hooks.nix { inherit pkgs inputs; };
+  herdrHooks = import ./herdr-hooks.nix { inherit inputs pkgs; };
 
   credentialGuard = import ./credential-guard.nix { inherit pkgs; };
 
@@ -15,21 +15,26 @@ let
   };
 
   hooksFile = (pkgs.formats.json { }).generate "codex-hooks.json" {
-    hooks.SessionStart = [{
-      hooks = [{
-        type = "command";
-        command = "bash ${herdrHooks}/codex-hook.sh session";
-        timeout = 10;
-      }];
-    }];
+    hooks.SessionStart = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "bash ${herdrHooks}/codex-hook.sh session";
+            timeout = 10;
+          }
+        ];
+      }
+    ];
   };
 in
 {
-  home.packages = with pkgs; [
-    bubblewrap
-    codexPackage
-  ];
-
+  home = {
+    packages = with pkgs; [
+      bubblewrap
+      codexPackage
+    ];
+    file.".codex/hooks.json".source = hooksFile;
+  };
   xdg.configFile."codex/config.toml".source = configFile;
-  home.file.".codex/hooks.json".source = hooksFile;
 }

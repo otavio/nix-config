@@ -81,7 +81,10 @@ let
   ];
 in
 {
-  imports = [ ./module.nix ../snixembed ];
+  imports = [
+    ./module.nix
+    ../snixembed
+  ];
 
   services.whisrs = {
     enable = true;

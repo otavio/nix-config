@@ -1,32 +1,28 @@
 {
   imports = [ ./desktop.nix ];
+  services = {
+    switcherooControl.enable = false;
+    libinput.enable = true;
+    displayManager = {
+      hiddenUsers = [ "otavio" ];
 
-  services.switcherooControl.enable = false;
-
-  services.libinput.enable = true;
-
-  services.displayManager = {
-    hiddenUsers = [ "otavio" ];
-
-    defaultSession = "cinnamon";
-  };
-
-  services.xserver = {
-    enable = true;
-
-    displayManager.lightdm.greeters = {
-      slick.enable = true;
-      pantheon.enable = false;
+      defaultSession = "cinnamon";
     };
+    xserver = {
+      enable = true;
 
-    desktopManager.cinnamon.enable = true;
+      displayManager.lightdm.greeters = {
+        slick.enable = true;
+        pantheon.enable = false;
+      };
+
+      desktopManager.cinnamon.enable = true;
+    };
+    avahi = {
+      enable = true;
+
+      nssmdns4 = true;
+    };
+    thermald.enable = true;
   };
-
-  services.avahi = {
-    enable = true;
-
-    nssmdns4 = true;
-  };
-
-  services.thermald.enable = true;
 }

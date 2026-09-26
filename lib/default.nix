@@ -1,30 +1,33 @@
 { inputs, flake }:
 
 {
-  mkColmenaFromNixOSConfigurations = conf:
-    inputs.colmena.lib.makeHive ({
-      meta = {
-        description = "my personal machines";
-        # This can be overriden by node nixpkgs
-        nixpkgs = import inputs.nixpkgs { system = "x86_64-linux"; };
-        nodeNixpkgs = builtins.mapAttrs (_: value: value.pkgs) conf;
-        nodeSpecialArgs = builtins.mapAttrs (_: value: value._module.specialArgs) conf;
-      };
-    } // builtins.mapAttrs
-      (_: value: {
+  mkColmenaFromNixOSConfigurations =
+    conf:
+    inputs.colmena.lib.makeHive (
+      {
+        meta = {
+          description = "my personal machines";
+          # This can be overriden by node nixpkgs
+          nixpkgs = import inputs.nixpkgs { system = "x86_64-linux"; };
+          nodeNixpkgs = builtins.mapAttrs (_: value: value.pkgs) conf;
+          nodeSpecialArgs = builtins.mapAttrs (_: value: value._module.specialArgs) conf;
+        };
+      }
+      // builtins.mapAttrs (_: value: {
         imports = value._module.args.modules;
         deployment = value.config.my.deployment;
-      })
-      conf);
+      }) conf
+    );
 
   mkInstallerForSystem =
-    { hostname
-    , targetConfiguration
-    , system
+    {
+      hostname,
+      system,
+      targetConfiguration,
     }:
     (inputs.nixpkgs.lib.nixosSystem {
       specialArgs = {
-        inherit inputs targetConfiguration flake;
+        inherit flake inputs targetConfiguration;
         hostName = hostname;
       };
 

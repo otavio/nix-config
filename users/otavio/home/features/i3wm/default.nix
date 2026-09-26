@@ -1,7 +1,8 @@
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 let
   modifier = "Mod4";
@@ -17,9 +18,13 @@ let
   browserWs = "3: browser ";
   triviaWs = "10: trivia ";
 
-  fzf-menu = pkgs.writeScriptBin "i3-fzf-menu" (builtins.readFile (pkgs.replaceVars ./fzf-menu {
-    fzf = "${pkgs.fzf}/bin/fzf";
-  }));
+  fzf-menu = pkgs.writeScriptBin "i3-fzf-menu" (
+    builtins.readFile (
+      pkgs.replaceVars ./fzf-menu {
+        fzf = "${pkgs.fzf}/bin/fzf";
+      }
+    )
+  );
 
   i3lockOnboard = pkgs.i3lock.overrideAttrs (old: {
     patches = (old.patches or [ ]) ++ [ ./i3lock-onboard.patch ];
@@ -87,176 +92,211 @@ let
     command = "echo '<span size=\"x-large\">${label}</span>'";
     format = "{$text.pango-str()|}";
     interval = "once";
-    click = [{ button = "left"; cmd = "${pkgs.wireplumber}/bin/wpctl set-volume ${args}"; }];
+    click = [
+      {
+        button = "left";
+        cmd = "${pkgs.wireplumber}/bin/wpctl set-volume ${args}";
+      }
+    ];
     merge_with_next = true;
   };
 in
 {
-  # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8
-  xsession.scriptPath = ".hm-xsession";
+  xsession = {
+    # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8
+    scriptPath = ".hm-xsession";
+    windowManager.i3 = {
+      enable = true;
+      config = {
+        inherit menu modifier terminal;
 
-  xsession.windowManager.i3 = {
-    enable = true;
-    config = {
-      inherit modifier terminal menu;
+        assigns = {
+          "${shellWs}" = [
+            {
+              class = "term";
+              instance = "term";
+            }
+          ];
+          "${editorWs}" = [ { class = "Emacs"; } ];
+          "${browserWs}" = [
+            { class = "Google-chrome"; }
+            { class = "Firefox"; }
+            { class = "Brave"; }
+            { class = "chromium"; }
+          ];
 
-      assigns = {
-        "${shellWs}" = [{ class = "term"; instance = "term"; }];
-        "${editorWs}" = [{ class = "Emacs"; }];
-        "${browserWs}" = [
-          { class = "Google-chrome"; }
-          { class = "Firefox"; }
-          { class = "Brave"; }
-          { class = "chromium"; }
+          "${triviaWs}" = [
+            { class = "slack"; }
+            { class = "discord"; }
+            { class = "telegram-desktop"; }
+          ];
+        };
+
+        bars = [
+          {
+            position = "bottom";
+            statusCommand = "${i3statusRustBottom}";
+            fonts = {
+              names = [
+                "FontAwesome"
+                "Iosevka"
+              ];
+              size = 9.0;
+            };
+            colors = {
+              background = "#000000";
+              statusline = "#ffffff";
+              separator = "#666666";
+              focusedWorkspace = {
+                border = "#4c7899";
+                background = "#285577";
+                text = "#ffffff";
+              };
+              activeWorkspace = {
+                border = "#333333";
+                background = "#5f676a";
+                text = "#ffffff";
+              };
+              inactiveWorkspace = {
+                border = "#333333";
+                background = "#222222";
+                text = "#888888";
+              };
+              urgentWorkspace = {
+                border = "#2f343a";
+                background = "#900000";
+                text = "#ffffff";
+              };
+              bindingMode = {
+                border = "#2f343a";
+                background = "#900000";
+                text = "#ffffff";
+              };
+            };
+          }
         ];
 
-        "${triviaWs}" = [
-          { class = "slack"; }
-          { class = "discord"; }
-          { class = "telegram-desktop"; }
+        fonts = {
+          names = [
+            "DejaVuSansMono"
+            "Terminus"
+          ];
+          style = "Bold Semi-Condensed";
+          size = 9.0;
+        };
+
+        focus = {
+          followMouse = false;
+          wrapping = "yes";
+        };
+
+        keybindings = lib.mkOptionDefault {
+          "${modifier}+x" = "kill";
+
+          "${modifier}+l" = "focus left";
+          "${modifier}+k" = "focus down";
+          "${modifier}+j" = "focus up";
+          "${modifier}+semicolon" = "focus right";
+
+          "${modifier}+Shift+l" = "move left";
+          "${modifier}+Shift+k" = "move down";
+          "${modifier}+Shift+j" = "move up";
+          "${modifier}+Shift+semicolon" = "move right";
+
+          "${modifier}+1" = "workspace number ${shellWs}";
+          "${modifier}+2" = "workspace number ${editorWs}";
+          "${modifier}+3" = "workspace number ${browserWs}";
+          "${modifier}+0" = "workspace number ${triviaWs}";
+
+          "${modifier}+Shift+1" = "move container to workspace number ${shellWs}";
+          "${modifier}+Shift+2" = "move container to workspace number ${editorWs}";
+          "${modifier}+Shift+3" = "move container to workspace number ${browserWs}";
+          "${modifier}+Shift+0" = "move container to workspace number ${triviaWs}";
+
+          "${modifier}+o" = "exec onboard";
+
+          "${modifier}+Escape" = "exec ${pkgs.systemd}/bin/loginctl lock-session";
+
+          Print = "exec flameshot-gui";
+
+          "Control+Alt+h" = "exec ${copyq} toggle";
+
+          "Mod1+Prior" = "exec whisrs toggle";
+
+          "Control+Shift+space" = "exec ${dunstCloseNotification}";
+        };
+
+        window.commands = [
+          {
+            criteria = {
+              workspace = "${triviaWs}";
+            };
+            command = "layout tabbed";
+          }
+
+          {
+            criteria = {
+              class = "floating";
+            };
+            command = "floating enable";
+          }
+
+          {
+            criteria = {
+              class = "fzf-menu";
+            };
+            command = "border none, sticky enable, floating enable, focus";
+          }
+
+          {
+            criteria = {
+              title = ".*CopyQ";
+            };
+            command = "floating enable, sticky enable, floating enable, focus";
+          }
+
+          {
+            criteria = {
+              class = "xwaylandvideobridge";
+            };
+            command = "opacity 0.0, floating enable";
+          }
+
+          {
+            criteria = {
+              class = "InputOutput";
+            };
+            command = "floating enable, sticky enable, border none";
+          }
+
+          {
+            criteria = {
+              class = "Onboard";
+            };
+            command = "floating enable, sticky enable, border none";
+          }
+
+          {
+            criteria = {
+              class = "flameshot";
+            };
+            command = "floating enable, border pixel 0, fullscreen disable, focus";
+          }
+        ];
+
+        startup = [
+          {
+            command = "${pkgs.systemd}/bin/systemd-cat -t i3-startup ${lib.getExe start-graphical-session}";
+            notification = false;
+          }
+          {
+            command = "onboard";
+            notification = false;
+          }
         ];
       };
-
-      bars = [
-        {
-          position = "bottom";
-          statusCommand = "${i3statusRustBottom}";
-          fonts = {
-            names = [ "FontAwesome" "Iosevka" ];
-            size = 9.0;
-          };
-          colors = {
-            background = "#000000";
-            statusline = "#ffffff";
-            separator = "#666666";
-            focusedWorkspace = {
-              border = "#4c7899";
-              background = "#285577";
-              text = "#ffffff";
-            };
-            activeWorkspace = {
-              border = "#333333";
-              background = "#5f676a";
-              text = "#ffffff";
-            };
-            inactiveWorkspace = {
-              border = "#333333";
-              background = "#222222";
-              text = "#888888";
-            };
-            urgentWorkspace = {
-              border = "#2f343a";
-              background = "#900000";
-              text = "#ffffff";
-            };
-            bindingMode = {
-              border = "#2f343a";
-              background = "#900000";
-              text = "#ffffff";
-            };
-          };
-        }
-      ];
-
-      fonts = {
-        names = [ "DejaVuSansMono" "Terminus" ];
-        style = "Bold Semi-Condensed";
-        size = 9.0;
-      };
-
-      focus = {
-        followMouse = false;
-        wrapping = "yes";
-      };
-
-      keybindings = lib.mkOptionDefault {
-        "${modifier}+x" = "kill";
-
-        "${modifier}+l" = "focus left";
-        "${modifier}+k" = "focus down";
-        "${modifier}+j" = "focus up";
-        "${modifier}+semicolon" = "focus right";
-
-        "${modifier}+Shift+l" = "move left";
-        "${modifier}+Shift+k" = "move down";
-        "${modifier}+Shift+j" = "move up";
-        "${modifier}+Shift+semicolon" = "move right";
-
-        "${modifier}+1" = "workspace number ${shellWs}";
-        "${modifier}+2" = "workspace number ${editorWs}";
-        "${modifier}+3" = "workspace number ${browserWs}";
-        "${modifier}+0" = "workspace number ${triviaWs}";
-
-        "${modifier}+Shift+1" = "move container to workspace number ${shellWs}";
-        "${modifier}+Shift+2" = "move container to workspace number ${editorWs}";
-        "${modifier}+Shift+3" = "move container to workspace number ${browserWs}";
-        "${modifier}+Shift+0" = "move container to workspace number ${triviaWs}";
-
-        "${modifier}+o" = "exec onboard";
-
-        "${modifier}+Escape" = "exec ${pkgs.systemd}/bin/loginctl lock-session";
-
-        "Print" = "exec flameshot-gui";
-
-        "Control+Alt+h" = "exec ${copyq} toggle";
-
-        "Mod1+Prior" = "exec whisrs toggle";
-
-        "Control+Shift+space" = "exec ${dunstCloseNotification}";
-      };
-
-      window.commands = [
-        {
-          criteria = { workspace = "${triviaWs}"; };
-          command = "layout tabbed";
-        }
-
-        {
-          criteria = { class = "floating"; };
-          command = "floating enable";
-        }
-
-        {
-          criteria = { class = "fzf-menu"; };
-          command = "border none, sticky enable, floating enable, focus";
-        }
-
-        {
-          criteria = { title = ".*CopyQ"; };
-          command = "floating enable, sticky enable, floating enable, focus";
-        }
-
-        {
-          criteria = { class = "xwaylandvideobridge"; };
-          command = "opacity 0.0, floating enable";
-        }
-
-        {
-          criteria = { class = "InputOutput"; };
-          command = "floating enable, sticky enable, border none";
-        }
-
-        {
-          criteria = { class = "Onboard"; };
-          command = "floating enable, sticky enable, border none";
-        }
-
-        {
-          criteria = { class = "flameshot"; };
-          command = "floating enable, border pixel 0, fullscreen disable, focus";
-        }
-      ];
-
-      startup = [
-        {
-          command = "${pkgs.systemd}/bin/systemd-cat -t i3-startup ${lib.getExe start-graphical-session}";
-          notification = false;
-        }
-        { command = "onboard"; notification = false; }
-      ];
     };
   };
-
   programs.i3status-rust = {
     enable = true;
 
@@ -277,7 +317,12 @@ in
           {
             block = "net";
             format = " $icon {$signal_strength $ssid $frequency|Wired connection} IP: $ip {/ $ipv6|} ";
-            click = [{ button = "left"; cmd = "alacritty -e nmtui"; }];
+            click = [
+              {
+                button = "left";
+                cmd = "alacritty -e nmtui";
+              }
+            ];
           }
           {
             block = "net";
@@ -357,42 +402,44 @@ in
       };
     };
   };
-
   fonts.fontconfig.enable = true;
-  home.packages = with pkgs; [
-    iosevka-bin
-    noto-fonts
-    nerd-fonts.fira-code
-    font-awesome
+  home = {
+    packages = with pkgs; [
+      iosevka-bin
+      noto-fonts
+      nerd-fonts.fira-code
+      font-awesome
 
-    fzf
-    i3
-    onboard
-    pavucontrol
-    xclip
-  ];
-
+      fzf
+      i3
+      onboard
+      pavucontrol
+      xclip
+    ];
+    file.".xinitrc".source = ./xinitrc;
+  };
   services.screen-locker = {
     enable = true;
     inactiveInterval = 10;
     lockCmd = "${lockScript}";
   };
-
   dconf.settings = {
     "org/onboard".layout = "${pkgs.onboard}/share/onboard/layouts/Full Keyboard.onboard";
-    "org/onboard/window".force-to-top = true;
-    "org/onboard/window".docking-enabled = false;
+    "org/onboard/window" = {
+      force-to-top = true;
+      docking-enabled = false;
+    };
     "org/onboard/auto-show".enabled = false;
   };
-
-  home.file.".xinitrc".source = ./xinitrc;
-
   systemd.user.services.i3-session = {
     Unit = {
       Description = "i3 session bridge to graphical-session.target";
       BindsTo = [ "graphical-session.target" ];
       Before = [ "graphical-session.target" ];
-      Wants = [ "graphical-session-pre.target" "graphical-session.target" ];
+      Wants = [
+        "graphical-session-pre.target"
+        "graphical-session.target"
+      ];
       After = [ "graphical-session-pre.target" ];
     };
     Service = {

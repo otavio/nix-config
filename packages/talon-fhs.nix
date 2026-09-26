@@ -1,12 +1,13 @@
 # Talon is installed by hand into ~/.talon-bin rather than packaged, because its
 # in-app updater rewrites the install directory in place. Talon runs on the beta
 # channel, whose payload bumps its bundled Python independently of nixpkgs.
-{ pkgs, lib, ... }:
+{ lib, pkgs, ... }:
 
 let
   # red-tape's pkgs doesn't have allowUnfree, so reimport when needed
   pkgs' =
-    if pkgs.config.allowUnfree or false then pkgs
+    if pkgs.config.allowUnfree or false then
+      pkgs
     else
       import pkgs.path {
         inherit (pkgs.stdenv.hostPlatform) system;
@@ -26,49 +27,50 @@ in
 pkgs'.buildFHSEnv {
   name = "talon";
 
-  targetPkgs = _: with pkgs'; [
-    stdenv.cc.cc
-    stdenv.cc.libc
-    dbus
-    fontconfig
-    freetype
-    glib
-    libGL
-    libxkbcommon
-    sqlite
-    zlib
-    libpulseaudio
-    udev
-    libx11
-    libsm
-    libxcursor
-    libice
-    libxrender
-    libxcb
-    libxext
-    libxcomposite
-    libxrandr
-    libxi
-    bzip2
-    ncurses5
-    libuuid
-    gtk3-x11
-    gdk-pixbuf
-    cairo
-    libdrm
-    pango
-    gdbm
-    atk
-    wayland
-    wayland-protocols
-    wlroots
-    xwayland
-    libinput
-    libxml2
-    speechd
-    gfortran
-    (lib.getLib gfortran.cc)
-  ];
+  targetPkgs =
+    _: with pkgs'; [
+      stdenv.cc.cc
+      stdenv.cc.libc
+      dbus
+      fontconfig
+      freetype
+      glib
+      libGL
+      libxkbcommon
+      sqlite
+      zlib
+      libpulseaudio
+      udev
+      libx11
+      libsm
+      libxcursor
+      libice
+      libxrender
+      libxcb
+      libxext
+      libxcomposite
+      libxrandr
+      libxi
+      bzip2
+      ncurses5
+      libuuid
+      gtk3-x11
+      gdk-pixbuf
+      cairo
+      libdrm
+      pango
+      gdbm
+      atk
+      wayland
+      wayland-protocols
+      wlroots
+      xwayland
+      libinput
+      libxml2
+      speechd
+      gfortran
+      (lib.getLib gfortran.cc)
+    ];
 
   runScript = runTalon;
 
