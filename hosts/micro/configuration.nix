@@ -77,7 +77,7 @@
         # Wrap in a zsh login shell so /etc/profile and the user's zprofile
         # are sourced — without that, the X session inherits only greetd's
         # bare PAM-session PATH and i3 can't find alacritty /
-        # i3-sensible-terminal / fzf / pa-applet (all in
+        # i3-sensible-terminal / fzf (all in
         # /etc/profiles/per-user/$USER/bin).
         command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd '${pkgs.zsh}/bin/zsh -lc startx'";
         user = "greeter";
