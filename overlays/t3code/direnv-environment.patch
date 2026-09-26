@@ -1,0 +1,1954 @@
+diff --git a/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx b/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx
+index 9fdee211b0..d7dc1b14e1 100644
+--- a/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx
++++ b/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx
+@@ -389,6 +389,16 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
+                       onValueChange={(value) => write({ enableAgentBrowserAccess: value })}
+                     />
+                   </SettingsSection>
++                  <SettingsSection title="Project environment">
++                    <SettingsSwitchRow
++                      icon="hammer"
++                      label="Load direnv environment"
++                      subtitle="Start agents with the project's allowed .envrc, such as a Nix dev shell."
++                      value={uniform("enableDirenvEnvironment")}
++                      disabled={disabledFor("enableDirenvEnvironment")}
++                      onValueChange={(value) => write({ enableDirenvEnvironment: value })}
++                    />
++                  </SettingsSection>
+                 </>
+               ) : null}
+ 
+diff --git a/apps/mobile/src/features/threads/thread-work-log.tsx b/apps/mobile/src/features/threads/thread-work-log.tsx
+index 988048823c..a96833bfd4 100644
+--- a/apps/mobile/src/features/threads/thread-work-log.tsx
++++ b/apps/mobile/src/features/threads/thread-work-log.tsx
+@@ -33,6 +33,7 @@ import {
+ } from "react";
+ import {
+   AccessibilityInfo,
++  Alert,
+   AppState,
+   type ColorValue,
+   Pressable,
+@@ -41,7 +42,7 @@ import {
+   View,
+ } from "react-native";
+ import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
+-import type { EnvironmentId, ToolActivityIcon } from "@t3tools/contracts";
++import type { EnvironmentId, ThreadId, ToolActivityIcon } from "@t3tools/contracts";
+ import { toolActivityFaviconUrl } from "@t3tools/shared/favicon";
+ 
+ import { AppText as Text } from "../../components/AppText";
+@@ -80,6 +81,8 @@ import Animated, {
+   withTiming,
+ } from "react-native-reanimated";
+ import { useAssetUrl } from "../../state/assets";
++import { threadEnvironment } from "../../state/threads";
++import { useAtomCommand } from "../../state/use-atom-command";
+ 
+ const SHIMMER_WIDTH = 72;
+ const SHIMMER_SWEEP_MS = 1_350;
+@@ -767,6 +770,54 @@ function workLogRowKey(row: ThreadFeedActivity): string {
+   return row.id;
+ }
+ 
++/** Allows the thread's blocked `.envrc`; the next message loads it. */
++// The work log remounts rows, so the outcome outlives the button.
++const allowedDirenvWarnings = new Set<string>();
++
++function AllowDirenvButton(props: {
++  readonly environmentId: EnvironmentId;
++  readonly threadId: ThreadId;
++  readonly warningId: string;
++}) {
++  const allowDirenv = useAtomCommand(threadEnvironment.allowDirenv, "allow direnv");
++  const [state, setState] = useState<"idle" | "pending" | "allowed">(() =>
++    allowedDirenvWarnings.has(props.warningId) ? "allowed" : "idle",
++  );
++  return (
++    <Pressable
++      accessibilityRole="button"
++      accessibilityHint="Loads the project's direnv environment with your next message."
++      disabled={state !== "idle"}
++      hitSlop={6}
++      onPress={async () => {
++        setState("pending");
++        const result = await allowDirenv({
++          environmentId: props.environmentId,
++          input: { threadId: props.threadId },
++        });
++        if (result._tag === "Success" && result.value.allowed) {
++          allowedDirenvWarnings.add(props.warningId);
++          setState("allowed");
++          return;
++        }
++        setState("idle");
++        if (result._tag === "Success") {
++          Alert.alert("Could not allow the .envrc", result.value.error);
++        }
++      }}
++      className="min-h-8 justify-center px-2"
++    >
++      <Text className="font-t3-medium text-xs text-foreground">
++        {state === "allowed"
++          ? "Allowed · applies to your next message"
++          : state === "pending"
++            ? "Allowing…"
++            : "Allow .envrc"}
++      </Text>
++    </Pressable>
++  );
++}
++
+ const ThreadWorkLogRow = memo(function ThreadWorkLogRow(
+   props: Omit<
+     ThreadWorkLogProps,
+@@ -952,6 +1003,14 @@ const ThreadWorkLogRow = memo(function ThreadWorkLogRow(
+         )}
+ 
+         <View className="shrink-0 flex-row items-center gap-px">
++          {row.projectedItem.item.type === "system_notice" &&
++          row.projectedItem.item.action?.type === "direnv.allow" ? (
++            <AllowDirenvButton
++              environmentId={props.environmentId}
++              threadId={row.projectedItem.item.threadId}
++              warningId={row.projectedItem.item.id}
++            />
++          ) : null}
+           {props.copied ? (
+             <Text className="pr-1 font-t3-medium text-3xs text-adaptive-emerald-600-400">
+               Copied
+diff --git a/apps/server/src/auth/RpcAuthorization.ts b/apps/server/src/auth/RpcAuthorization.ts
+index a8d22a2157..c62b6f2bd5 100644
+--- a/apps/server/src/auth/RpcAuthorization.ts
++++ b/apps/server/src/auth/RpcAuthorization.ts
+@@ -145,6 +145,7 @@ export const RPC_REQUIRED_SCOPES = {
+   [WS_METHODS.subscribeVcsStatus]: AuthOrchestrationReadScope,
+   [WS_METHODS.subscribeWorktreeSetup]: AuthOrchestrationReadScope,
+   [WS_METHODS.worktreeSetupCancel]: AuthOrchestrationOperateScope,
++  [WS_METHODS.projectEnvironmentAllowDirenv]: AuthOrchestrationOperateScope,
+   [WS_METHODS.subscribeResourceTelemetry]: AuthOrchestrationReadScope,
+   [WS_METHODS.vcsRefreshStatus]: AuthOrchestrationReadScope,
+   [WS_METHODS.vcsPull]: AuthOrchestrationOperateScope,
+diff --git a/apps/server/src/orchestration-v2/Adapters/AcpAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/AcpAdapterV2.ts
+index 14571cc3b9..674c4e0334 100644
+--- a/apps/server/src/orchestration-v2/Adapters/AcpAdapterV2.ts
++++ b/apps/server/src/orchestration-v2/Adapters/AcpAdapterV2.ts
+@@ -60,6 +60,7 @@ import {
+   type AcpMcpOverAcpBridge,
+ } from "../../mcp/AcpMcpOverAcpBridge.ts";
+ import * as McpProviderSession from "../../mcp/McpProviderSession.ts";
++import * as DirenvEnvironment from "../../provider/DirenvEnvironment.ts";
+ import {
+   applyAcpAgentTerminalUpdate,
+   acpContentBlockDisplayText,
+@@ -143,6 +144,8 @@ export interface AcpAdapterV2RuntimeInput {
+   readonly acpMcpServers?: ReadonlyArray<EffectAcpSchema.McpServer>;
+   /** Scoped credentials for terminal fallback when an ACP agent drops `mcpServers`. */
+   readonly processEnvironment?: NodeJS.ProcessEnv;
++  /** The project's direnv environment, for flavors to apply to the agent's launch environment. */
++  readonly direnvEnvironment?: DirenvEnvironment.DirenvEnvironmentDiff;
+   readonly resumeSessionId?: string;
+   readonly interruptPromptOnCancel?: boolean;
+   readonly clientCapabilities: EffectAcpSchema.InitializeRequest["clientCapabilities"];
+@@ -1408,7 +1411,10 @@ export function makeAcpAdapterV2(options: AcpAdapterV2Options): ProviderAdapterV
+             : yield* makeAcpClientTerminals({
+                 spawner: options.clientTerminals.childProcessSpawner,
+                 defaultCwd: input.runtimePolicy.cwd ?? process.cwd(),
+-                environment: options.clientTerminals.environment,
++                environment: DirenvEnvironment.withThreadDirenvEnvironment(
++                  options.clientTerminals.environment ?? process.env,
++                  input.threadId,
++                ),
+                 shellCommands: options.clientTerminals.shellCommands,
+                 environmentForSession: (sessionId) => {
+                   const remembered = terminalEnvironmentBySessionId.get(sessionId);
+@@ -1883,6 +1889,9 @@ export function makeAcpAdapterV2(options: AcpAdapterV2Options): ProviderAdapterV
+             handleRuntimeTerminationAtGeneration(runtimeGeneration),
+         ): AcpAdapterV2RuntimeInput => {
+           const mcpContext = acpMcpContext(threadId, self);
++          // The launch environment belongs to the session, which loaded it for
++          // the thread that opened it.
++          const direnvEnvironment = DirenvEnvironment.readThreadDirenvEnvironment(input.threadId);
+           return {
+             cwd: input.runtimePolicy.cwd ?? process.cwd(),
+             mcpServers: mcpContext.servers,
+@@ -1890,6 +1899,7 @@ export function makeAcpAdapterV2(options: AcpAdapterV2Options): ProviderAdapterV
+             ...(mcpContext.processEnvironment === undefined
+               ? {}
+               : { processEnvironment: mcpContext.processEnvironment }),
++            ...(direnvEnvironment === undefined ? {} : { direnvEnvironment }),
+             ...(resumeSessionId === undefined ? {} : { resumeSessionId }),
+             interruptPromptOnCancel: flavor.interruptPromptOnCancel ?? false,
+             clientCapabilities: {
+diff --git a/apps/server/src/orchestration-v2/Adapters/AcpRegistryAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/AcpRegistryAdapterV2.ts
+index 110f26eadb..51567b4abc 100644
+--- a/apps/server/src/orchestration-v2/Adapters/AcpRegistryAdapterV2.ts
++++ b/apps/server/src/orchestration-v2/Adapters/AcpRegistryAdapterV2.ts
+@@ -32,6 +32,7 @@ import { AcpRegistryRuntimeCoordinator } from "../../provider/acp/AcpRegistryRun
+ import * as AcpSessionRuntime from "../../provider/acp/AcpSessionRuntime.ts";
+ import { makeAcpNativeLoggerFactory } from "../../provider/acp/AcpNativeLogging.ts";
+ import { ProviderEventLoggers } from "../../provider/Layers/ProviderEventLoggers.ts";
++import { applyDirenvEnvironment } from "../../provider/DirenvEnvironment.ts";
+ import { mergeProviderInstanceEnvironment } from "../../provider/ProviderInstanceEnvironment.ts";
+ import { IdAllocatorV2 } from "../IdAllocator.ts";
+ import { makeProviderFailure } from "../ProviderFailure.ts";
+@@ -102,7 +103,7 @@ function makeAcpRegistryRuntime(options: AcpRegistryAdapterV2Options) {
+     Crypto.Crypto | Scope.Scope
+   > =>
+     Effect.gen(function* () {
+-      const { processEnvironment, ...runtimeInput } = input;
++      const { processEnvironment, direnvEnvironment, ...runtimeInput } = input;
+       const resolved = yield* options.resolver
+         .resolve(options.settings, input.cwd, options.environment)
+         .pipe(
+@@ -118,11 +119,17 @@ function makeAcpRegistryRuntime(options: AcpRegistryAdapterV2Options) {
+         AcpSessionRuntime.layer({
+           ...runtimeInput,
+           spawn:
+-            processEnvironment === undefined
++            processEnvironment === undefined && direnvEnvironment === undefined
+               ? resolved.spawn
+               : {
+                   ...resolved.spawn,
+-                  env: { ...resolved.spawn.env, ...processEnvironment },
++                  env: {
++                    ...applyDirenvEnvironment(
++                      resolved.spawn.env ?? options.environment,
++                      direnvEnvironment,
++                    ),
++                    ...processEnvironment,
++                  },
+                 },
+           ...(options.settings.authMethodId ? { authMethodId: options.settings.authMethodId } : {}),
+         }).pipe(
+diff --git a/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
+index e7c113405e..732b21b7f7 100644
+--- a/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
++++ b/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
+@@ -109,6 +109,7 @@ import { mergeProviderInstanceEnvironment } from "../../provider/ProviderInstanc
+ import { T3_CODE_ORCHESTRATION_INSTRUCTIONS } from "../../provider/T3OrchestrationInstructions.ts";
+ import { buildRuntimeInstructions } from "../../provider/RuntimeInstructions.ts";
+ import * as McpProviderSession from "../../mcp/McpProviderSession.ts";
++import * as DirenvEnvironment from "../../provider/DirenvEnvironment.ts";
+ import { IdAllocatorV2, type IdAllocatorV2Shape } from "../IdAllocator.ts";
+ import { makeProviderFailure, makeProviderRetryTurnItem } from "../ProviderFailure.ts";
+ import { turnScopedSelectionTransition } from "../ProviderSelectionTransition.ts";
+@@ -6077,7 +6078,10 @@ export function makeClaudeAdapterV2(
+                 cwd: turnInput.runtimePolicy.cwd,
+                 attachmentsDir,
+                 settings: adapterOptions.settings,
+-                environment: adapterOptions.environment,
++                environment: DirenvEnvironment.withThreadDirenvEnvironment(
++                  adapterOptions.environment,
++                  turnInput.threadId,
++                ),
+                 tools: queryPolicy.tools ?? CLAUDE_CODE_PRESET_TOOLS,
+                 ...mcpOverrides,
+                 permissionMode: queryPolicy.permissionMode,
+diff --git a/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts
+index c2610d3630..1f16529c28 100644
+--- a/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts
++++ b/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts
+@@ -105,6 +105,7 @@ import {
+ } from "../../provider/Layers/codexLaunchArgs.ts";
+ import { mergeProviderInstanceEnvironment } from "../../provider/ProviderInstanceEnvironment.ts";
+ import * as McpProviderSession from "../../mcp/McpProviderSession.ts";
++import * as DirenvEnvironment from "../../provider/DirenvEnvironment.ts";
+ import {
+   ProviderAdapterDriverCreateError,
+   type ProviderAdapterDriver,
+@@ -1516,7 +1517,10 @@ export function makeCodexAdapterV2(adapterOptions: CodexAdapterV2Options): Provi
+           providerSessionId: input.providerSessionId,
+           runtimePolicy: input.runtimePolicy,
+           settings: adapterOptions.settings,
+-          environment: adapterOptions.environment,
++          environment: DirenvEnvironment.withThreadDirenvEnvironment(
++            adapterOptions.environment,
++            input.threadId,
++          ),
+         });
+         const additionalContextByThread = yield* Ref.make(
+           new Map<
+diff --git a/apps/server/src/orchestration-v2/Adapters/GrokAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/GrokAdapterV2.ts
+index 84768f9dd1..4c7e13a289 100644
+--- a/apps/server/src/orchestration-v2/Adapters/GrokAdapterV2.ts
++++ b/apps/server/src/orchestration-v2/Adapters/GrokAdapterV2.ts
+@@ -46,6 +46,7 @@ import {
+   XAiAskUserQuestionRequest,
+   XAiExitPlanModeRequest,
+ } from "../../provider/acp/XAiAcpExtension.ts";
++import { applyDirenvEnvironment } from "../../provider/DirenvEnvironment.ts";
+ import { mergeProviderInstanceEnvironment } from "../../provider/ProviderInstanceEnvironment.ts";
+ import * as AcpSessionRuntime from "../../provider/acp/AcpSessionRuntime.ts";
+ import { ProviderEventLoggers } from "../../provider/Layers/ProviderEventLoggers.ts";
+@@ -250,12 +251,12 @@ export function makeGrokAcpAdapterFlavor(options: GrokAdapterV2Options): AcpAdap
+       }),
+     makeRuntime:
+       options.makeRuntime ??
+-      ((input) =>
++      (({ direnvEnvironment, ...input }) =>
+         makeGrokAcpRuntime({
+           ...input,
+           interruptPromptOnCancel: input.interruptPromptOnCancel ?? false,
+           grokSettings: options.settings,
+-          environment: options.environment,
++          environment: applyDirenvEnvironment(options.environment, direnvEnvironment),
+           childProcessSpawner: options.childProcessSpawner,
+         })),
+     promptFailure: (cause) =>
+diff --git a/apps/server/src/orchestration-v2/Adapters/OpenCodeAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/OpenCodeAdapterV2.ts
+index e57a4c0eb4..4a2bb54d9a 100644
+--- a/apps/server/src/orchestration-v2/Adapters/OpenCodeAdapterV2.ts
++++ b/apps/server/src/orchestration-v2/Adapters/OpenCodeAdapterV2.ts
+@@ -57,6 +57,7 @@ import * as Stream from "effect/Stream";
+ import { resolveAttachmentPath } from "../../attachmentStore.ts";
+ import { ServerConfig } from "../../config.ts";
+ import * as McpProviderSession from "../../mcp/McpProviderSession.ts";
++import * as DirenvEnvironment from "../../provider/DirenvEnvironment.ts";
+ import type { EventNdjsonLogger } from "../../provider/Layers/EventNdjsonLogger.ts";
+ import { ProviderEventLoggers } from "../../provider/Layers/ProviderEventLoggers.ts";
+ import {
+@@ -1001,7 +1002,10 @@ export function makeOpenCodeAdapterV2(options: OpenCodeAdapterV2Options): Provid
+           binaryPath: options.settings.binaryPath,
+           directory: cwd,
+           serverUrl: options.settings.serverUrl,
+-          environment: options.environment,
++          environment: DirenvEnvironment.withThreadDirenvEnvironment(
++            options.environment,
++            input.threadId,
++          ),
+         });
+         const client = runtime.createOpenCodeSdkClient({
+           baseUrl: connection.url,
+diff --git a/apps/server/src/orchestration-v2/Adapters/PiAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/PiAdapterV2.ts
+index b31f1d3117..118f7fc273 100644
+--- a/apps/server/src/orchestration-v2/Adapters/PiAdapterV2.ts
++++ b/apps/server/src/orchestration-v2/Adapters/PiAdapterV2.ts
+@@ -62,6 +62,7 @@ import { ChildProcessSpawner } from "effect/unstable/process";
+ import { resolveAttachmentPath } from "../../attachmentStore.ts";
+ import { ServerConfig } from "../../config.ts";
+ import * as McpProviderSession from "../../mcp/McpProviderSession.ts";
++import * as DirenvEnvironment from "../../provider/DirenvEnvironment.ts";
+ import {
+   expandPiSkillReference,
+   parsePiCompactCommand,
+@@ -428,7 +429,10 @@ export function makePiAdapterV2(options: PiAdapterV2Options): ProviderAdapterV2S
+       }
+       const launch = buildPiRpcLaunch({
+         launchArgs: resolvedLaunchArgs.args,
+-        environment: options.environment,
++        environment: DirenvEnvironment.withThreadDirenvEnvironment(
++          options.environment,
++          input.threadId,
++        ),
+         mcpSession,
+         extensionPath,
+         runtimeMode: input.runtimePolicy.runtimeMode,
+diff --git a/apps/server/src/orchestration-v2/EffectWorker.test.ts b/apps/server/src/orchestration-v2/EffectWorker.test.ts
+index c082ed35b6..b3924f6260 100644
+--- a/apps/server/src/orchestration-v2/EffectWorker.test.ts
++++ b/apps/server/src/orchestration-v2/EffectWorker.test.ts
+@@ -114,6 +114,7 @@ function makeExecutorLayer(input: {
+         closeInstance: () => Effect.void,
+         release: () => record("release"),
+         detach: () => record("detach"),
++        takeProjectEnvironmentFailure: () => Effect.succeed(undefined),
+       }),
+     ),
+     Layer.succeed(
+diff --git a/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts b/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts
+index 8d2947094a..1f01d42b57 100644
+--- a/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts
++++ b/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts
+@@ -31,6 +31,7 @@ import { TestClock } from "effect/testing";
+ import { HttpServer } from "effect/unstable/http";
+ 
+ import { ProviderWorkspaceMissingError } from "../provider/Errors.ts";
++import * as DirenvEnvironment from "../provider/DirenvEnvironment.ts";
+ import { ServerEnvironment } from "../environment/ServerEnvironment.ts";
+ import * as ProjectService from "../project/ProjectService.ts";
+ import * as McpProviderSession from "../mcp/McpProviderSession.ts";
+@@ -58,6 +59,7 @@ import { makeSingleLayer as makeProviderAdapterRegistryLayer } from "./ProviderA
+ import { layer as providerEventIngestorLayer } from "./ProviderEventIngestor.ts";
+ import {
+   ProviderSessionManagerV2,
++  type ProviderSessionManagerV2Error,
+   layerWithOptions as providerSessionManagerLayerWithOptions,
+ } from "./ProviderSessionManager.ts";
+ 
+@@ -354,6 +356,7 @@ function makeTestLayer(input: {
+   readonly hangSessionScopeClose?: boolean;
+   readonly serverSettingsLayer?: ReturnType<typeof ServerSettings.layerTest>;
+   readonly projectServiceLayer?: Layer.Layer<ProjectService.ProjectService>;
++  readonly direnvLayer?: Layer.Layer<DirenvEnvironment.DirenvEnvironment>;
+ }) {
+   const configuredEventSinkLayer = input.failReleaseEventWrites
+     ? FailingReleaseEventSinkLayer
+@@ -394,6 +397,7 @@ function makeTestLayer(input: {
+           TestStoresLayer,
+           ...(input.serverSettingsLayer === undefined ? [] : [input.serverSettingsLayer]),
+           ...(input.projectServiceLayer === undefined ? [] : [input.projectServiceLayer]),
++          ...(input.direnvLayer === undefined ? [] : [input.direnvLayer]),
+         ),
+       ),
+     ),
+@@ -3004,3 +3008,164 @@ it.effect(
+       assert.isFalse(denied?.capabilities?.has("device"));
+     }),
+ );
++
++/**
++ * Runs `body` against a manager whose direnv loads answer from `results` in
++ * order, recording each load's `previous` diff and the environment each
++ * provider process opened with.
++ */
++function runDirenvScenario(
++  results: ReadonlyArray<DirenvEnvironment.DirenvLoadResult>,
++  body: (input: {
++    readonly manager: ProviderSessionManagerV2["Service"];
++    readonly open: Effect.Effect<ProviderAdapterV2SessionRuntime, ProviderSessionManagerV2Error>;
++    readonly threadId: ThreadId;
++  }) => Effect.Effect<void, ProviderSessionManagerV2Error>,
++) {
++  return Effect.gen(function* () {
++    const state = yield* Ref.make(emptyState);
++    const threadId = ThreadId.make("thread-provider-session-manager-direnv");
++    const loads = yield* Ref.make<
++      ReadonlyArray<DirenvEnvironment.DirenvEnvironmentDiff | undefined>
++    >([]);
++    const openedWith = yield* Ref.make<
++      ReadonlyArray<DirenvEnvironment.DirenvEnvironmentDiff | undefined>
++    >([]);
++    const direnvLayer = Layer.succeed(
++      DirenvEnvironment.DirenvEnvironment,
++      DirenvEnvironment.DirenvEnvironment.of({
++        load: (_cwd, previous) =>
++          Ref.modify(loads, (current) => [
++            results[Math.min(current.length, results.length - 1)]!,
++            [...current, previous],
++          ]),
++        allow: () => Effect.succeed({ _tag: "NotFound" }),
++      }),
++    );
++    const beforeOpen = () =>
++      Ref.update(openedWith, (current) => [
++        ...current,
++        DirenvEnvironment.readThreadDirenvEnvironment(threadId),
++      ]);
++
++    yield* Effect.gen(function* () {
++      const eventSink = yield* EventSinkV2;
++      const idAllocator = yield* IdAllocatorV2;
++      const manager = yield* ProviderSessionManagerV2;
++      const now = yield* DateTime.now;
++      const providerSessionId = yield* idAllocator.allocate.providerSession({
++        providerInstanceId: modelSelection.instanceId,
++        threadId,
++      });
++      yield* eventSink.write({
++        events: [yield* makeThreadCreatedEvent({ idAllocator, threadId, now })],
++      });
++      yield* body({
++        manager,
++        open: manager.open({ threadId, providerSessionId, modelSelection, runtimePolicy }),
++        threadId,
++      });
++    }).pipe(
++      Effect.provide(makeTestLayer({ state, idleTimeoutMs: 60_000, beforeOpen, direnvLayer })),
++    );
++    return {
++      state: yield* Ref.get(state),
++      loads: yield* Ref.get(loads),
++      openedWith: yield* Ref.get(openedWith),
++    };
++  });
++}
++
++it.effect("ProviderSessionManagerV2 opens a session with the project's direnv environment", () =>
++  Effect.gen(function* () {
++    const diff = { PATH: "/nix/store/tools/bin", DIRENV_DIFF: "d1" };
++    const result = yield* runDirenvScenario([{ _tag: "Loaded", diff, changed: true }], ({ open }) =>
++      open.pipe(Effect.asVoid),
++    );
++    assert.deepStrictEqual(result.openedWith, [diff]);
++    assert.deepStrictEqual(result.loads, [undefined]);
++  }),
++);
++
++it.effect("ProviderSessionManagerV2 keeps a session whose direnv environment is current", () =>
++  Effect.gen(function* () {
++    const diff = { PATH: "/nix/store/tools/bin", DIRENV_DIFF: "d1" };
++    const result = yield* runDirenvScenario(
++      [
++        { _tag: "Loaded", diff, changed: true },
++        { _tag: "Loaded", diff, changed: false },
++      ],
++      ({ open }) =>
++        Effect.gen(function* () {
++          const first = yield* open;
++          const second = yield* open;
++          assert.strictEqual(first, second);
++        }),
++    );
++    assert.equal(result.state.openCount, 1);
++    // The reuse is direnv's staleness check against what the session loaded.
++    assert.deepStrictEqual(result.loads, [undefined, diff]);
++  }),
++);
++
++it.effect(
++  "ProviderSessionManagerV2 restarts an idle session when its direnv environment changes",
++  () =>
++    Effect.gen(function* () {
++      const before = { PATH: "/nix/store/old/bin", DIRENV_DIFF: "d1" };
++      const after = { PATH: "/nix/store/new/bin", DIRENV_DIFF: "d2" };
++      const result = yield* runDirenvScenario(
++        [
++          { _tag: "Loaded", diff: before, changed: true },
++          { _tag: "Loaded", diff: after, changed: true },
++        ],
++        ({ open }) =>
++          Effect.gen(function* () {
++            const first = yield* open;
++            const second = yield* open;
++            assert.notStrictEqual(first, second);
++          }),
++      );
++      assert.equal(result.state.openCount, 2);
++      assert.deepStrictEqual(result.openedWith, [before, after]);
++      // The restart reuses the environment the check loaded instead of evaluating again.
++      assert.equal(result.loads.length, 2);
++    }),
++);
++
++it.effect(
++  "ProviderSessionManagerV2 restarts without an environment direnv no longer provides",
++  () =>
++    Effect.gen(function* () {
++      const diff = { PATH: "/nix/store/tools/bin", DIRENV_DIFF: "d1" };
++      const result = yield* runDirenvScenario(
++        [{ _tag: "Loaded", diff, changed: true }, { _tag: "None" }, { _tag: "None" }],
++        ({ open }) => Effect.all([open, open], { discard: true }),
++      );
++      assert.equal(result.state.openCount, 2);
++      assert.deepStrictEqual(result.openedWith, [diff, undefined]);
++    }),
++);
++
++it.effect("ProviderSessionManagerV2 reports a failing .envrc once per thread", () =>
++  Effect.gen(function* () {
++    const blocked: DirenvEnvironment.DirenvLoadResult = {
++      _tag: "Failed",
++      envrcPath: "/project/.envrc",
++      reason: "blocked",
++      message: "/project/.envrc is blocked. Run `direnv allow` to approve its content",
++    };
++    const result = yield* runDirenvScenario([blocked], ({ manager, open, threadId }) =>
++      Effect.gen(function* () {
++        yield* open;
++        assert.deepStrictEqual(yield* manager.takeProjectEnvironmentFailure(threadId), blocked);
++        assert.equal(yield* manager.takeProjectEnvironmentFailure(threadId), undefined);
++        // The per-message check sees the same failure; the thread already shows it.
++        yield* open;
++        assert.equal(yield* manager.takeProjectEnvironmentFailure(threadId), undefined);
++      }),
++    );
++    assert.equal(result.state.openCount, 1);
++    assert.deepStrictEqual(result.openedWith, [undefined]);
++  }),
++);
+diff --git a/apps/server/src/orchestration-v2/ProviderSessionManager.ts b/apps/server/src/orchestration-v2/ProviderSessionManager.ts
+index d6f9d90597..993780b773 100644
+--- a/apps/server/src/orchestration-v2/ProviderSessionManager.ts
++++ b/apps/server/src/orchestration-v2/ProviderSessionManager.ts
+@@ -29,6 +29,7 @@ import * as Stream from "effect/Stream";
+ import { ProviderWorkspaceMissingError } from "../provider/Errors.ts";
+ import * as ProjectService from "../project/ProjectService.ts";
+ import * as McpProviderSession from "../mcp/McpProviderSession.ts";
++import * as DirenvEnvironment from "../provider/DirenvEnvironment.ts";
+ import * as ServerSettings from "../serverSettings.ts";
+ import * as McpSessionRegistry from "../mcp/McpSessionRegistry.ts";
+ import { EventSinkV2 } from "./EventSink.ts";
+@@ -52,6 +53,7 @@ const RELEASE_SCOPE_CLOSE_TIMEOUT_MS = 30 * 1000;
+ 
+ export const ProviderSessionReleaseReason = Schema.Literals([
+   "idle_timeout",
++  "environment_changed",
+   "runtime_error",
+   "manual_shutdown",
+   "server_shutdown",
+@@ -175,6 +177,14 @@ export interface ProviderSessionManagerV2Shape {
+      */
+     readonly revokeMcpCredential?: boolean;
+   }) => Effect.Effect<void, ProviderSessionManagerV2Error>;
++  /**
++   * The project's direnv environment failed to load for the thread's latest
++   * `open`, and the thread has not been told yet. Consumed by the caller that
++   * can place a notice on the thread's timeline.
++   */
++  readonly takeProjectEnvironmentFailure: (
++    threadId: ThreadId,
++  ) => Effect.Effect<DirenvEnvironment.DirenvLoadFailure | undefined>;
+ }
+ 
+ export class ProviderSessionManagerV2 extends Context.Service<
+@@ -207,6 +217,14 @@ interface LiveSessionEntry {
+   readonly idleFiber: Fiber.Fiber<void, never> | null;
+   /** Set when idle release is deferred for pending background work; bounds total deferral. */
+   readonly pinnedSinceMs: number | null;
++  /** The direnv environment the provider process started with; null when none was loaded. */
++  readonly direnv: SessionDirenvEnvironment | null;
++}
++
++interface SessionDirenvEnvironment {
++  readonly cwd: string;
++  /** Undefined when direnv found nothing to load or the `.envrc` failed. */
++  readonly diff: DirenvEnvironment.DirenvEnvironmentDiff | undefined;
+ }
+ 
+ type ProviderSessionEventSignal =
+@@ -357,6 +375,91 @@ export const layerWithOptions = (
+           );
+         },
+       );
++      const direnv = yield* Effect.serviceOption(DirenvEnvironment.DirenvEnvironment);
++      const direnvEnabled = Effect.fn("ProviderSessionManagerV2.direnvEnabled")(
++        function* (threadId: ThreadId) {
++          if (Option.isNone(serverSettings)) return true;
++          const settings = yield* serverSettings.value.getSettings;
++          const thread = yield* projectionStore.getThread(threadId);
++          return resolveProjectSettings(settings, thread.projectId).settings
++            .enableDirenvEnvironment;
++        },
++        Effect.catch((cause) =>
++          Effect.logWarning(
++            "Could not resolve the direnv setting; starting the provider without the project's environment.",
++            { cause },
++          ).pipe(Effect.as(false)),
++        ),
++      );
++      /** The failure each thread was last told about, so restarts do not repeat it. */
++      const reportedDirenvFailures = new Map<ThreadId, string>();
++      const unreportedDirenvFailures = new Map<ThreadId, DirenvEnvironment.DirenvLoadFailure>();
++      const recordDirenvResult = (
++        threadId: ThreadId,
++        result: DirenvEnvironment.DirenvLoadResult,
++      ) => {
++        if (result._tag !== "Failed") {
++          reportedDirenvFailures.delete(threadId);
++          unreportedDirenvFailures.delete(threadId);
++          return;
++        }
++        if (reportedDirenvFailures.get(threadId) === result.message) return;
++        reportedDirenvFailures.set(threadId, result.message);
++        unreportedDirenvFailures.set(threadId, result);
++      };
++      /**
++       * Load the direnv environment for a provider process about to start in
++       * `cwd`. Adapters read it by thread while building their launch
++       * environment. `preloaded` is a diff `checkDirenvEnvironment` just loaded.
++       */
++      const prepareDirenvEnvironment = Effect.fn(
++        "ProviderSessionManagerV2.prepareDirenvEnvironment",
++      )(function* (
++        threadId: ThreadId,
++        cwd: string | null,
++        preloaded: DirenvEnvironment.DirenvEnvironmentDiff | undefined,
++      ) {
++        DirenvEnvironment.setThreadDirenvEnvironment(threadId, preloaded);
++        if (cwd === null) return null;
++        if (preloaded !== undefined) return { cwd, diff: preloaded } as SessionDirenvEnvironment;
++        if (Option.isNone(direnv) || !(yield* direnvEnabled(threadId))) return null;
++        const result = yield* direnv.value.load(cwd);
++        yield* Effect.annotateCurrentSpan({ "provider.direnv.result": result._tag });
++        recordDirenvResult(threadId, result);
++        const diff = result._tag === "Loaded" ? result.diff : undefined;
++        DirenvEnvironment.setThreadDirenvEnvironment(threadId, diff);
++        return { cwd, diff } as SessionDirenvEnvironment;
++      });
++      /**
++       * Re-check a live session's direnv environment before reusing it, as a
++       * shell hook does on each prompt: direnv compares the files it watches
++       * (the `.envrc`, its allow record, `flake.lock`, ...) and only evaluates
++       * again when one changed. `restart` means the process should start over
++       * with `diff`.
++       */
++      const checkDirenvEnvironment = Effect.fn("ProviderSessionManagerV2.checkDirenvEnvironment")(
++        function* (entry: LiveSessionEntry, threadId: ThreadId, cwd: string | null) {
++          const loaded = entry.direnv?.diff;
++          if (Option.isNone(direnv) || cwd === null) return { restart: false } as const;
++          if (!(yield* direnvEnabled(threadId))) return { restart: loaded !== undefined } as const;
++          const previous = entry.direnv?.cwd === cwd ? loaded : undefined;
++          const result = yield* direnv.value.load(cwd, previous);
++          yield* Effect.annotateCurrentSpan({ "provider.direnv.refresh": result._tag });
++          recordDirenvResult(threadId, result);
++          switch (result._tag) {
++            // A running session keeps whatever it started with.
++            case "Failed":
++              return { restart: false } as const;
++            case "None":
++              return { restart: loaded !== undefined } as const;
++            case "Loaded":
++              return result.changed
++                ? ({ restart: true, diff: result.diff } as const)
++                : ({ restart: false } as const);
++          }
++        },
++      );
++
+       const layerScope = yield* Effect.scope;
+       const sessions = yield* Ref.make(new Map<string, LiveSessionEntry>());
+       const nextSubscriberId = yield* Ref.make(0);
+@@ -1530,11 +1633,20 @@ export const layerWithOptions = (
+             ),
+           { discard: true },
+         );
++        DirenvEnvironment.clearAllThreadDirenvEnvironments();
++        reportedDirenvFailures.clear();
++        unreportedDirenvFailures.clear();
+       });
+       yield* Effect.addFinalizer(() => shutdown);
+ 
+       return ProviderSessionManagerV2.of({
+         shutdown,
++        takeProjectEnvironmentFailure: (threadId) =>
++          Effect.sync(() => {
++            const failure = unreportedDirenvFailures.get(threadId);
++            unreportedDirenvFailures.delete(threadId);
++            return failure;
++          }),
+         open: (input) =>
+           sessionOpen.withLock(
+             input.providerSessionId,
+@@ -1554,6 +1666,7 @@ export const layerWithOptions = (
+               }
+               const key = sessionKey(input.providerSessionId);
+               const existing = (yield* Ref.get(sessions)).get(key);
++              let preloadedDirenv: DirenvEnvironment.DirenvEnvironmentDiff | undefined;
+               if (existing !== undefined) {
+                 if (
+                   !existing.attachedThreadIds.has(input.threadId) &&
+@@ -1565,13 +1678,33 @@ export const layerWithOptions = (
+                     cause: `Provider ${existing.runtime.driver} does not support attaching multiple app threads to one session.`,
+                   });
+                 }
+-                yield* ensureThreadAttached({
++                // Restarting the process would cut off work in flight or other
++                // threads sharing it; those pick the change up once it idles.
++                const ownedIdle =
++                  existing.busyCount === 0 &&
++                  existing.attachedThreadIds.size === 1 &&
++                  existing.attachedThreadIds.has(input.threadId);
++                const direnvRefresh = ownedIdle
++                  ? yield* checkDirenvEnvironment(existing, input.threadId, cwd)
++                  : ({ restart: false } as const);
++                if (!direnvRefresh.restart) {
++                  yield* ensureThreadAttached({
++                    providerSessionId: input.providerSessionId,
++                    threadId: input.threadId,
++                    providerInstanceId: existing.runtime.instanceId,
++                  });
++                  yield* touchActivity(input.providerSessionId);
++                  return existing.exposedRuntime;
++                }
++                yield* Effect.logInfo("orchestration-v2.provider-session.environment-changed", {
+                   providerSessionId: input.providerSessionId,
+                   threadId: input.threadId,
+-                  providerInstanceId: existing.runtime.instanceId,
+                 });
+-                yield* touchActivity(input.providerSessionId);
+-                return existing.exposedRuntime;
++                yield* releaseEntry({
++                  providerSessionId: input.providerSessionId,
++                  reason: "environment_changed",
++                });
++                preloadedDirenv = "diff" in direnvRefresh ? direnvRefresh.diff : undefined;
+               }
+ 
+               const adapter = yield* registry.get(input.modelSelection.instanceId).pipe(
+@@ -1584,6 +1717,11 @@ export const layerWithOptions = (
+                     }),
+                 ),
+               );
++              const sessionDirenv = yield* prepareDirenvEnvironment(
++                input.threadId,
++                cwd,
++                preloadedDirenv,
++              );
+               const prepared = yield* prepareMcpSession(
+                 input.threadId,
+                 input.modelSelection.instanceId,
+@@ -1671,6 +1809,7 @@ export const layerWithOptions = (
+                 lastActivityAtMs: now,
+                 idleFiber: null,
+                 pinnedSinceMs: null,
++                direnv: sessionDirenv,
+               };
+               yield* Ref.update(sessions, (current) => {
+                 const updated = new Map(current);
+@@ -1851,6 +1990,9 @@ export const layerWithOptions = (
+             // and the token must not outlive the thread.
+             if (input.revokeMcpCredential === true) {
+               yield* clearMcpSession(input.threadId);
++              DirenvEnvironment.setThreadDirenvEnvironment(input.threadId, undefined);
++              reportedDirenvFailures.delete(input.threadId);
++              unreportedDirenvFailures.delete(input.threadId);
+             }
+             if (Option.isNone(detached)) {
+               return;
+diff --git a/apps/server/src/orchestration-v2/ProviderTurnControlService.test.ts b/apps/server/src/orchestration-v2/ProviderTurnControlService.test.ts
+index 24c9cfe80a..1396113474 100644
+--- a/apps/server/src/orchestration-v2/ProviderTurnControlService.test.ts
++++ b/apps/server/src/orchestration-v2/ProviderTurnControlService.test.ts
+@@ -272,6 +272,7 @@ it.effect(
+           closeInstance: () => Effect.void,
+           release: () => Effect.void,
+           detach: () => Effect.void,
++          takeProjectEnvironmentFailure: () => Effect.succeed(undefined),
+         }),
+       );
+       const controlLayer = providerTurnControlLayer.pipe(
+diff --git a/apps/server/src/orchestration-v2/ProviderTurnStartService.ts b/apps/server/src/orchestration-v2/ProviderTurnStartService.ts
+index 9e05636207..f70e10db20 100644
+--- a/apps/server/src/orchestration-v2/ProviderTurnStartService.ts
++++ b/apps/server/src/orchestration-v2/ProviderTurnStartService.ts
+@@ -23,6 +23,7 @@ import * as Schema from "effect/Schema";
+ import { GitWorkflowService } from "../git/GitWorkflowService.ts";
+ import { ProjectService } from "../project/ProjectService.ts";
+ import { ProviderAuthService } from "../provider/Services/ProviderAuthService.ts";
++import { direnvFailureNotice } from "../provider/DirenvEnvironment.ts";
+ import { EventSinkV2 } from "./EventSink.ts";
+ import * as ContextHandoffService from "./ContextHandoffService.ts";
+ import {
+@@ -563,6 +564,49 @@ export const layer: Layer.Layer<
+         return;
+       }
+       const session = sessionResult.success;
++      const direnvFailure = yield* providerSessions.takeProjectEnvironmentFailure(
++        projection.thread.id,
++      );
++      if (direnvFailure !== undefined) {
++        const now = yield* DateTime.now;
++        const notice = direnvFailureNotice(direnvFailure);
++        const item: OrchestrationV2TurnItem = {
++          id: idAllocator.derive.runSignalTurnItem({ runId, signal: "direnv-failure" }),
++          threadId: projection.thread.id,
++          runId,
++          nodeId: rootNode.id,
++          providerThreadId: providerThread.id,
++          providerTurnId: null,
++          nativeItemRef: null,
++          parentItemId: null,
++          ordinal: yield* projectionStore.getNextTurnItemOrdinal(projection.thread.id),
++          type: "system_notice",
++          status: "completed",
++          title: notice.message,
++          ...notice,
++          startedAt: now,
++          completedAt: now,
++          updatedAt: now,
++        };
++        yield* eventSink.writeIfRunCurrent({
++          threadId: projection.thread.id,
++          runId,
++          activeAttemptId: attempt.id,
++          expectedStatus: "starting",
++          events: [
++            {
++              type: "turn-item.updated",
++              payload: item,
++              id: yield* idAllocator.allocate.event({ threadId: projection.thread.id }),
++              threadId: projection.thread.id,
++              runId,
++              nodeId: rootNode.id,
++              providerInstanceId: run.providerInstanceId,
++              occurredAt: now,
++            },
++          ],
++        });
++      }
+       let effectiveHandoffs = handoffs;
+       const loadedProviderThread = yield* Effect.gen(function* () {
+         if (nativeForkTransfer !== undefined) {
+diff --git a/apps/server/src/orchestration-v2/testkit/ProviderTurnStartMemory.fixture.mjs b/apps/server/src/orchestration-v2/testkit/ProviderTurnStartMemory.fixture.mjs
+index 36d5ce1adb..4ea7b82717 100644
+--- a/apps/server/src/orchestration-v2/testkit/ProviderTurnStartMemory.fixture.mjs
++++ b/apps/server/src/orchestration-v2/testkit/ProviderTurnStartMemory.fixture.mjs
+@@ -64,7 +64,10 @@ const dependencies = Layer.mergeAll(
+     getTurnStartHistory: () => Effect.sync(() => current.turnItems),
+     getRuntimeRecoveryProjection: () => Effect.sync(() => current),
+   }),
+-  Layer.mock(Sessions.ProviderSessionManagerV2)({ open: () => Effect.succeed(session) }),
++  Layer.mock(Sessions.ProviderSessionManagerV2)({
++    open: () => Effect.succeed(session),
++    takeProjectEnvironmentFailure: () => Effect.succeed(undefined),
++  }),
+   Layer.mock(Policy.RuntimePolicyV2)({
+     resolve: () =>
+       Effect.succeed({ cwd: "/synthetic", interactionMode: "default", runtimeMode: "full-access" }),
+diff --git a/apps/server/src/processRunner.ts b/apps/server/src/processRunner.ts
+index 0a9bb9b04a..6e2c542cc4 100644
+--- a/apps/server/src/processRunner.ts
++++ b/apps/server/src/processRunner.ts
+@@ -24,6 +24,8 @@ export interface ProcessRunInput {
+   readonly spawnCwd?: string | undefined;
+   readonly timeout?: Duration.Input | undefined;
+   readonly env?: NodeJS.ProcessEnv | undefined;
++  /** Merge `env` over the server's environment. Defaults to true when `env` is set. */
++  readonly extendEnv?: boolean | undefined;
+   readonly stdin?: string | undefined;
+   /** Receives every stdout chunk, including bytes beyond the buffered output limit. */
+   readonly onStdoutChunk?: ((chunk: Uint8Array) => void) | undefined;
+@@ -292,7 +294,7 @@ const runProcessCore = Effect.fn("processRunner.runProcessCore")(function* (
+   const maxOutputBytes = input.maxOutputBytes ?? DEFAULT_MAX_OUTPUT_BYTES;
+   const outputMode = input.outputMode ?? "error";
+   const truncatedMarker = input.truncatedMarker ?? "";
+-  const extendEnv = input.env !== undefined;
++  const extendEnv = input.extendEnv ?? input.env !== undefined;
+   const spawnCommand = yield* resolveSpawnCommand(
+     input.command,
+     input.args,
+diff --git a/apps/server/src/provider/DirenvEnvironment.test.ts b/apps/server/src/provider/DirenvEnvironment.test.ts
+new file mode 100644
+index 0000000000..de6993f9ec
+--- /dev/null
++++ b/apps/server/src/provider/DirenvEnvironment.test.ts
+@@ -0,0 +1,236 @@
++import * as NodeServices from "@effect/platform-node/NodeServices";
++import { afterEach, describe, expect, it } from "@effect/vitest";
++import { HostProcessPlatform } from "@t3tools/shared/hostProcess";
++import * as Deferred from "effect/Deferred";
++import * as Effect from "effect/Effect";
++import * as Fiber from "effect/Fiber";
++import * as FileSystem from "effect/FileSystem";
++import * as Layer from "effect/Layer";
++import * as Path from "effect/Path";
++import * as ChildProcessSpawner from "effect/unstable/process/ChildProcessSpawner";
++import { vi } from "vite-plus/test";
++
++import * as ProcessRunner from "../processRunner.ts";
++import * as DirenvEnvironment from "./DirenvEnvironment.ts";
++
++const runMock = vi.fn<ProcessRunner.ProcessRunner["Service"]["run"]>();
++
++const TestLayer = DirenvEnvironment.layer.pipe(
++  Layer.provide(
++    Layer.succeed(ProcessRunner.ProcessRunner, ProcessRunner.ProcessRunner.of({ run: runMock })),
++  ),
++  Layer.provide(Layer.succeed(HostProcessPlatform, "linux")),
++  Layer.provideMerge(NodeServices.layer),
++);
++
++const output = (
++  overrides: Partial<ProcessRunner.ProcessRunOutput>,
++): ProcessRunner.ProcessRunOutput => ({
++  stdout: "",
++  stderr: "",
++  code: ChildProcessSpawner.ExitCode(0),
++  timedOut: false,
++  stdoutTruncated: false,
++  stderrTruncated: false,
++  stdoutInvalidUtf8: false,
++  stderrInvalidUtf8: false,
++  ...overrides,
++});
++
++/** A project root holding an `.envrc`, and a nested directory a thread might run in. */
++const makeProject = Effect.gen(function* () {
++  const fileSystem = yield* FileSystem.FileSystem;
++  const path = yield* Path.Path;
++  const root = yield* fileSystem.makeTempDirectoryScoped({ prefix: "t3-direnv-" });
++  const nested = path.join(root, "packages", "app");
++  yield* fileSystem.makeDirectory(nested, { recursive: true });
++  yield* fileSystem.writeFileString(path.join(root, ".envrc"), "use flake\n");
++  return { envrcPath: path.join(root, ".envrc"), nested };
++});
++
++afterEach(() => {
++  runMock.mockReset();
++});
++
++describe("DirenvEnvironment.load", () => {
++  it.effect("skips direnv when no .envrc governs the directory", () =>
++    Effect.gen(function* () {
++      const fileSystem = yield* FileSystem.FileSystem;
++      const cwd = yield* fileSystem.makeTempDirectoryScoped({ prefix: "t3-direnv-" });
++      const direnv = yield* DirenvEnvironment.DirenvEnvironment;
++
++      expect(yield* direnv.load(cwd)).toEqual({ _tag: "None" });
++      expect(runMock).not.toHaveBeenCalled();
++    }).pipe(Effect.scoped, Effect.provide(TestLayer)),
++  );
++
++  it.effect("loads the exported variables from the nearest parent .envrc", () =>
++    Effect.gen(function* () {
++      const { nested } = yield* makeProject;
++      runMock.mockReturnValueOnce(
++        Effect.succeed(output({ stdout: '{"PATH":"/nix/store/x/bin:/usr/bin","OLD":null}' })),
++      );
++      const direnv = yield* DirenvEnvironment.DirenvEnvironment;
++
++      const result = yield* direnv.load(nested);
++
++      expect(result).toEqual({
++        _tag: "Loaded",
++        diff: { PATH: "/nix/store/x/bin:/usr/bin", OLD: null },
++        changed: true,
++      });
++      expect(runMock).toHaveBeenCalledWith(
++        expect.objectContaining({ command: "direnv", args: ["export", "json"], cwd: nested }),
++      );
++    }).pipe(Effect.scoped, Effect.provide(TestLayer)),
++  );
++
++  it.effect("reports a blocked .envrc instead of loading it", () =>
++    Effect.gen(function* () {
++      const { envrcPath, nested } = yield* makeProject;
++      runMock.mockReturnValueOnce(
++        Effect.succeed(
++          output({
++            // direnv still prints its own bookkeeping variables when blocked.
++            stdout: '{"DIRENV_DIR":"-/project"}',
++            stderr: `\u001b[31mdirenv: error ${envrcPath} is blocked. Run \`direnv allow\` to approve its content\u001b[0m\n`,
++            code: ChildProcessSpawner.ExitCode(1),
++          }),
++        ),
++      );
++      const direnv = yield* DirenvEnvironment.DirenvEnvironment;
++
++      const result = yield* direnv.load(nested);
++
++      expect(result).toEqual({
++        _tag: "Failed",
++        envrcPath,
++        reason: "blocked",
++        message: `${envrcPath} is blocked. Run \`direnv allow\` to approve its content`,
++      });
++    }).pipe(Effect.scoped, Effect.provide(TestLayer)),
++  );
++
++  it.effect("treats a missing direnv binary as no project environment", () =>
++    Effect.gen(function* () {
++      const { nested } = yield* makeProject;
++      runMock.mockReturnValueOnce(
++        Effect.fail(
++          new ProcessRunner.ProcessSpawnError({
++            command: "direnv",
++            argumentCount: 2,
++            cause: new Error("spawn direnv ENOENT"),
++          }),
++        ),
++      );
++      const direnv = yield* DirenvEnvironment.DirenvEnvironment;
++
++      expect(yield* direnv.load(nested)).toEqual({ _tag: "None" });
++    }).pipe(Effect.scoped, Effect.provide(TestLayer)),
++  );
++
++  it.effect("reports a timed-out load", () =>
++    Effect.gen(function* () {
++      const { nested } = yield* makeProject;
++      runMock.mockReturnValueOnce(Effect.succeed(output({ code: null, timedOut: true })));
++      const direnv = yield* DirenvEnvironment.DirenvEnvironment;
++
++      const result = yield* direnv.load(nested);
++
++      expect(result).toMatchObject({ _tag: "Failed", reason: "timeout" });
++    }).pipe(Effect.scoped, Effect.provide(TestLayer)),
++  );
++
++  it.effect("checks staleness against exactly the previously loaded environment", () =>
++    Effect.gen(function* () {
++      const { nested } = yield* makeProject;
++      const previous = { PATH: "/nix/store/old/bin", STALE: null, DIRENV_DIFF: "v1" };
++      runMock.mockReturnValueOnce(Effect.succeed(output({ stdout: "" })));
++      const direnv = yield* DirenvEnvironment.DirenvEnvironment;
++
++      const result = yield* direnv.load(nested, previous);
++
++      expect(result).toEqual({ _tag: "Loaded", diff: previous, changed: false });
++      const input = runMock.mock.calls[0]?.[0];
++      expect(input?.extendEnv).toBe(false);
++      expect(input?.env?.PATH).toBe("/nix/store/old/bin");
++      expect(input?.env && "STALE" in input.env).toBe(false);
++    }).pipe(Effect.scoped, Effect.provide(TestLayer)),
++  );
++
++  it.effect("keeps the diff relative to the server environment after a change", () =>
++    Effect.gen(function* () {
++      const { nested } = yield* makeProject;
++      const previous = { PATH: "/nix/store/old/bin", FOO: "1", DIRENV_DIFF: "v1" };
++      runMock.mockReturnValueOnce(
++        Effect.succeed(output({ stdout: '{"PATH":"/nix/store/new/bin","DIRENV_DIFF":"v2"}' })),
++      );
++      const direnv = yield* DirenvEnvironment.DirenvEnvironment;
++
++      expect(yield* direnv.load(nested, previous)).toEqual({
++        _tag: "Loaded",
++        diff: { PATH: "/nix/store/new/bin", FOO: "1", DIRENV_DIFF: "v2" },
++        changed: true,
++      });
++    }).pipe(Effect.scoped, Effect.provide(TestLayer)),
++  );
++
++  it.effect("shares one evaluation between concurrent loads of a directory", () =>
++    Effect.gen(function* () {
++      const { nested } = yield* makeProject;
++      const release = yield* Deferred.make<void>();
++      runMock.mockReturnValueOnce(
++        Deferred.await(release).pipe(Effect.as(output({ stdout: '{"FOO":"bar"}' }))),
++      );
++      const direnv = yield* DirenvEnvironment.DirenvEnvironment;
++
++      const first = yield* Effect.forkChild(direnv.load(nested), { startImmediately: true });
++      const second = yield* Effect.forkChild(direnv.load(nested), { startImmediately: true });
++      yield* Deferred.succeed(release, undefined);
++
++      expect(yield* Fiber.join(first)).toEqual(yield* Fiber.join(second));
++      expect(runMock).toHaveBeenCalledTimes(1);
++    }).pipe(Effect.scoped, Effect.provide(TestLayer)),
++  );
++});
++
++describe("DirenvEnvironment.allow", () => {
++  it.effect("allows the .envrc governing the directory", () =>
++    Effect.gen(function* () {
++      const { envrcPath, nested } = yield* makeProject;
++      runMock.mockReturnValueOnce(Effect.succeed(output({})));
++      const direnv = yield* DirenvEnvironment.DirenvEnvironment;
++
++      expect(yield* direnv.allow(nested)).toEqual({ _tag: "Allowed", envrcPath });
++      expect(runMock).toHaveBeenCalledWith(
++        expect.objectContaining({ command: "direnv", args: ["allow", envrcPath] }),
++      );
++    }).pipe(Effect.scoped, Effect.provide(TestLayer)),
++  );
++});
++
++describe("applyDirenvEnvironment", () => {
++  const serverEnv = { PATH: "/usr/bin", HOME: "/home/user", STALE: "1" };
++
++  it("sets and unsets variables over the server environment", () => {
++    expect(
++      DirenvEnvironment.applyDirenvEnvironment(
++        serverEnv,
++        { PATH: "/nix/store/x/bin:/usr/bin", STALE: null, IN_NIX_SHELL: "impure" },
++        serverEnv,
++      ),
++    ).toEqual({ PATH: "/nix/store/x/bin:/usr/bin", HOME: "/home/user", IN_NIX_SHELL: "impure" });
++  });
++
++  it("keeps values the provider instance configured itself", () => {
++    const instanceEnv = { ...serverEnv, CLAUDE_CONFIG_DIR: "/home/user/.claude-work" };
++
++    expect(
++      DirenvEnvironment.applyDirenvEnvironment(
++        instanceEnv,
++        { CLAUDE_CONFIG_DIR: "/project/.claude", FOO: "bar" },
++        serverEnv,
++      ),
++    ).toEqual({ ...instanceEnv, FOO: "bar" });
++  });
++});
+diff --git a/apps/server/src/provider/DirenvEnvironment.ts b/apps/server/src/provider/DirenvEnvironment.ts
+new file mode 100644
+index 0000000000..00f103e2d4
+--- /dev/null
++++ b/apps/server/src/provider/DirenvEnvironment.ts
+@@ -0,0 +1,267 @@
++import type { ThreadId } from "@t3tools/contracts";
++import { HostProcessPlatform } from "@t3tools/shared/hostProcess";
++import * as Context from "effect/Context";
++import * as Deferred from "effect/Deferred";
++import * as Effect from "effect/Effect";
++import * as FileSystem from "effect/FileSystem";
++import * as Layer from "effect/Layer";
++import * as Option from "effect/Option";
++import * as Path from "effect/Path";
++import * as Schema from "effect/Schema";
++
++import * as ProcessRunner from "../processRunner.ts";
++
++/** Variables to set (string) or unset (null), as `direnv export json` reports them. */
++export type DirenvEnvironmentDiff = Readonly<Record<string, string | null>>;
++
++export type DirenvFailureReason = "blocked" | "timeout" | "failed";
++
++export type DirenvLoadResult =
++  /** No `.envrc` governs the directory, or direnv is not installed. */
++  | { readonly _tag: "None" }
++  | {
++      readonly _tag: "Loaded";
++      /** The full diff over the server's environment, bookkeeping variables included. */
++      readonly diff: DirenvEnvironmentDiff;
++      /** False when direnv reported `previous` as still current. */
++      readonly changed: boolean;
++    }
++  | {
++      readonly _tag: "Failed";
++      readonly envrcPath: string;
++      readonly reason: DirenvFailureReason;
++      readonly message: string;
++    };
++
++export type DirenvLoadFailure = Extract<DirenvLoadResult, { readonly _tag: "Failed" }>;
++
++export type DirenvAllowResult =
++  | { readonly _tag: "Allowed"; readonly envrcPath: string }
++  | { readonly _tag: "NotFound" }
++  | { readonly _tag: "Failed"; readonly message: string };
++
++/**
++ * Loads the direnv environment a shell would get in a directory, so provider
++ * sessions see the same project tools (Nix dev shells, devenv, mise, ...) a
++ * terminal does. Trust stays with direnv: a blocked `.envrc` is reported and
++ * only allowed when the user asks for it.
++ */
++export class DirenvEnvironment extends Context.Service<
++  DirenvEnvironment,
++  {
++    /**
++     * Load the environment for `cwd`. With `previous` (a diff this service
++     * returned earlier), this is the shell hook's cheap staleness check: direnv
++     * compares the files it watches, such as `.envrc`, its allow record and
++     * `flake.lock`, and only re-evaluates when one changed.
++     */
++    readonly load: (
++      cwd: string,
++      previous?: DirenvEnvironmentDiff,
++    ) => Effect.Effect<DirenvLoadResult>;
++    /** `direnv allow` the `.envrc` governing `cwd`. */
++    readonly allow: (cwd: string) => Effect.Effect<DirenvAllowResult>;
++  }
++>()("t3/provider/DirenvEnvironment") {}
++
++const DIRENV_FAILURE_MESSAGES: Record<DirenvFailureReason, string> = {
++  blocked: "The project's .envrc is blocked, so its direnv environment was not loaded.",
++  timeout: "Loading the project's direnv environment timed out.",
++  failed: "The project's direnv environment failed to load.",
++};
++
++/** What a thread shows for a failed load; a blocked `.envrc` offers to allow it. */
++export function direnvFailureNotice(failure: DirenvLoadFailure): {
++  readonly message: string;
++  readonly detail: string;
++  readonly action?: { readonly type: "direnv.allow" };
++} {
++  return {
++    message: DIRENV_FAILURE_MESSAGES[failure.reason],
++    detail: failure.message,
++    ...(failure.reason === "blocked" ? { action: { type: "direnv.allow" } as const } : {}),
++  };
++}
++
++// A first `nix develop` evaluation can legitimately take minutes.
++const DIRENV_TIMEOUT = "5 minutes";
++
++const decodeDirenvExport = Schema.decodeUnknownOption(
++  Schema.fromJsonString(Schema.Record(Schema.String, Schema.NullOr(Schema.String))),
++);
++
++const ANSI_PATTERN = new RegExp(String.raw`\u001b\[[0-9;]*m`, "g");
++
++/** The `direnv: error ...` lines, or the last stderr line when there are none. */
++export function direnvErrorMessage(stderr: string): string {
++  const lines = stderr
++    .replace(ANSI_PATTERN, "")
++    .split("\n")
++    .map((line) => line.trim())
++    .filter((line) => line.length > 0);
++  const errors = lines.filter((line) => line.startsWith("direnv: error"));
++  return (errors.length > 0 ? errors.join("\n") : (lines.at(-1) ?? "direnv failed")).replace(
++    /^direnv: (error )?/,
++    "",
++  );
++}
++
++export const make = Effect.fn("DirenvEnvironment.make")(function* () {
++  const runner = yield* ProcessRunner.ProcessRunner;
++  const fileSystem = yield* FileSystem.FileSystem;
++  const path = yield* Path.Path;
++  const platform = yield* HostProcessPlatform;
++
++  const findEnvrc = Effect.fn("DirenvEnvironment.findEnvrc")(function* (cwd: string) {
++    let directory = path.resolve(cwd);
++    while (true) {
++      const candidate = path.join(directory, ".envrc");
++      if (yield* fileSystem.exists(candidate).pipe(Effect.orElseSucceed(() => false))) {
++        return Option.some(candidate);
++      }
++      const parent = path.dirname(directory);
++      if (parent === directory) return Option.none<string>();
++      directory = parent;
++    }
++  });
++
++  const loadUncached = Effect.fn("DirenvEnvironment.load")(function* (
++    cwd: string,
++    previous: DirenvEnvironmentDiff | undefined,
++  ) {
++    if (platform === "win32") return { _tag: "None" } as const;
++    const envrcPath = yield* findEnvrc(cwd);
++    // Without a previous load there is nothing for direnv to unload either.
++    if (Option.isNone(envrcPath) && previous === undefined) return { _tag: "None" } as const;
++
++    const failed = (reason: DirenvFailureReason, message: string) =>
++      ({
++        _tag: "Failed",
++        envrcPath: Option.getOrElse(envrcPath, () => path.join(cwd, ".envrc")),
++        reason,
++        message,
++      }) as const;
++    const result = yield* runner
++      .run({
++        command: "direnv",
++        args: ["export", "json"],
++        cwd,
++        // direnv diffs against the environment it is given, so a staleness
++        // check must see exactly what the previous load produced.
++        ...(previous
++          ? { env: applyDirenvEnvironment(process.env, previous), extendEnv: false }
++          : {}),
++        timeout: DIRENV_TIMEOUT,
++        timeoutBehavior: "timedOutResult",
++      })
++      .pipe(Effect.result);
++    if (result._tag === "Failure") {
++      // Having an `.envrc` without direnv installed is common in shared repos.
++      return result.failure._tag === "ProcessSpawnError"
++        ? ({ _tag: "None" } as const)
++        : failed("failed", result.failure.message);
++    }
++    const output = result.success;
++    if (output.timedOut)
++      return failed("timeout", `direnv did not finish within ${DIRENV_TIMEOUT}.`);
++    if (output.code !== 0) {
++      const message = direnvErrorMessage(output.stderr);
++      return failed(message.includes(" is blocked") ? "blocked" : "failed", message);
++    }
++    // Empty output means the environment is already current for this directory.
++    if (output.stdout.trim().length === 0) {
++      return { _tag: "Loaded", diff: previous ?? {}, changed: false } as const;
++    }
++    const delta = decodeDirenvExport(output.stdout);
++    if (Option.isNone(delta)) {
++      return failed("failed", "direnv printed an environment T3 Code could not read.");
++    }
++    // `delta` is relative to the previous environment; keep the diff relative
++    // to the server's own environment.
++    return { _tag: "Loaded", diff: { ...previous, ...delta.value }, changed: true } as const;
++  });
++
++  // Threads started together in one checkout share a single evaluation.
++  const inFlight = new Map<string, Deferred.Deferred<DirenvLoadResult>>();
++  const load = (cwd: string, previous?: DirenvEnvironmentDiff) =>
++    Effect.suspend(() => {
++      // DIRENV_DIFF identifies the environment a staleness check starts from.
++      const key = `${path.resolve(cwd)}\0${previous?.DIRENV_DIFF ?? ""}`;
++      const existing = inFlight.get(key);
++      if (existing) return Deferred.await(existing);
++      const deferred = Deferred.makeUnsafe<DirenvLoadResult>();
++      inFlight.set(key, deferred);
++      return loadUncached(cwd, previous).pipe(
++        Deferred.into(deferred),
++        Effect.ensuring(Effect.sync(() => inFlight.delete(key))),
++        Effect.andThen(Deferred.await(deferred)),
++      );
++    });
++
++  const allow = Effect.fn("DirenvEnvironment.allow")(function* (cwd: string) {
++    const envrcPath = yield* findEnvrc(cwd);
++    if (Option.isNone(envrcPath)) return { _tag: "NotFound" } as const;
++    const result = yield* runner
++      .run({ command: "direnv", args: ["allow", envrcPath.value], cwd })
++      .pipe(Effect.result);
++    if (result._tag === "Failure") {
++      return { _tag: "Failed", message: result.failure.message } as const;
++    }
++    return result.success.code === 0
++      ? ({ _tag: "Allowed", envrcPath: envrcPath.value } as const)
++      : ({ _tag: "Failed", message: direnvErrorMessage(result.success.stderr) } as const);
++  });
++
++  return DirenvEnvironment.of({ load, allow });
++});
++
++export const layer = Layer.effect(DirenvEnvironment, make());
++
++/**
++ * Apply a direnv diff over a provider's launch environment. Values the
++ * provider instance set itself (anything differing from the server's own
++ * environment, like `CODEX_HOME` or `CLAUDE_CONFIG_DIR`) are explicit user
++ * configuration and win over the project's `.envrc`.
++ */
++export function applyDirenvEnvironment(
++  base: NodeJS.ProcessEnv,
++  diff: DirenvEnvironmentDiff | undefined,
++  serverEnv: NodeJS.ProcessEnv = process.env,
++): NodeJS.ProcessEnv {
++  if (!diff) return base;
++  const next: NodeJS.ProcessEnv = { ...base };
++  for (const [name, value] of Object.entries(diff)) {
++    if (base[name] !== serverEnv[name]) continue;
++    if (value === null) delete next[name];
++    else next[name] = value;
++  }
++  return next;
++}
++
++// ProviderSessionManagerV2 loads the diff before opening a session; adapters
++// read it while building the provider's launch environment.
++const diffsByThread = new Map<ThreadId, DirenvEnvironmentDiff>();
++
++export function setThreadDirenvEnvironment(
++  threadId: ThreadId,
++  diff: DirenvEnvironmentDiff | undefined,
++): void {
++  if (diff && Object.keys(diff).length > 0) diffsByThread.set(threadId, diff);
++  else diffsByThread.delete(threadId);
++}
++
++export function readThreadDirenvEnvironment(threadId: ThreadId): DirenvEnvironmentDiff | undefined {
++  return diffsByThread.get(threadId);
++}
++
++export function clearAllThreadDirenvEnvironments(): void {
++  diffsByThread.clear();
++}
++
++/** `base` with the thread's direnv environment applied, or `base` untouched. */
++export function withThreadDirenvEnvironment(
++  base: NodeJS.ProcessEnv,
++  threadId: ThreadId,
++): NodeJS.ProcessEnv {
++  return applyDirenvEnvironment(base, diffsByThread.get(threadId));
++}
+diff --git a/apps/server/src/provider/Drivers/AntigravityDriver.ts b/apps/server/src/provider/Drivers/AntigravityDriver.ts
+index 4e1a502393..890b9399df 100644
+--- a/apps/server/src/provider/Drivers/AntigravityDriver.ts
++++ b/apps/server/src/provider/Drivers/AntigravityDriver.ts
+@@ -1,4 +1,5 @@
+ import { withAgentDeviceEnvironment } from "../../mcp/McpProviderSession.ts";
++import { applyDirenvEnvironment } from "../DirenvEnvironment.ts";
+ import { AntigravitySettings, ProviderDriverKind, ProviderSetupError } from "@t3tools/contracts";
+ import { HostProcessPlatform } from "@t3tools/shared/hostProcess";
+ import { resolveSelfInvocation } from "@t3tools/shared/nodeRuntime";
+@@ -242,7 +243,10 @@ export const AntigravityDriver: ProviderDriver<AntigravitySettings, AntigravityD
+             installation: executable,
+             profile,
+             cwd: input.cwd,
+-            baseEnv: withAgentDeviceEnvironment(processEnvironment, input),
++            baseEnv: withAgentDeviceEnvironment(
++              applyDirenvEnvironment(processEnvironment, input.direnvEnvironment),
++              input,
++            ),
+             auth,
+             runtimeTempDirectory,
+           }),
+diff --git a/apps/server/src/provider/acp/AntigravityAcpSupport.ts b/apps/server/src/provider/acp/AntigravityAcpSupport.ts
+index 12b723c880..502e249a43 100644
+--- a/apps/server/src/provider/acp/AntigravityAcpSupport.ts
++++ b/apps/server/src/provider/acp/AntigravityAcpSupport.ts
+@@ -22,6 +22,7 @@ import {
+   makeAntigravityStderrHandler,
+   makeAntigravityStdoutTransform,
+ } from "../antigravityAuthSupport.ts";
++import type { DirenvEnvironmentDiff } from "../DirenvEnvironment.ts";
+ import * as AcpSessionRuntime from "./AcpSessionRuntime.ts";
+ import { normalizeAntigravitySessionUpdate } from "./AntigravityProtocol.ts";
+ 
+@@ -38,6 +39,8 @@ export interface AntigravityAcpRuntimeInput extends Omit<
+ > {
+   /** Device CLI environment supplied for this provider session. */
+   readonly agentDeviceEnvironment?: Readonly<Record<string, string>>;
++  /** The project's direnv environment loaded for this provider session. */
++  readonly direnvEnvironment?: DirenvEnvironmentDiff;
+   readonly childProcessSpawner: ChildProcessSpawner.ChildProcessSpawner["Service"];
+   readonly onAuthorizationUrl?: (url: string) => Effect.Effect<void, EffectAcpErrors.AcpError>;
+   /**
+diff --git a/apps/server/src/server.ts b/apps/server/src/server.ts
+index 86bc22462d..5e6e30dee9 100644
+--- a/apps/server/src/server.ts
++++ b/apps/server/src/server.ts
+@@ -72,6 +72,7 @@ import { deviceHubProxyRouteLayer } from "./device/DeviceHubProxy.ts";
+ import * as PreviewManager from "./preview/Manager.ts";
+ import * as PortScanner from "./preview/PortScanner.ts";
+ import * as ProcessRunner from "./processRunner.ts";
++import * as DirenvEnvironment from "./provider/DirenvEnvironment.ts";
+ import * as GitManager from "./git/GitManager.ts";
+ import * as EnvironmentTheme from "./environmentTheme.ts";
+ import * as Keybindings from "./keybindings.ts";
+@@ -437,6 +438,7 @@ const CloudManagedEndpointRuntimeLive = Layer.mergeAll(
+ );
+ 
+ const OrchestrationV2RuntimeLayerLive = OrchestrationV2ProductionLayerLive.pipe(
++  Layer.provideMerge(DirenvEnvironment.layer.pipe(Layer.provide(ProcessRunner.layer))),
+   Layer.provide(ProviderEventIngestor.analyticsLive),
+   Layer.provide(CheckpointStoreLayerLive),
+   Layer.provide(GitWorkflowLayerLive),
+diff --git a/apps/server/src/ws.ts b/apps/server/src/ws.ts
+index c1a5d1b7a5..091a8fc40a 100644
+--- a/apps/server/src/ws.ts
++++ b/apps/server/src/ws.ts
+@@ -197,6 +197,7 @@ import { linkCreatedPullRequest } from "./git/linkCreatedPullRequest.ts";
+ import * as ReviewService from "./review/ReviewService.ts";
+ import * as ProjectEnrichmentService from "./project/ProjectEnrichmentService.ts";
+ import * as ProjectService from "./project/ProjectService.ts";
++import * as DirenvEnvironment from "./provider/DirenvEnvironment.ts";
+ import { projectMutationOperation } from "./project/ProjectMutation.ts";
+ import * as ProjectSetupScriptRunner from "./project/ProjectSetupScriptRunner.ts";
+ import * as ProjectCloneTracker from "./project/ProjectCloneTracker.ts";
+@@ -1130,6 +1131,38 @@ const makeWsRpcLayer = (
+       const repositoryIdentityResolver =
+         yield* RepositoryIdentityResolver.RepositoryIdentityResolver;
+       const projectService = yield* ProjectService.ProjectService;
++      const direnvEnvironment = yield* Effect.serviceOption(DirenvEnvironment.DirenvEnvironment);
++      const allowThreadDirenv = Effect.fn("ws.allowThreadDirenv")(function* (threadId: ThreadId) {
++        const thread = yield* threadManagement.getThreadRecords(threadId, []).pipe(
++          Effect.map((records) => records.thread),
++          Effect.orElseSucceed(() => undefined),
++        );
++        const project =
++          thread === undefined || thread.worktreePath !== null
++            ? undefined
++            : Option.getOrUndefined(
++                yield* projectService
++                  .getById(thread.projectId)
++                  .pipe(Effect.orElseSucceed(() => Option.none())),
++              );
++        // The same directory RuntimePolicyV2 starts the thread's provider in.
++        const cwd = thread?.worktreePath ?? project?.workspaceRoot;
++        if (cwd === undefined) {
++          return { allowed: false, error: "The thread has no workspace." };
++        }
++        if (Option.isNone(direnvEnvironment)) {
++          return { allowed: false, error: "direnv support is unavailable on this server." };
++        }
++        const result = yield* direnvEnvironment.value.allow(cwd);
++        switch (result._tag) {
++          case "Allowed":
++            return { allowed: true };
++          case "NotFound":
++            return { allowed: false, error: "No .envrc governs the thread's workspace." };
++          case "Failed":
++            return { allowed: false, error: result.message };
++        }
++      });
+       const agentSessionScanner = yield* AgentSessionScanner.AgentSessionScanner;
+       const agentSessionImporter = yield* AgentSessionImporter;
+       const checkpointDiffQuery = yield* CheckpointDiffQuery.CheckpointDiffQuery;
+@@ -3143,6 +3176,12 @@ const makeWsRpcLayer = (
+               .pipe(Effect.map((cancelled) => ({ cancelled }))),
+             { "rpc.aggregate": "vcs" },
+           ),
++        [WS_METHODS.projectEnvironmentAllowDirenv]: (input) =>
++          observeRpcEffect(
++            WS_METHODS.projectEnvironmentAllowDirenv,
++            allowThreadDirenv(input.threadId),
++            { "rpc.aggregate": "workspace" },
++          ),
+         [WS_METHODS.vcsRefreshStatus]: (input) =>
+           observeRpcEffect(
+             WS_METHODS.vcsRefreshStatus,
+diff --git a/apps/web/src/components/chat/MessagesTimeline.tsx b/apps/web/src/components/chat/MessagesTimeline.tsx
+index 1ade3af638..3ac0f69bcb 100644
+--- a/apps/web/src/components/chat/MessagesTimeline.tsx
++++ b/apps/web/src/components/chat/MessagesTimeline.tsx
+@@ -143,6 +143,9 @@ import type {
+   KnownComposerContextRecord,
+ } from "@t3tools/contracts";
+ import { Button, InlineButton } from "../ui/button";
++import { toastManager } from "../ui/toast";
++import { threadEnvironment } from "../../state/threads";
++import { useAtomCommand } from "../../state/use-atom-command";
+ import { useAssetUrlRefresh, useAssetUrls, useAssetUrlState } from "../../assets/assetUrls";
+ import { MediaVideoPlayer } from "../media/MediaVideoPlayer";
+ import { getVirtualizedScrollFadeClassName } from "../ui/scroll-area";
+@@ -4870,6 +4873,60 @@ function ReasoningTraceContent({ entries }: { entries: ReadonlyArray<TimelineWor
+   );
+ }
+ 
++/** Allows the thread's blocked `.envrc`; the next message loads it. */
++// The virtualized timeline remounts rows, so the outcome outlives the button.
++const allowedDirenvWarnings = new Set<string>();
++
++function AllowDirenvButton({
++  threadRef,
++  warningId,
++}: {
++  readonly threadRef: ScopedThreadRef;
++  readonly warningId: string;
++}) {
++  const allowDirenv = useAtomCommand(threadEnvironment.allowDirenv);
++  const [state, setState] = useState<"idle" | "pending" | "allowed">(() =>
++    allowedDirenvWarnings.has(warningId) ? "allowed" : "idle",
++  );
++  const onClick = async (event: MouseEvent<HTMLButtonElement>) => {
++    event.stopPropagation();
++    setState("pending");
++    const result = await allowDirenv({
++      environmentId: threadRef.environmentId,
++      input: { threadId: threadRef.threadId },
++    });
++    if (result._tag === "Success" && result.value.allowed) {
++      allowedDirenvWarnings.add(warningId);
++      setState("allowed");
++      return;
++    }
++    setState("idle");
++    if (result._tag === "Success") {
++      toastManager.add({
++        type: "error",
++        title: "Could not allow the .envrc",
++        description: result.value.error,
++      });
++    }
++  };
++  return (
++    <Button
++      disabled={state !== "idle"}
++      onClick={onClick}
++      onKeyDown={(event) => event.stopPropagation()}
++      size="xs"
++      type="button"
++      variant="ghost-muted"
++    >
++      {state === "allowed"
++        ? "Allowed · applies to your next message"
++        : state === "pending"
++          ? "Allowing…"
++          : "Allow .envrc"}
++    </Button>
++  );
++}
++
+ const SimpleWorkEntryRow = memo(function SimpleWorkEntryRow(props: {
+   workEntry: TimelineWorkEntry;
+   workspaceRoot: string | undefined;
+@@ -5114,6 +5171,9 @@ const SimpleWorkEntryRow = memo(function SimpleWorkEntryRow(props: {
+           !toolIconAcceptsTint(entryIconName, entryToolIcon) ? (
+             <XIcon aria-hidden className={cn("size-3 shrink-0", failedToolIconClassName)} />
+           ) : null}
++          {workEntry.warningAction?.type === "direnv.allow" && ctx.threadRef ? (
++            <AllowDirenvButton threadRef={ctx.threadRef} warningId={workEntry.id} />
++          ) : null}
+           <TimelineRowTimestamp createdAt={workEntry.createdAt} timestampFormat={timestampFormat} />
+           <span
+             className={cn(
+diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
+index fb6b587653..1faaae5096 100644
+--- a/apps/web/src/components/settings/SettingsPanels.tsx
++++ b/apps/web/src/components/settings/SettingsPanels.tsx
+@@ -596,6 +596,9 @@ export function useSettingsRestore(onRestored?: () => void) {
+       DEFAULT_UNIFIED_SETTINGS.enableProviderUpdateChecks
+         ? ["Provider update checks"]
+         : []),
++      ...(settings.enableDirenvEnvironment !== DEFAULT_UNIFIED_SETTINGS.enableDirenvEnvironment
++        ? ["Load direnv environment"]
++        : []),
+       ...(settings.continueThreadsAfterServerUpdate !==
+       DEFAULT_UNIFIED_SETTINGS.continueThreadsAfterServerUpdate
+         ? ["Continue threads after restarts"]
+@@ -671,6 +674,7 @@ export function useSettingsRestore(onRestored?: () => void) {
+       settings.responseStreamingMode,
+       settings.persistComposerContextStrip,
+       settings.enableProviderUpdateChecks,
++      settings.enableDirenvEnvironment,
+       settings.continueThreadsAfterServerUpdate,
+       settings.sidebarAutoSettleAfterDays,
+       settings.sidebarAutoSettleOnMerge,
+@@ -780,6 +784,7 @@ export function useSettingsRestore(onRestored?: () => void) {
+       snoozeLimitedThreads: DEFAULT_UNIFIED_SETTINGS.snoozeLimitedThreads,
+       responseStreamingMode: DEFAULT_UNIFIED_SETTINGS.responseStreamingMode,
+       enableProviderUpdateChecks: DEFAULT_UNIFIED_SETTINGS.enableProviderUpdateChecks,
++      enableDirenvEnvironment: DEFAULT_UNIFIED_SETTINGS.enableDirenvEnvironment,
+       continueThreadsAfterServerUpdate: DEFAULT_UNIFIED_SETTINGS.continueThreadsAfterServerUpdate,
+       backgroundActivity: DEFAULT_UNIFIED_SETTINGS.backgroundActivity,
+       backgroundActivityProfile: DEFAULT_UNIFIED_SETTINGS.backgroundActivityProfile,
+@@ -2803,6 +2808,36 @@ export function GeneralSettingsPanel() {
+           }
+         />
+ 
++        <SettingsRow
++          {...searchableSetting("direnv-environment")}
++          serverScoped
++          settingKeys={["enableDirenvEnvironment"]}
++          description="Start agents with the project's direnv environment, such as a Nix dev shell. Only .envrc files approved with direnv allow are loaded."
++          resetAction={
++            settings.enableDirenvEnvironment !==
++            DEFAULT_UNIFIED_SETTINGS.enableDirenvEnvironment ? (
++              <SettingResetButton
++                label="direnv environment"
++                onClick={() =>
++                  updateSettings({
++                    enableDirenvEnvironment: DEFAULT_UNIFIED_SETTINGS.enableDirenvEnvironment,
++                  })
++                }
++              />
++            ) : null
++          }
++          control={
++            <ScopedSwitch
++              settingKeys={["enableDirenvEnvironment"]}
++              checked={settings.enableDirenvEnvironment}
++              onCheckedChange={(checked) =>
++                updateSettings({ enableDirenvEnvironment: Boolean(checked) })
++              }
++              aria-label="Load direnv environment"
++            />
++          }
++        />
++
+         <SettingsRow
+           serverScoped
+           settingKeys={["backgroundActivity"]}
+diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
+index f5d3c16ba7..4b1f87d792 100644
+--- a/apps/web/src/components/settings/settingsSearch.ts
++++ b/apps/web/src/components/settings/settingsSearch.ts
+@@ -404,6 +404,13 @@ export const SETTINGS_SEARCH_ITEMS = [
+       "resume running active interrupted work restart reboot machine crash desktop update automatically",
+     ],
+   },
++  {
++    id: "direnv-environment",
++    title: "Load direnv environment",
++    to: "/settings/general",
++    scope: "project-defaults",
++    searchTerms: ["envrc nix flake devenv mise dev shell path tools environment variables agents"],
++  },
+   {
+     id: "background-activity",
+     title: "Background activity",
+diff --git a/apps/web/src/session-logic.ts b/apps/web/src/session-logic.ts
+index 97d6edc16e..9d024b3b6a 100644
+--- a/apps/web/src/session-logic.ts
++++ b/apps/web/src/session-logic.ts
+@@ -5,6 +5,7 @@ import {
+   type OrchestrationV2PlanArtifact,
+   type OrchestrationV2ProjectedTurnItem,
+   type OrchestrationV2RunAttempt,
++  type OrchestrationV2SystemNoticeAction,
+   type OrchestrationV2ThreadProjection,
+   type OrchestrationV2TurnItem,
+   type PlanId,
+@@ -70,6 +71,8 @@ export interface WorkLogEntry {
+   readonly toolIcon?: ToolActivityIcon;
+   readonly toolSource?: ToolActivitySource;
+   readonly sourceActivityKind?: string;
++  /** Button a notice offers, such as allowing a blocked `.envrc`. */
++  readonly warningAction?: OrchestrationV2SystemNoticeAction;
+   readonly taskId?: string;
+   readonly agentRole?: string;
+   readonly toolData?: unknown;
+@@ -475,6 +478,8 @@ function projectedWorkEntry(row: OrchestrationV2ProjectedTurnItem): WorkLogEntry
+         ...common,
+         label: item.message,
+         sourceActivityKind: "runtime.warning",
++        ...(item.detail ? { detail: item.detail } : {}),
++        ...(item.action ? { warningAction: item.action } : {}),
+       };
+     case "error": {
+       const presentation = providerErrorPresentation(item);
+diff --git a/docs/user/project-settings.md b/docs/user/project-settings.md
+index bb9af1ff35..06df8ae529 100644
+--- a/docs/user/project-settings.md
++++ b/docs/user/project-settings.md
+@@ -87,6 +87,26 @@ itself, or **Skip** to leave them for a setup script. It resolves in the same or
+ workspace default: a `"worktreeSubmodules"` value in the `t3.json` of the branch being checked out
+ applies when the project and environment are both on **Inherit**.
+ 
++## Project environments with direnv
++
++If a project uses [direnv](https://direnv.net), agents start with the same environment its `.envrc`
++gives your shell, such as the tools from a Nix dev shell. T3 Code only loads an `.envrc` you
++approved with `direnv allow`. A blocked or failing one shows a warning in the thread and the agent
++continues without it. For a blocked `.envrc`, **Allow .envrc** on the warning approves it without
++opening a terminal.
++
++Like your shell, T3 Code checks the environment again before each message. After you allow or edit
++the `.envrc`, or update a file it watches such as `flake.lock`, your next message restarts the
++agent with the new environment and the conversation continues. direnv asks for a new allow after
++every edit to `.envrc`.
++
++Cursor agents run inside T3 Code through the Cursor SDK, which has no way to pass them an
++environment, so they do not get the project's `.envrc`.
++
++direnv approves each directory separately, so a new worktree needs its own allow. Turn off **Load
++direnv environment** in **Settings → General**, for an environment or for one project, to stop
++loading it.
++
+ ## Storage cleanup
+ 
+ Open **Settings → Storage** to enable automatic cleanup on one machine or all connected
+diff --git a/packages/client-runtime/src/state/threadCommands.ts b/packages/client-runtime/src/state/threadCommands.ts
+index ae9fb37cbb..7f7cdeda49 100644
+--- a/packages/client-runtime/src/state/threadCommands.ts
++++ b/packages/client-runtime/src/state/threadCommands.ts
+@@ -383,6 +383,10 @@ export function createThreadEnvironmentAtoms<R, E>(
+       scheduler,
+       concurrency,
+     }),
++    allowDirenv: createEnvironmentRpcCommand(runtime, {
++      label: "environment-data:commands:thread:allow-direnv",
++      tag: WS_METHODS.projectEnvironmentAllowDirenv,
++    }),
+   };
+   const optimistic = createOptimisticThreadLifecycle(snapshotAtom);
+   return {
+diff --git a/packages/contracts/src/index.ts b/packages/contracts/src/index.ts
+index 938ed62fa2..e97b392874 100644
+--- a/packages/contracts/src/index.ts
++++ b/packages/contracts/src/index.ts
+@@ -58,3 +58,4 @@ export * from "./worktreeMcp.ts";
+ export * from "./resourceTelemetry.ts";
+ export * from "./rpc.ts";
+ export * from "./worktreeSetup.ts";
++export * from "./projectEnvironment.ts";
+diff --git a/packages/contracts/src/orchestrationV2.ts b/packages/contracts/src/orchestrationV2.ts
+index 3ba1244729..be285bd2ae 100644
+--- a/packages/contracts/src/orchestrationV2.ts
++++ b/packages/contracts/src/orchestrationV2.ts
+@@ -1045,6 +1045,13 @@ export const OrchestrationV2UserMessageInputIntent = Schema.Literals([
+ export type OrchestrationV2UserMessageInputIntent =
+   typeof OrchestrationV2UserMessageInputIntent.Type;
+ 
++/** Something the user can do about a notice, rendered as a button on its row. */
++export const OrchestrationV2SystemNoticeAction = Schema.Struct({
++  /** `direnv allow` the thread's `.envrc` (`projectEnvironment.allowDirenv`). */
++  type: Schema.Literal("direnv.allow"),
++});
++export type OrchestrationV2SystemNoticeAction = typeof OrchestrationV2SystemNoticeAction.Type;
++
+ const OrchestrationV2TurnItemBaseFields = {
+   toolSurface: Schema.optional(ToolActivitySurface),
+   toolIcon: Schema.optional(ToolActivityIcon),
+@@ -1197,6 +1204,8 @@ export const OrchestrationV2TurnItem = Schema.Union([
+     ...OrchestrationV2TurnItemBaseFields,
+     type: Schema.Literal("system_notice"),
+     message: Schema.String,
++    detail: Schema.optional(Schema.String),
++    action: Schema.optional(OrchestrationV2SystemNoticeAction),
+   }),
+   Schema.Struct({
+     ...OrchestrationV2TurnItemBaseFields,
+@@ -1915,6 +1924,8 @@ export const OrchestrationV2TurnItemJson = Schema.Union([
+     ...OrchestrationV2TurnItemJsonBaseFields,
+     type: Schema.Literal("system_notice"),
+     message: Schema.String,
++    detail: Schema.optional(Schema.String),
++    action: Schema.optional(OrchestrationV2SystemNoticeAction),
+   }),
+   Schema.Struct({
+     ...OrchestrationV2TurnItemJsonBaseFields,
+diff --git a/packages/contracts/src/projectEnvironment.ts b/packages/contracts/src/projectEnvironment.ts
+new file mode 100644
+index 0000000000..37a2292453
+--- /dev/null
++++ b/packages/contracts/src/projectEnvironment.ts
+@@ -0,0 +1,18 @@
++import * as Schema from "effect/Schema";
++
++import { ThreadId } from "./baseSchemas.ts";
++
++/**
++ * `direnv allow` the `.envrc` governing a thread's workspace. The server
++ * resolves the directory from the thread, so a client cannot name an
++ * arbitrary path. The next message picks the environment up.
++ */
++export const ProjectEnvironmentAllowDirenvInput = Schema.Struct({ threadId: ThreadId });
++export type ProjectEnvironmentAllowDirenvInput = typeof ProjectEnvironmentAllowDirenvInput.Type;
++
++export const ProjectEnvironmentAllowDirenvResult = Schema.Struct({
++  allowed: Schema.Boolean,
++  /** Why nothing was allowed. */
++  error: Schema.optional(Schema.String),
++});
++export type ProjectEnvironmentAllowDirenvResult = typeof ProjectEnvironmentAllowDirenvResult.Type;
+diff --git a/packages/contracts/src/rpc.ts b/packages/contracts/src/rpc.ts
+index a24fa471a0..43a8b98dce 100644
+--- a/packages/contracts/src/rpc.ts
++++ b/packages/contracts/src/rpc.ts
+@@ -83,6 +83,10 @@ import {
+   OrchestrationGetFullThreadDiffError,
+   OrchestrationGetTurnDiffError,
+ } from "./checkpointDiff.ts";
++import {
++  ProjectEnvironmentAllowDirenvInput,
++  ProjectEnvironmentAllowDirenvResult,
++} from "./projectEnvironment.ts";
+ import {
+   WorktreeSetupCancelInput,
+   WorktreeSetupCancelResult,
+@@ -504,6 +508,7 @@ export const WS_METHODS = {
+   subscribeVcsStatus: "subscribeVcsStatus",
+   subscribeWorktreeSetup: "subscribeWorktreeSetup",
+   worktreeSetupCancel: "worktreeSetup.cancel",
++  projectEnvironmentAllowDirenv: "projectEnvironment.allowDirenv",
+   subscribeTerminalEvents: "subscribeTerminalEvents",
+   subscribeTerminalMetadata: "subscribeTerminalMetadata",
+   subscribePreviewEvents: "subscribePreviewEvents",
+@@ -1202,6 +1207,12 @@ const WsWorktreeSetupCancelRpc = Rpc.make(WS_METHODS.worktreeSetupCancel, {
+   error: EnvironmentAuthorizationError,
+ });
+ 
++const WsProjectEnvironmentAllowDirenvRpc = Rpc.make(WS_METHODS.projectEnvironmentAllowDirenv, {
++  payload: ProjectEnvironmentAllowDirenvInput,
++  success: ProjectEnvironmentAllowDirenvResult,
++  error: EnvironmentAuthorizationError,
++});
++
+ const WsGitRunStackedActionRpc = Rpc.make(WS_METHODS.gitRunStackedAction, {
+   payload: GitRunStackedActionInput,
+   success: GitActionProgressEvent,
+@@ -1733,6 +1744,7 @@ export const WsRpcGroup = RpcGroup.make(
+   WsSubscribeVcsStatusRpc,
+   WsSubscribeWorktreeSetupRpc,
+   WsWorktreeSetupCancelRpc,
++  WsProjectEnvironmentAllowDirenvRpc,
+   WsVcsPullRpc,
+   WsVcsRefreshStatusRpc,
+   WsGitRunStackedActionRpc,
+diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
+index b46dcf4af5..39705c8408 100644
+--- a/packages/contracts/src/settings.ts
++++ b/packages/contracts/src/settings.ts
+@@ -1090,6 +1090,7 @@ export const PROJECT_SCOPED_SERVER_SETTING_KEYS = [
+   "defaultProjectScripts",
+   "enableAgentBrowserAccess",
+   "enableAgentDeviceAccess",
++  "enableDirenvEnvironment",
+   "textGenerationModelSelection",
+   "sourceControlWriterModelSelection",
+   "sourceControlWritingStyle",
+@@ -1120,6 +1121,7 @@ export const ProjectSettingsOverrides = Schema.Struct({
+   defaultProjectScripts: Schema.optionalKey(Schema.Array(ProjectScript)),
+   enableAgentBrowserAccess: Schema.optionalKey(Schema.Boolean),
+   enableAgentDeviceAccess: Schema.optionalKey(Schema.Boolean),
++  enableDirenvEnvironment: Schema.optionalKey(Schema.Boolean),
+   textGenerationModelSelection: Schema.optionalKey(ModelSelection),
+   sourceControlWriterModelSelection: Schema.optionalKey(Schema.NullOr(ModelSelection)),
+   sourceControlWritingStyle: Schema.optionalKey(SourceControlWritingStyleSettings),
+@@ -1233,6 +1235,12 @@ export const ServerSettings = Schema.Struct({
+    * unaffected.
+    */
+   enableAgentDeviceAccess: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
++  /**
++   * Whether provider sessions load the project's direnv environment (`.envrc`),
++   * as a shell with the direnv hook would. Only `.envrc` files the user has
++   * already approved with `direnv allow` are loaded.
++   */
++  enableDirenvEnvironment: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(true))),
+   /**
+    * Whether this server may install and run T3's device helper processes.
+    * Kept separate from agent access so enabling the user's Device panel does
+@@ -1590,6 +1598,7 @@ export const ServerSettingsPatch = Schema.Struct({
+     Schema.Record(ProjectId, Schema.NullOr(ProjectSettingsOverrides)),
+   ),
+   enableAgentDeviceAccess: Schema.optionalKey(Schema.Boolean),
++  enableDirenvEnvironment: Schema.optionalKey(Schema.Boolean),
+   enableDeviceSupport: Schema.optionalKey(Schema.Boolean),
+   deviceOnboardingCompleted: Schema.optionalKey(Schema.Boolean),
+   deviceHosts: Schema.optionalKey(SshDeviceHostConfigs),
