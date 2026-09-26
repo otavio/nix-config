@@ -1,4 +1,10 @@
-{ config, flake, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  flake,
+  ...
+}:
 
 let
   credentialGuard = import ./credential-guard.nix { inherit pkgs; };
@@ -13,9 +19,11 @@ let
     nativeBuildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       wrapProgram $out/bin/opencode \
-        ${lib.concatStringsSep " \\\n        "
-          (lib.mapAttrsToList (name: value: "--set ${name} ${lib.escapeShellArg value}")
-            (credentialGuard.mkAgentEnv "opencode"))}
+        ${lib.concatStringsSep " \\\n        " (
+          lib.mapAttrsToList (name: value: "--set ${name} ${lib.escapeShellArg value}") (
+            credentialGuard.mkAgentEnv "opencode"
+          )
+        )}
     '';
   };
 
@@ -30,8 +38,7 @@ in
   home.packages = [ opencodePackage ];
 
   xdg.configFile = {
-    "opencode/opencode.json".source =
-      (pkgs.formats.json { }).generate "opencode.json" settings;
+    "opencode/opencode.json".source = (pkgs.formats.json { }).generate "opencode.json" settings;
 
     "opencode/USER.md".source = ./USER.md;
     "opencode/docs".source = "${flake}/docs/ai";

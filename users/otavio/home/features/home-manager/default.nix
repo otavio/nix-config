@@ -1,4 +1,9 @@
-{ lib, config, flake, ... }:
+{
+  config,
+  lib,
+  flake,
+  ...
+}:
 
 {
   nixpkgs = {

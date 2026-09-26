@@ -1,4 +1,10 @@
-{ config, inputs, lib, pkgs, ... }:
+{
+  inputs,
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   notificationSound = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/complete.oga";
 
@@ -11,28 +17,37 @@ let
 
   statuslineScript = pkgs.writeShellApplication {
     name = "statusline-command";
-    runtimeInputs = [ pkgs.jq pkgs.git pkgs.coreutils ];
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.git
+      pkgs.coreutils
+    ];
     text = builtins.readFile ./statusline-command.sh;
   };
 
   notifySoundCommand = "${pkgs.pulseaudio}/bin/paplay ${notificationSound} 2>/dev/null || true";
-  notifySoundHook = { hooks = [{ type = "command"; command = notifySoundCommand; }]; };
+  notifySoundHook = {
+    hooks = [
+      {
+        type = "command";
+        command = notifySoundCommand;
+      }
+    ];
+  };
 
-  herdrHooks = import ./herdr-hooks.nix { inherit pkgs inputs; };
+  herdrHooks = import ./herdr-hooks.nix { inherit inputs pkgs; };
 
   credentialGuard = import ./credential-guard.nix { inherit pkgs; };
 in
 {
-  home.packages = with pkgs; [ sox ];
-
-  # Claude Code rewrites settings.json in place -- /config, permission grants,
-  # plugin toggles -- which a read-only store symlink forbids. Deploy a real
-  # copy instead, and replace it only when the Nix-side content actually
-  # changes, so edits made inside the harness survive unrelated activations.
-  home.file.${settingsPath}.enable = false;
-
-  home.activation.claudeCodeSettings =
-    lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+  home = {
+    packages = with pkgs; [ sox ];
+    # Claude Code rewrites settings.json in place -- /config, permission grants,
+    # plugin toggles -- which a read-only store symlink forbids. Deploy a real
+    # copy instead, and replace it only when the Nix-side content actually
+    # changes, so edits made inside the harness survive unrelated activations.
+    file.${settingsPath}.enable = false;
+    activation.claudeCodeSettings = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
       if [ ! -f ${lib.escapeShellArg settingsPath} ] \
         || [ -L ${lib.escapeShellArg settingsPath} ] \
         || [ "$(readlink ${lib.escapeShellArg deployedMarker} 2>/dev/null)" \
@@ -45,19 +60,19 @@ in
       run ln -sfn ${lib.escapeShellArg settingsSource} \
         ${lib.escapeShellArg deployedMarker}
     '';
-
+  };
   nixpkgs = {
     overlays = [ inputs.claude-code-overlay.overlays.default ];
     config.allowUnfreePredicate = pkg: builtins.elem (inputs.nixpkgs.lib.getName pkg) [ "claude" ];
   };
-
   programs.claude-code = {
     enable = true;
     package = pkgs.claude-code;
     settings = {
       env = {
         CLAUDE_CODE_NO_FLICKER = "1";
-      } // credentialGuard.mkAgentEnv "claude";
+      }
+      // credentialGuard.mkAgentEnv "claude";
       model = "opus";
       voiceEnabled = true;
       skipDangerousModePermissionPrompt = true;
@@ -164,11 +179,13 @@ in
         SessionStart = [
           {
             matcher = "*";
-            hooks = [{
-              type = "command";
-              command = "bash ${herdrHooks}/claude-hook.sh session";
-              timeout = 10;
-            }];
+            hooks = [
+              {
+                type = "command";
+                command = "bash ${herdrHooks}/claude-hook.sh session";
+                timeout = 10;
+              }
+            ];
           }
         ];
         PreToolUse = [
@@ -246,7 +263,7 @@ in
       };
     };
 
-    outputStyles."ASD-STE100" = ''
+    outputStyles.ASD-STE100 = ''
       ---
       name: ASD-STE100
       description: Simplified Technical English — one meaning per word, active voice, simple tenses, short sentences

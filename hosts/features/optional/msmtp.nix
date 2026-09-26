@@ -13,7 +13,7 @@
       enable = true;
 
       accounts = {
-        "default" = {
+        default = {
           tls = true;
           host = "smtp.gmail.com";
           port = 587;

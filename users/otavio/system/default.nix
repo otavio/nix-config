@@ -10,7 +10,10 @@ in
     description = "Otavio Salvador";
 
     isNormalUser = true;
-    extraGroups = [ "wheel" ] ++ addIfGroupExist [
+    extraGroups = [
+      "wheel"
+    ]
+    ++ addIfGroupExist [
       "audio"
       "networkmanager"
       "docker"

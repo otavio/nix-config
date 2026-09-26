@@ -1,4 +1,9 @@
-{ pkgs, modulesPath, targetConfiguration, ... }:
+{
+  pkgs,
+  modulesPath,
+  targetConfiguration,
+  ...
+}:
 
 {
   imports = [
@@ -6,31 +11,37 @@
 
     "${modulesPath}/installer/cd-dvd/installation-cd-base.nix"
   ];
-
   isoImage = {
     compressImage = false;
     squashfsCompression = "zstd -Xcompression-level 1";
   };
-
-  # Disable ZFS support, it may not be compatible
-  # with the configured kernel version
-  boot.supportedFilesystems = pkgs.lib.mkForce
-    [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
-
-  boot.swraid.enable = true;
-  # remove warning about unset mail
-  boot.swraid.mdadmConf = "PROGRAM ${pkgs.coreutils}/bin/true";
-
-  # The global useDHCP flag is deprecated, therefore explicitly set to false here.
-  # Per-interface useDHCP will be mandatory in the future, so this generated config
-  # replicates the default behaviour.
-  networking.useDHCP = false;
-
+  boot = {
+    # Disable ZFS support, it may not be compatible
+    # with the configured kernel version
+    supportedFilesystems = pkgs.lib.mkForce [
+      "btrfs"
+      "reiserfs"
+      "vfat"
+      "f2fs"
+      "xfs"
+      "ntfs"
+      "cifs"
+    ];
+    swraid = {
+      enable = true;
+      # remove warning about unset mail
+      mdadmConf = "PROGRAM ${pkgs.coreutils}/bin/true";
+    };
+  };
+  networking = {
+    # The global useDHCP flag is deprecated, therefore explicitly set to false here.
+    # Per-interface useDHCP will be mandatory in the future, so this generated config
+    # replicates the default behaviour.
+    useDHCP = false;
+    networkmanager.enable = true;
+  };
   # Allow root login
   services.openssh.settings.PermitRootLogin = pkgs.lib.mkForce "without-password";
-
-  networking.networkmanager.enable = true;
-
   disko.enableConfig = false;
   environment.systemPackages =
     let

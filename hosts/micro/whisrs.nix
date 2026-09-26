@@ -1,7 +1,7 @@
 { config, ... }:
 
 {
-  sops.secrets."openai_api_key" = {
+  sops.secrets.openai_api_key = {
     owner = config.users.users.otavio.name;
     inherit (config.users.users.otavio) group;
   };

@@ -24,7 +24,10 @@ in
   systemd.services.kadu-session = {
     description = "Select the GNOME session for ${user.name}";
 
-    after = [ "accounts-daemon.service" "display-manager.service" ];
+    after = [
+      "accounts-daemon.service"
+      "display-manager.service"
+    ];
     requires = [ "accounts-daemon.service" ];
     wantedBy = [ "graphical.target" ];
 

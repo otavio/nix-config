@@ -13,14 +13,16 @@ let
     exit "$status"
   '';
 
-  flameshotOcrForLang = lang: pkgs.writeScriptBin "flameshot-ocr-${lang}" ''
-    # The sleep is required to give time for the fzf-menu to disappear before opening flameshot.
-    sleep 0.1
+  flameshotOcrForLang =
+    lang:
+    pkgs.writeScriptBin "flameshot-ocr-${lang}" ''
+      # The sleep is required to give time for the fzf-menu to disappear before opening flameshot.
+      sleep 0.1
 
-    ${flameshotGui}/bin/flameshot-gui -r | \
-       ${pkgs.tesseract}/bin/tesseract -l ${lang} - - | \
-       ${pkgs.xclip}/bin/xclip -sel clip
-  '';
+      ${flameshotGui}/bin/flameshot-gui -r | \
+         ${pkgs.tesseract}/bin/tesseract -l ${lang} - - | \
+         ${pkgs.xclip}/bin/xclip -sel clip
+    '';
 
   flameshotOcr = {
     eng = flameshotOcrForLang "eng";

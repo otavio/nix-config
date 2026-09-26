@@ -13,14 +13,17 @@
       };
 
       "org/onboard/theme-settings" = {
-        key-label-overrides = [ "LWIN:Super:" "RWIN:Super:" ];
+        key-label-overrides = [
+          "LWIN:Super:"
+          "RWIN:Super:"
+        ];
       };
     };
   };
-
-  qt.enable = true;
-  qt.style.name = "Adwaita-Dark";
-
+  qt = {
+    enable = true;
+    style.name = "Adwaita-Dark";
+  };
   gtk = {
     enable = true;
 

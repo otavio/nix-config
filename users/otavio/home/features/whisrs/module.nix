@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   tomlFormat = pkgs.formats.toml { };
@@ -6,18 +11,20 @@ let
 
   apiKeyEnvVar = provider: "WHISRS_${lib.toUpper provider}_API_KEY";
 
-  mkApiKeyFileOption = provider: lib.mkOption {
-    type = lib.types.nullOr lib.types.path;
-    default = null;
-    example = "/run/secrets/whisrs-${provider}-api-key";
-    description = ''
-      File holding the ${provider} API key, read at service start and
-      exported as `${apiKeyEnvVar provider}`. Use this instead of an
-      `api_key` in {option}`services.whisrs.settings`, which would put
-      the key in the world-readable Nix store. The file must be readable
-      by the user running the service.
-    '';
-  };
+  mkApiKeyFileOption =
+    provider:
+    lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      example = "/run/secrets/whisrs-${provider}-api-key";
+      description = ''
+        File holding the ${provider} API key, read at service start and
+        exported as `${apiKeyEnvVar provider}`. Use this instead of an
+        `api_key` in {option}`services.whisrs.settings`, which would put
+        the key in the world-readable Nix store. The file must be readable
+        by the user running the service.
+      '';
+    };
 
   exportApiKey = provider: file: ''
     ${apiKeyEnvVar provider}="$(< ${lib.escapeShellArg file})"
@@ -36,11 +43,14 @@ let
   # whisrs declares `api_key` on each provider table without a serde
   # default, so any table reaching config.toml must carry the field even
   # when the real key arrives through the environment.
-  apiKeyPlaceholders = lib.genAttrs
-    (lib.filter
-      (provider: activeApiKeyFiles ? ${provider} || cfg.settings ? ${provider})
-      (lib.attrNames apiKeyFiles))
-    (_: { api_key = ""; });
+  apiKeyPlaceholders =
+    lib.genAttrs
+      (lib.filter (provider: activeApiKeyFiles ? ${provider} || cfg.settings ? ${provider}) (
+        lib.attrNames apiKeyFiles
+      ))
+      (_: {
+        api_key = "";
+      });
 
   settings = lib.recursiveUpdate apiKeyPlaceholders cfg.settings;
 
@@ -56,11 +66,9 @@ let
 
   whisrsdStart = pkgs.writeShellApplication {
     name = "whisrsd-start";
-    text =
-      lib.concatStrings (lib.mapAttrsToList exportApiKey activeApiKeyFiles)
-      + ''
-        exec ${lib.getExe' cfg.package "whisrsd"}
-      '';
+    text = lib.concatStrings (lib.mapAttrsToList exportApiKey activeApiKeyFiles) + ''
+      exec ${lib.getExe' cfg.package "whisrsd"}
+    '';
   };
 in
 {
@@ -142,8 +150,7 @@ in
 
   config = lib.mkIf cfg.enable {
     assertions = [
-      (lib.hm.assertions.assertPlatform "services.whisrs" pkgs
-        lib.platforms.linux)
+      (lib.hm.assertions.assertPlatform "services.whisrs" pkgs lib.platforms.linux)
     ];
 
     home.packages = [ cfg.package ];
@@ -157,28 +164,21 @@ in
         Description = "whisrs speech-to-text daemon";
         Documentation = "https://github.com/y0sif/whisrs";
         Wants = lib.optional usesTray "tray.target";
-        After = [ "graphical-session-pre.target" ]
-          ++ lib.optional usesTray "tray.target";
+        After = [ "graphical-session-pre.target" ] ++ lib.optional usesTray "tray.target";
         PartOf = [ "graphical-session.target" ];
         # sd-switch restarts a unit only when the unit file changes.
         # Without the config's store path here, editing it leaves the unit
         # identical and the daemon keeps the old settings until the next
         # manual restart.
-        X-Restart-Triggers =
-          lib.optional (settings != { }) "${configFile}";
+        X-Restart-Triggers = lib.optional (settings != { }) "${configFile}";
       };
       Service = {
         ExecStart =
-          if activeApiKeyFiles != { } then
-            lib.getExe whisrsdStart
-          else
-            lib.getExe' cfg.package "whisrsd";
+          if activeApiKeyFiles != { } then lib.getExe whisrsdStart else lib.getExe' cfg.package "whisrsd";
         Restart = "on-failure";
         Environment =
-          lib.optional (cfg.xkb.layout != null)
-            "XKB_DEFAULT_LAYOUT=${cfg.xkb.layout}"
-          ++ lib.optional (cfg.xkb.variant != null)
-            "XKB_DEFAULT_VARIANT=${cfg.xkb.variant}";
+          lib.optional (cfg.xkb.layout != null) "XKB_DEFAULT_LAYOUT=${cfg.xkb.layout}"
+          ++ lib.optional (cfg.xkb.variant != null) "XKB_DEFAULT_VARIANT=${cfg.xkb.variant}";
       };
       Install.WantedBy = [ "graphical-session.target" ];
     };

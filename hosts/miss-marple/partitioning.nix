@@ -29,8 +29,20 @@
               type = "btrfs";
               extraArgs = [ "-f" ];
               subvolumes = {
-                "/root" = { mountpoint = "/"; mountOptions = [ "compress=zstd" "noatime" ]; };
-                "/nix" = { mountpoint = "/nix"; mountOptions = [ "compress=zstd" "noatime" ]; };
+                "/root" = {
+                  mountpoint = "/";
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
+                };
+                "/nix" = {
+                  mountpoint = "/nix";
+                  mountOptions = [
+                    "compress=zstd"
+                    "noatime"
+                  ];
+                };
               };
             };
           };

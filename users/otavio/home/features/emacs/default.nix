@@ -32,47 +32,46 @@ in
   nixpkgs.overlays = [
     inputs.emacs-overlay.overlay
   ];
+  home = {
+    packages = with pkgs; [
+      keychain
+      emacs-all-the-icons-fonts
 
-  home.packages = with pkgs; [
-    keychain
-    emacs-all-the-icons-fonts
+      emacsWithPackages
 
-    emacsWithPackages
+      # Markdown
+      multimarkdown
 
-    # Markdown
-    multimarkdown
+      # Used in lsp-mode
+      inputs.pedantix.packages.${pkgs.stdenv.hostPlatform.system}.pedantix-wrapped
+      nil
 
-    # Used in lsp-mode
-    nixpkgs-fmt
-    nil
-
-    aspell
-    aspellDicts.en
-    aspellDicts.en-computers
-    aspellDicts.en-science
-    aspellDicts.pt_BR
-  ];
-
-  home.sessionVariables.EDITOR = "emacs -nw";
-  home.file = {
-    ".emacs.d/init.el".text = ''
-      ;;; init.el --- Entry point -*- lexical-binding: t; -*-
-      (org-babel-load-file "~/.emacs.d/settings.org")
-    '';
-
-    ".emacs.d/settings.org" = {
-      source = ./settings.org;
-
-      onChange = ''
-        # We need to ensure we regenerate the Emacs Lisp file for the changes be
-        # applied in next start.
-        rm -f ~/.emacs.d/settings.el
-
-        # Remove the ELPA downloaded files so we don't leave old ones.
-        rm -rf ~/.emacs.d/elpa
+      aspell
+      aspellDicts.en
+      aspellDicts.en-computers
+      aspellDicts.en-science
+      aspellDicts.pt_BR
+    ];
+    sessionVariables.EDITOR = "emacs -nw";
+    file = {
+      ".emacs.d/init.el".text = ''
+        ;;; init.el --- Entry point -*- lexical-binding: t; -*-
+        (org-babel-load-file "~/.emacs.d/settings.org")
       '';
+
+      ".emacs.d/settings.org" = {
+        source = ./settings.org;
+
+        onChange = ''
+          # We need to ensure we regenerate the Emacs Lisp file for the changes be
+          # applied in next start.
+          rm -f ~/.emacs.d/settings.el
+
+          # Remove the ELPA downloaded files so we don't leave old ones.
+          rm -rf ~/.emacs.d/elpa
+        '';
+      };
     };
   };
-
   services.emacs.package = emacsWithPackages;
 }

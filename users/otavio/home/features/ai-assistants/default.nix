@@ -26,14 +26,25 @@ in
     ./herdr-config.nix
     ./t3code.nix
   ];
-
-  home.packages = with pkgs; [ fd jq ripgrep rtk ];
-
-  home.file =
-    mkInstructions { dir = ".claude"; indexFile = "CLAUDE.md"; }
-    // mkInstructions { dir = ".codex"; indexFile = "AGENTS.md"; }
-    // {
-      "src/nixpkgs/CLAUDE.md".source = ./projects/nixpkgs.md;
-      "src/nixpkgs/AGENTS.md".source = ./projects/nixpkgs.md;
-    };
+  home = {
+    packages = with pkgs; [
+      fd
+      jq
+      ripgrep
+      rtk
+    ];
+    file =
+      mkInstructions {
+        dir = ".claude";
+        indexFile = "CLAUDE.md";
+      }
+      // mkInstructions {
+        dir = ".codex";
+        indexFile = "AGENTS.md";
+      }
+      // {
+        "src/nixpkgs/CLAUDE.md".source = ./projects/nixpkgs.md;
+        "src/nixpkgs/AGENTS.md".source = ./projects/nixpkgs.md;
+      };
+  };
 }

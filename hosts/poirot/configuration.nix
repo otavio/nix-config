@@ -1,56 +1,69 @@
 { inputs, flake, ... }:
 
 {
-  imports = with inputs.nixos-hardware.nixosModules; [
-    common-cpu-intel
-    common-gpu-intel
-    common-gpu-nvidia-disable
-    common-pc-laptop-ssd
-  ] ++ [
-    ../features/required
+  imports =
+    with inputs.nixos-hardware.nixosModules;
+    [
+      common-cpu-intel
+      common-gpu-intel
+      common-gpu-nvidia-disable
+      common-pc-laptop-ssd
+    ]
+    ++ [
+      ../features/required
 
-    ../features/optional/auto-upgrade.nix
-    ../features/optional/bluetooth.nix
-    ../features/optional/desktop-cinnamon.nix
-    ../features/optional/epson-l495.nix
-    ../features/optional/latest-linux-kernel.nix
-    ../features/optional/msmtp.nix
-    ../features/optional/network-manager.nix
-    ../features/optional/no-mitigations.nix
-    ../features/optional/pipewire.nix
-    ../features/optional/pt-br-locale.nix
-    ../features/optional/quietboot.nix
-    ../features/optional/zram-swap.nix
+      ../features/optional/auto-upgrade.nix
+      ../features/optional/bluetooth.nix
+      ../features/optional/desktop-cinnamon.nix
+      ../features/optional/epson-l495.nix
+      ../features/optional/latest-linux-kernel.nix
+      ../features/optional/msmtp.nix
+      ../features/optional/network-manager.nix
+      ../features/optional/no-mitigations.nix
+      ../features/optional/pipewire.nix
+      ../features/optional/pt-br-locale.nix
+      ../features/optional/quietboot.nix
+      ../features/optional/zram-swap.nix
 
-    ../../users/bruna/system
-    ../../users/otavio/system
+      ../../users/bruna/system
+      ../../users/otavio/system
 
-    flake.nixosModules.restic-r2
+      flake.nixosModules.restic-r2
 
-    ./partitioning.nix
-  ];
-
-  my.backup.user = "bruna";
-
+      ./partitioning.nix
+    ];
+  my = {
+    backup.user = "bruna";
+    deployment = {
+      targetHost = "10.121.15.18";
+      buildOnTarget = true;
+    };
+  };
   home-manager.users = {
     bruna = import ../../users/bruna/home;
     otavio = import ../../users/otavio/home/features/global;
   };
-
-  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelParams = [ "systemd.gpt_auto=0" ];
-
-  boot.kernelModules = [ "kvm-intel" ];
-  boot.extraModulePackages = [ ];
-
-  boot.loader.grub.enable = true;
-  boot.loader.grub.efiSupport = true;
-  boot.loader.efi.efiSysMountPoint = "/efi";
-  boot.loader.grub.device = "nodev";
-
-  my.deployment = {
-    targetHost = "10.121.15.18";
-    buildOnTarget = true;
+  boot = {
+    initrd = {
+      availableKernelModules = [
+        "xhci_pci"
+        "ahci"
+        "usb_storage"
+        "sd_mod"
+        "rtsx_pci_sdmmc"
+      ];
+      kernelModules = [ ];
+    };
+    kernelParams = [ "systemd.gpt_auto=0" ];
+    kernelModules = [ "kvm-intel" ];
+    extraModulePackages = [ ];
+    loader = {
+      grub = {
+        enable = true;
+        efiSupport = true;
+        device = "nodev";
+      };
+      efi.efiSysMountPoint = "/efi";
+    };
   };
 }

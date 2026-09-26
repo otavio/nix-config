@@ -5,44 +5,40 @@ let
 in
 {
   imports = [ ../snixembed ];
-
-  home.packages =
-    assert (
-      lib.assertMsg
-        (
+  home = {
+    packages =
+      assert (
+        lib.assertMsg (
           !gazeOcr || (gazeOcr && eyeTracking)
         ) "gaze-ocr cannot be enabled without eye-tracking"
-    );
-    lib.flatten [
-      # These are from my fidgetingbits-talon repo, so need to be global
-      pkgs.just
+      );
+      lib.flatten [
+        # These are from my fidgetingbits-talon repo, so need to be global
+        pkgs.just
 
-      # FIXME: Double check these are actually needed anymore?
-      (pkgs.python312.withPackages (p: (lib.attrValues { inherit (p) lxml beautifulsoup4 requests; })))
-      (lib.optional pkgs.stdenv.isLinux [
-        pkgs.xsel
-        pkgs.xdg-utils
-      ])
-      (lib.optional gazeOcr pkgs.tesseract)
-      (lib.optional eyeTracking pkgs.v4l-utils)
-    ];
-
+        # FIXME: Double check these are actually needed anymore?
+        (pkgs.python312.withPackages (p: (lib.attrValues { inherit (p) beautifulsoup4 lxml requests; })))
+        (lib.optional pkgs.stdenv.isLinux [
+          pkgs.xsel
+          pkgs.xdg-utils
+        ])
+        (lib.optional gazeOcr pkgs.tesseract)
+        (lib.optional eyeTracking pkgs.v4l-utils)
+      ];
+    activation.talonInstallTesseract = lib.mkIf gazeOcr ''
+      if ! ~/.talon/bin/pip show screen-ocr\[tesseract\] >/dev/null 2>&1; then
+        ~/.talon/bin/pip install screen-ocr\[tesseract\]
+      fi
+    '';
+    # WARNING: This is undocumented, so very likely to break
+    file.".config/Talon/Talon.conf".text = ''
+      [General]
+      IAgreeToEULAVersion=5
+    '';
+  };
   # Enabled through the module rather than added to home.packages, where a
   # second git derivation collides with git-with-svn on git-receive-pack.
   programs.git.enable = true;
-
-  home.activation.talonInstallTesseract = lib.mkIf gazeOcr ''
-    if ! ~/.talon/bin/pip show screen-ocr\[tesseract\] >/dev/null 2>&1; then
-      ~/.talon/bin/pip install screen-ocr\[tesseract\]
-    fi
-  '';
-
-  # WARNING: This is undocumented, so very likely to break
-  home.file.".config/Talon/Talon.conf".text = ''
-    [General]
-    IAgreeToEULAVersion=5
-  '';
-
   systemd.user = {
     targets = {
       talon = {
@@ -90,8 +86,8 @@ in
             runtimeInputs = lib.flatten [
               (builtins.attrValues {
                 inherit (pkgs)
-                  inotify-tools# inotifywait
-                  coreutils# cut
+                  inotify-tools # inotifywait
+                  coreutils # cut
                   ;
               })
               talon-notify

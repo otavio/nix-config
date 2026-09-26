@@ -2,7 +2,7 @@
 # current upstream release until the pin catches up, then drop this file in
 # favour of nixpkgs' own package. Kept deliberately close to that definition so
 # the two stay easy to diff.
-{ pkgs, lib }:
+{ lib, pkgs }:
 
 pkgs.rustPlatform.buildRustPackage (finalAttrs: {
   pname = "rtk";
