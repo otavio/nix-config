@@ -81,6 +81,15 @@ let
       exit 1
     '';
   };
+
+  volumeButton = label: args: {
+    block = "custom";
+    command = "echo '<span size=\"x-large\">${label}</span>'";
+    format = "{$text.pango-str()|}";
+    interval = "once";
+    click = [{ button = "left"; cmd = "${pkgs.wireplumber}/bin/wpctl set-volume ${args}"; }];
+    merge_with_next = true;
+  };
 in
 {
   # Ref: https://discourse.nixos.org/t/opening-i3-from-home-manager-automatically/4849/8
@@ -312,22 +321,26 @@ in
             interval = 1;
             format = " $icon 1min avg: $1m.eng(w:4) ";
           }
+          (volumeButton " −" "@DEFAULT_AUDIO_SINK@ 1%-")
           {
             block = "sound";
             device_kind = "sink";
-            step_width = 5;
+            step_width = 1;
             max_vol = 100;
             headphones_indicator = true;
             format = " $icon {$volume.eng(w:2)|} ";
-            click = [{ button = "left"; cmd = "pavucontrol --tab=3"; }];
+            merge_with_next = true;
           }
+          (volumeButton "+ " "-l 1.0 @DEFAULT_AUDIO_SINK@ 1%+" // { merge_with_next = false; })
+          (volumeButton " −" "@DEFAULT_AUDIO_SOURCE@ 1%-")
           {
             block = "sound";
             device_kind = "source";
-            step_width = 5;
+            step_width = 1;
             format = " $icon {$volume.eng(w:2)|} ";
-            click = [{ button = "left"; cmd = "pavucontrol --tab=4"; }];
+            merge_with_next = true;
           }
+          (volumeButton "+ " "-l 1.0 @DEFAULT_AUDIO_SOURCE@ 1%+" // { merge_with_next = false; })
           {
             block = "time";
             interval = 60;
