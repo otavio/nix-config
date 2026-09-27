@@ -1,0 +1,92 @@
+diff --git a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
+index f1b2eee2b..f86f5eff1 100644
+--- a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
++++ b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
+@@ -23,6 +23,7 @@ import {
+ import {
+   projectScriptCwd,
+   projectScriptRuntimeEnv,
++  projectScriptTerminalInput,
+   resolveProjectScripts,
+ } from "@t3tools/shared/projectScripts";
+ import { Alert, Platform, ScrollView, View } from "react-native";
+@@ -773,7 +774,7 @@ function ThreadRouteContent(
+           cwd,
+           worktreePath: preferredWorktreePath,
+           env,
+-          initialInput: `${script.command}\r`,
++          initialInput: projectScriptTerminalInput(script.command),
+         },
+       });
+       terminalDebugLog("project-script:staged", {
+diff --git a/apps/server/src/project/ProjectSetupScriptRunner.test.ts b/apps/server/src/project/ProjectSetupScriptRunner.test.ts
+index 85af1b3e3..7c0a2606f 100644
+--- a/apps/server/src/project/ProjectSetupScriptRunner.test.ts
++++ b/apps/server/src/project/ProjectSetupScriptRunner.test.ts
+@@ -92,7 +92,7 @@ it.effect("resolves setup scripts through the standalone project service", () =>
+       NO_COLOR: "1",
+       FORCE_COLOR: "0",
+     });
+-    assert.equal(write.mock.calls[0]?.[0].data, "vp install\r");
++    assert.equal(write.mock.calls[0]?.[0].data, " vp install\r");
+     const lines: string[] = [];
+     const observed = yield* runner.runForThread({
+       threadId: "thread-1",
+diff --git a/apps/server/src/project/ProjectSetupScriptRunner.ts b/apps/server/src/project/ProjectSetupScriptRunner.ts
+index 9498f996d..f53e8ada3 100644
+--- a/apps/server/src/project/ProjectSetupScriptRunner.ts
++++ b/apps/server/src/project/ProjectSetupScriptRunner.ts
+@@ -2,6 +2,7 @@ import { ProjectId, type ProjectScript } from "@t3tools/contracts";
+ import { HostProcessEnvironment, HostProcessPlatform } from "@t3tools/shared/hostProcess";
+ import {
+   projectScriptRuntimeEnv,
++  projectScriptTerminalInput,
+   resolveProjectScripts,
+   setupProjectScript,
+ } from "@t3tools/shared/projectScripts";
+@@ -412,7 +413,7 @@ export const make = Effect.gen(function* () {
+       .write({
+         threadId: input.threadId,
+         terminalId,
+-        data: `${commandLine}\r`,
++        data: projectScriptTerminalInput(commandLine),
+       })
+       .pipe(
+         Effect.mapError(
+diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
+index 75e35d3ca..40ab46550 100644
+--- a/apps/web/src/components/ChatView.tsx
++++ b/apps/web/src/components/ChatView.tsx
+@@ -109,6 +109,7 @@ import {
+ import {
+   projectScriptCwd,
+   projectScriptRuntimeEnv,
++  projectScriptTerminalInput,
+   resolveProjectScripts,
+ } from "@t3tools/shared/projectScripts";
+ import { CHAT_LIST_ANCHOR_OFFSET } from "@t3tools/shared/chatList";
+@@ -4650,7 +4651,7 @@ export default function ChatView(props: ChatViewProps) {
+         input: {
+           threadId: activeThreadId,
+           terminalId: targetTerminalId,
+-          data: `${script.command}\r`,
++          data: projectScriptTerminalInput(script.command),
+         },
+       });
+       if (writeResult._tag === "Failure" && !isAtomCommandInterrupted(writeResult)) {
+diff --git a/packages/shared/src/projectScripts.ts b/packages/shared/src/projectScripts.ts
+index 5cb988753..dd4f30271 100644
+--- a/packages/shared/src/projectScripts.ts
++++ b/packages/shared/src/projectScripts.ts
+@@ -73,3 +73,11 @@ export function projectScriptRuntimeEnv(
+ export function setupProjectScript(scripts: readonly ProjectScript[]): ProjectScript | null {
+   return scripts.find((script) => script.runOnWorktreeCreate) ?? null;
+ }
++
++/**
++ * Terminal input that runs a project script. The leading space keeps it out
++ * of shell history under zsh `HIST_IGNORE_SPACE`, bash `ignorespace`, and fish.
++ */
++export function projectScriptTerminalInput(command: string): string {
++  return ` ${command}\r`;
++}
