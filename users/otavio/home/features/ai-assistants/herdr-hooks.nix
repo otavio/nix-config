@@ -1,12 +1,12 @@
-# herdr's agent-state hooks, generated from the herdr in the flake so they track
+# herdr's agent-state hooks, generated from the packaged herdr so they track
 # its version instead of being vendored by hand. Each agent's SessionStart hook
 # reports its session to the running herdr server when inside a herdr pane; it is
 # a no-op otherwise. Registration lives in claude.nix / codex.nix.
-{ inputs, pkgs }:
+{ pkgs }:
 
 pkgs.runCommandLocal "herdr-agent-hooks"
   {
-    nativeBuildInputs = [ inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+    nativeBuildInputs = [ pkgs.herdr ];
   }
   ''
     export HOME=$TMPDIR/home

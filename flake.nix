@@ -39,19 +39,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    claude-code-overlay = {
-      url = "github:ryoppippi/claude-code-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    codex-nix = {
-      url = "github:secbear/codex-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    herdr = {
-      url = "github:ogulcancelik/herdr";
-      inputs.nixpkgs.follows = "nixpkgs";
+    llm-agents = {
+      # No nixpkgs follows: keep llm-agents' pin so it hits cache.numtide.com
+      # instead of rebuilding every agent on each nixpkgs bump.
+      url = "github:numtide/llm-agents.nix";
     };
 
     herdr-plugin-hunk = {
@@ -95,7 +86,7 @@
       ];
 
       flake = {
-        overlays = import ./overlays { };
+        overlays = import ./overlays { inherit inputs; };
 
         colmenaHive =
           (import ./lib {

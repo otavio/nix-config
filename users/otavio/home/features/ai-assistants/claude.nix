@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   lib,
   pkgs,
@@ -35,7 +34,7 @@ let
     ];
   };
 
-  herdrHooks = import ./herdr-hooks.nix { inherit inputs pkgs; };
+  herdrHooks = import ./herdr-hooks.nix { inherit pkgs; };
 
   credentialGuard = import ./credential-guard.nix { inherit pkgs; };
 in
@@ -60,10 +59,6 @@ in
       run ln -sfn ${lib.escapeShellArg settingsSource} \
         ${lib.escapeShellArg deployedMarker}
     '';
-  };
-  nixpkgs = {
-    overlays = [ inputs.claude-code-overlay.overlays.default ];
-    config.allowUnfreePredicate = pkg: builtins.elem (inputs.nixpkgs.lib.getName pkg) [ "claude" ];
   };
   programs.claude-code = {
     enable = true;

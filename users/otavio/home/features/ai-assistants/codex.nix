@@ -1,9 +1,7 @@
-{ inputs, pkgs, ... }:
+{ pkgs, ... }:
 
 let
-  codexPackage = inputs.codex-nix.packages.${pkgs.stdenv.hostPlatform.system}.default;
-
-  herdrHooks = import ./herdr-hooks.nix { inherit inputs pkgs; };
+  herdrHooks = import ./herdr-hooks.nix { inherit pkgs; };
 
   credentialGuard = import ./credential-guard.nix { inherit pkgs; };
 
@@ -32,7 +30,7 @@ in
   home = {
     packages = with pkgs; [
       bubblewrap
-      codexPackage
+      codex
     ];
     file.".codex/hooks.json".source = hooksFile;
   };
