@@ -49,6 +49,12 @@ in
 
       dotDir = "${config.xdg.configHome}/zsh";
       history.path = "${config.xdg.stateHome}/zsh_history";
+      # .zshenv so non-interactive `zsh -c` (as used by AI harnesses) gets it:
+      # unmatched globs pass through literally and `===` is not `=cmd` expansion.
+      envExtra = ''
+        setopt NO_NOMATCH
+        unsetopt EQUALS
+      '';
       initContent = lib.mkOrder 500 ''
         stty -ixon
 
