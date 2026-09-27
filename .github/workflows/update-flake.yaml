@@ -16,7 +16,7 @@ jobs:
         with:
           base-branch: master
           install-nix: true
-          auto-merge: false
+          auto-merge: true
           token-owner: otavio
           client-id: ${{ secrets.FLAKE_UPDATE_CLIENT_ID }}
           app-private-key: ${{ secrets.FLAKE_UPDATE_APP_PRIVATE_KEY }}
