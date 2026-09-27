@@ -12,6 +12,7 @@
         "https://otavio-nix-config.cachix.org"
         "https://numtide.cachix.org"
         "https://colmena.cachix.org"
+        "https://cache.numtide.com"
       ];
 
       # Caches in trusted-substituters can be used by unprivileged users i.e. in
@@ -23,6 +24,7 @@
         "otavio-nix-config.cachix.org-1:4HXl0KPGJ0+tkTUn/0tHRpz1wJst9MxovLjKbsPnqS4="
         "numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigGmycPPE="
         "colmena.cachix.org-1:7BzpDnjjH8ki2CT3f6GdOk7QAzPOl+1t3LvTLXqYcSg="
+        "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
       ];
 
       trusted-users = [

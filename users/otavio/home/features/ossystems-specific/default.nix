@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ pkgs, ... }:
 
 let
   ossystems-scripts = pkgs.stdenv.mkDerivation {
@@ -23,7 +23,7 @@ let
         wrapProgram $out/bin/oe-ws \
           --prefix PATH : ${
             pkgs.lib.makeBinPath [
-              inputs.herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
+              pkgs.herdr
               pkgs.jq
               pkgs.fzf
               pkgs.gitRepo
