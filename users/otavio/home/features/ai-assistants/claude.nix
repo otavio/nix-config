@@ -79,7 +79,6 @@ in
       # whether or not the tools are used.
       disableClaudeAiConnectors = true; # Gmail/Calendar/Drive MCP tools
       disableWorkflows = true; # multi-agent orchestration
-      disableBundledSkills = true; # ships the marketplace plugins instead
       enableArtifact = false; # claude.ai-hosted pages
       disableRemoteControl = true; # claude.ai/code driving this session
       disableAgentView = true; # claude agents, --bg, /background, the daemon
