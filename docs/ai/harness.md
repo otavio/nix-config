@@ -23,5 +23,5 @@ says or narrate a change. Only comment genuinely non-obvious rationale; put the
 
 Introducing parameterized behavior shared across hosts (a `my.*` option backed
 by a module in `modules/nixos/`)? See
-[reusable-modules.md](reusable-modules.md). Prefer this over copy-pasting
+`docs/ai/reusable-modules.md`. Prefer this over copy-pasting
 near-identical files across hosts.
