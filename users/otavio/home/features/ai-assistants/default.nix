@@ -26,6 +26,13 @@ in
     ./herdr-config.nix
     ./t3code.nix
   ];
+  # Claude Code refuses `rtk git …` in a worktree-isolated subagent: its guard
+  # cannot prove where a git run behind an unknown launcher lands, so every
+  # add/commit/push from such an agent fails. Leave git unrewritten.
+  xdg.configFile."rtk/config.toml".source = (pkgs.formats.toml { }).generate "rtk-config.toml" {
+    hooks.exclude_commands = [ "git" ];
+  };
+
   home = {
     packages = with pkgs; [
       fd
