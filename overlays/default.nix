@@ -35,10 +35,11 @@
     );
 
   modifications = final: prev: {
-    # Ahead of nixpkgs (0.0.42) on an upstream preview, carrying my open
-    # upstream PRs rebased onto that tag:
+    # Ahead of nixpkgs (0.0.42) on the orchestration v2 branch
+    # (https://github.com/pingdotgg/t3code/pull/2829), which the upstream
+    # preview releases are cut from, carrying my open upstream PRs rebased
+    # onto it:
     # https://github.com/pingdotgg/t3code/pull/12095
-    # https://github.com/pingdotgg/t3code/pull/11594
     # https://github.com/pingdotgg/t3code/pull/13708
     # https://github.com/pingdotgg/t3code/pull/13734
     # https://github.com/pingdotgg/t3code/pull/13755
@@ -47,14 +48,17 @@
       let
         unwrapped = prev.t3code.unwrapped.overrideAttrs (
           finalAttrs: old: {
-            version = "0.0.43-preview.20260925.2240";
-            src = old.src.override {
-              tag = "v${finalAttrs.version}";
-              hash = "sha256-hsMflvt7S71pbB8sQ13CM/pzlrsDg0+CpQpGw6FDCpE=";
+            # The -preview.<date>.<n> shape keeps the app on the preview
+            # release channel.
+            version = "0.0.44-preview.20260930.0";
+            src = final.fetchFromGitHub {
+              owner = "pingdotgg";
+              repo = "t3code";
+              rev = "0fb3731eb43762459cdab350bf9a8cc247d09548";
+              hash = "sha256-97b4/FSIdh//FMEM3w8CdD4+9R2baFkON+YnNGlCQnA=";
             };
             patches = (old.patches or [ ]) ++ [
               ./t3code/context-window-indicator.patch
-              ./t3code/chat-width-setting.patch
               ./t3code/composer-focus-caret.patch
               ./t3code/right-panel-default-width.patch
               ./t3code/direnv-environment.patch
@@ -69,7 +73,7 @@
                 ;
               pnpm = final.pnpm_11;
               fetcherVersion = 4;
-              hash = "sha256-7y5NCq8gPv3tTr/FyFni2VJ0feEIZNHTQYbBlJv11Hg=";
+              hash = "sha256-Hd2pHu58OoicTEInd4sJmy8+p6AIO3pkVubQfnNOYjc=";
             };
           }
         );

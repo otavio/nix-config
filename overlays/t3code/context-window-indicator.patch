@@ -1,32 +1,8 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Otavio Salvador <otavio@ossystems.com.br>
-Date: Wed, 16 Sep 2026 11:38:19 -0300
-Subject: [PATCH 1/2] fix(web): move context window indicator out of legacy
- settings
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-The toggle lived under Settings → General → Legacy features, which made a
-supported feature look deprecated and hard to find. It now sits with the
-other composer settings, keeping its default and persisted value.
-
-Fixes #9352
-
-Backport of https://github.com/pingdotgg/t3code/pull/12095 onto
-v0.0.43-preview.20260925.2240.
----
- .../components/settings/SettingsPanels.tsx    | 41 ++++++++++++-------
- .../settings/settingsSearch.test.ts           |  2 +-
- .../src/components/settings/settingsSearch.ts | 12 +++---
- packages/contracts/src/settings.ts            |  4 +-
- 4 files changed, 36 insertions(+), 23 deletions(-)
-
 diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
-index fb6b587653..dc3475345c 100644
+index 942a1f9e5..07a0fbbb7 100644
 --- a/apps/web/src/components/settings/SettingsPanels.tsx
 +++ b/apps/web/src/components/settings/SettingsPanels.tsx
-@@ -2007,7 +2007,6 @@ function AutoSettleDaysInput({
+@@ -2050,7 +2050,6 @@ function AutoSettleDaysInput({
  // expand the section before its target can mount and scroll.
  const LEGACY_FEATURE_TARGET_IDS: ReadonlySet<string> = new Set([
    "legacy-plan-mode",
@@ -34,7 +10,7 @@ index fb6b587653..dc3475345c 100644
    "legacy-sidebar",
  ]);
  
-@@ -2062,19 +2061,6 @@ function LegacyFeaturesSection() {
+@@ -2105,19 +2104,6 @@ function LegacyFeaturesSection() {
                  />
                }
              />
@@ -54,7 +30,7 @@ index fb6b587653..dc3475345c 100644
              <SettingsRow
                {...searchableSetting("legacy-sidebar")}
                description="Restore per-project thread trees instead of the default flat sidebar."
-@@ -2693,6 +2679,33 @@ export function GeneralSettingsPanel() {
+@@ -2736,6 +2722,33 @@ export function GeneralSettingsPanel() {
            }
          />
  
@@ -89,10 +65,10 @@ index fb6b587653..dc3475345c 100644
            {...searchableSetting("follow-up-behavior")}
            description={
 diff --git a/apps/web/src/components/settings/settingsSearch.test.ts b/apps/web/src/components/settings/settingsSearch.test.ts
-index c92e2d05ef..2f3bec64c2 100644
+index 76f26b2ee..523ddb560 100644
 --- a/apps/web/src/components/settings/settingsSearch.test.ts
 +++ b/apps/web/src/components/settings/settingsSearch.test.ts
-@@ -398,7 +398,7 @@ describe("settings search targets", () => {
+@@ -422,7 +422,7 @@ describe("settings search targets", () => {
      const streaming = getSettingsSearchTargetScope("response-streaming")!;
      expect(streaming.scope).toBe("project-defaults");
      expect(isSettingsSearchScopeAvailable(streaming.scope, "project")).toBe(true);
@@ -102,10 +78,10 @@ index c92e2d05ef..2f3bec64c2 100644
      }
    });
 diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
-index f5d3c16ba7..183ff0569b 100644
+index 0e86928e9..cec264458 100644
 --- a/apps/web/src/components/settings/settingsSearch.ts
 +++ b/apps/web/src/components/settings/settingsSearch.ts
-@@ -382,6 +382,12 @@ export const SETTINGS_SEARCH_ITEMS = [
+@@ -390,6 +390,12 @@ export const SETTINGS_SEARCH_ITEMS = [
      to: "/settings/general",
      searchTerms: ["enter return command ctrl multiline prompt new line composer"],
    },
@@ -118,7 +94,7 @@ index f5d3c16ba7..183ff0569b 100644
    {
      id: "follow-up-behavior",
      title: "Follow-up behavior",
-@@ -490,12 +496,6 @@ export const SETTINGS_SEARCH_ITEMS = [
+@@ -498,12 +504,6 @@ export const SETTINGS_SEARCH_ITEMS = [
      to: "/settings/general",
      searchTerms: ["build plan composer old"],
    },
@@ -132,10 +108,10 @@ index f5d3c16ba7..183ff0569b 100644
      id: "legacy-sidebar",
      title: "Sidebar (legacy)",
 diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
-index b46dcf4af5..6740adf8f3 100644
+index 764e6d560..cf14bb90d 100644
 --- a/packages/contracts/src/settings.ts
 +++ b/packages/contracts/src/settings.ts
-@@ -434,8 +434,8 @@ export const ClientSettingsSchema = Schema.Struct({
+@@ -439,8 +439,8 @@ export const ClientSettingsSchema = Schema.Struct({
    // default UI; this beta flag restores it (plus the /plan and /default slash
    // commands) for users who still rely on the old workflow.
    planModeEnabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
