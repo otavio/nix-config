@@ -84,12 +84,6 @@
           t3code-unwrapped = unwrapped;
         };
       };
-
-    # Python 3.14's configparser rejects keys containing the delimiter, and
-    # timekpr 0.5.8 writes its commented config template through it, so the
-    # daemon dies initialising per-user config. Upstream dropped configparser
-    # in 0.5.9; drop this once the nixpkgs pin carries 0.5.10.
-    timekpr = prev.timekpr.override { python3Packages = prev.python312Packages; };
   };
 
   llm-agents = final: _: {
