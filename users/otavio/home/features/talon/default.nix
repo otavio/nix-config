@@ -18,7 +18,7 @@ in
 
         # FIXME: Double check these are actually needed anymore?
         (pkgs.python312.withPackages (p: (lib.attrValues { inherit (p) beautifulsoup4 lxml requests; })))
-        (lib.optional pkgs.stdenv.isLinux [
+        (lib.optional pkgs.stdenv.hostPlatform.isLinux [
           pkgs.xsel
           pkgs.xdg-utils
         ])

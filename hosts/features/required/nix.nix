@@ -37,6 +37,10 @@
         "flakes"
       ];
       warn-dirty = false;
+
+      # Map registries to channels
+      # Very useful when using legacy commands
+      nix-path = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
     };
 
     # improve desktop responsiveness when updating the system
@@ -54,9 +58,5 @@
     # Add each flake input as a registry
     # To make nix3 commands consistent with the flake
     registry = lib.mapAttrs (_: value: { flake = value; }) inputs;
-
-    # Map registries to channels
-    # Very useful when using legacy commands
-    nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
   };
 }
