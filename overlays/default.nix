@@ -75,6 +75,11 @@
               fetcherVersion = 4;
               hash = "sha256-Hd2pHu58OoicTEInd4sJmy8+p6AIO3pkVubQfnNOYjc=";
             };
+            # node-pty 1.2 skips node-gyp when it ships a prebuild for the
+            # host, and that prebuild cannot find libstdc++ on NixOS.
+            env = (old.env or { }) // {
+              npm_config_build_from_source = "true";
+            };
           }
         );
       in
