@@ -1,0 +1,12 @@
+builds:
+  include:
+    - "*.x86_64-linux.*"
+    - devShell.x86_64-linux
+    - homeConfigurations.*
+    - nixosConfigurations.*
+  exclude:
+    # Built on demand; checks.*.installer-* covers the installer systems.
+    # Garnix wildcards only match whole attribute names, so list each host.
+    - packages.x86_64-linux.installer-iso-micro
+    - packages.x86_64-linux.installer-iso-miss-marple
+    - packages.x86_64-linux.installer-iso-poirot

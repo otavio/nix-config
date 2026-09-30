@@ -19,13 +19,13 @@
       }) conf
     );
 
-  mkInstallerForSystem =
+  mkInstaller =
     {
       hostname,
       system,
       targetConfiguration,
     }:
-    (inputs.nixpkgs.lib.nixosSystem {
+    inputs.nixpkgs.lib.nixosSystem {
       specialArgs = {
         inherit flake inputs targetConfiguration;
         hostName = hostname;
@@ -40,5 +40,5 @@
 
         ./installer
       ];
-    }).config.system.build.isoImage;
+    };
 }
