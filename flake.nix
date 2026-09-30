@@ -115,30 +115,35 @@
         { pkgs, ... }:
         let
           inherit (pkgs.stdenv.hostPlatform) system;
+          inherit (inputs.nixpkgs) lib;
+          hosts = lib.filterAttrs (
+            _: cfg: cfg.config.nixpkgs.hostPlatform.system == system
+          ) self.nixosConfigurations;
+          installers = lib.mapAttrs (
+            hostname: cfg:
+            (import ./lib {
+              inherit inputs;
+              flake = self;
+            }).mkInstaller
+              {
+                inherit hostname system;
+                targetConfiguration = cfg;
+              }
+          ) hosts;
         in
         {
-          packages = builtins.foldl' (
-            acc: hostname:
-            let
-              cfg = self.nixosConfigurations.${hostname};
-              hostSystem = cfg.config.nixpkgs.hostPlatform.system;
-            in
-            if hostSystem == system then
-              acc
-              // {
-                "installer-iso-${hostname}" =
-                  (import ./lib {
-                    inherit inputs;
-                    flake = self;
-                  }).mkInstallerForSystem
-                    {
-                      inherit hostname system;
-                      targetConfiguration = cfg;
-                    };
-              }
-            else
-              acc
-          ) { } (builtins.attrNames self.nixosConfigurations);
+          # Building the images squashes each host's whole closure, so CI only
+          # builds the installer systems (see garnix.yaml); the images stay
+          # available on demand.
+          packages = lib.mapAttrs' (
+            hostname: installer:
+            lib.nameValuePair "installer-iso-${hostname}" installer.config.system.build.isoImage
+          ) installers;
+
+          checks = lib.mapAttrs' (
+            hostname: installer:
+            lib.nameValuePair "installer-${hostname}" installer.config.system.build.toplevel
+          ) installers;
         };
     };
 }
