@@ -1,5 +1,50 @@
+diff --git a/apps/web/src/components/preview/PreviewPanelShell.test.ts b/apps/web/src/components/preview/PreviewPanelShell.test.ts
+index 765e0b0a1..26ed6cfde 100644
+--- a/apps/web/src/components/preview/PreviewPanelShell.test.ts
++++ b/apps/web/src/components/preview/PreviewPanelShell.test.ts
+@@ -1,6 +1,6 @@
+ import { describe, expect, it } from "vite-plus/test";
+ 
+-import { getPreviewPanelMaxWidth } from "./PreviewPanelShell";
++import { getPreviewPanelDefaultWidth, getPreviewPanelMaxWidth } from "./PreviewPanelShell";
+ 
+ describe("getPreviewPanelMaxWidth", () => {
+   it("allows the panel to use 70% of an ultra-wide viewport without a pixel ceiling", () => {
+@@ -37,3 +37,13 @@ describe("getPreviewPanelMaxWidth", () => {
+     expect(getPreviewPanelMaxWidth(1_512, 300)).toBe(360);
+   });
+ });
++
++describe("getPreviewPanelDefaultWidth", () => {
++  it("opens at half of a wide viewport", () => {
++    expect(getPreviewPanelDefaultWidth(2_561)).toBe(1_280);
++  });
++
++  it("keeps the 540px floor on narrow viewports", () => {
++    expect(getPreviewPanelDefaultWidth(1_000)).toBe(540);
++  });
++});
+diff --git a/apps/web/src/components/preview/PreviewPanelShell.tsx b/apps/web/src/components/preview/PreviewPanelShell.tsx
+index 8969ebbf8..a80363158 100644
+--- a/apps/web/src/components/preview/PreviewPanelShell.tsx
++++ b/apps/web/src/components/preview/PreviewPanelShell.tsx
+@@ -2,12 +2,13 @@ import { type ReactNode, type RefObject, useLayoutEffect, useRef, useState } fro
+ 
+ import { isElectron } from "~/env";
+ import {
++  getPreviewPanelDefaultWidth,
+   getPreviewPanelMaxWidth,
+   type PreviewPanelInlineSize,
+   usePreviewPanelInlineSize,
+ } from "~/hooks/usePreviewPanelInlineSize";
+ 
+-export { getPreviewPanelMaxWidth };
++export { getPreviewPanelDefaultWidth, getPreviewPanelMaxWidth };
+ import { cn } from "~/lib/utils";
+ 
+ import { RightPanelResizeHandle } from "./RightPanelResizeHandle";
 diff --git a/apps/web/src/hooks/usePreviewPanelInlineSize.ts b/apps/web/src/hooks/usePreviewPanelInlineSize.ts
-index f4621669..1387414d 100644
+index f46216694..1387414d8 100644
 --- a/apps/web/src/hooks/usePreviewPanelInlineSize.ts
 +++ b/apps/web/src/hooks/usePreviewPanelInlineSize.ts
 @@ -20,7 +20,17 @@ const PREVIEW_PANEL_MAX_WIDTH_FRACTION = 0.7;

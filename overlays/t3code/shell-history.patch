@@ -1,5 +1,5 @@
 diff --git a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
-index f1b2eee2b..f86f5eff1 100644
+index 72d868677..f68ef485f 100644
 --- a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
 +++ b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
 @@ -23,6 +23,7 @@ import {
@@ -33,7 +33,7 @@ index 85af1b3e3..7c0a2606f 100644
      const observed = yield* runner.runForThread({
        threadId: "thread-1",
 diff --git a/apps/server/src/project/ProjectSetupScriptRunner.ts b/apps/server/src/project/ProjectSetupScriptRunner.ts
-index 9498f996d..f53e8ada3 100644
+index f97c0f4df..e39c2ba79 100644
 --- a/apps/server/src/project/ProjectSetupScriptRunner.ts
 +++ b/apps/server/src/project/ProjectSetupScriptRunner.ts
 @@ -2,6 +2,7 @@ import { ProjectId, type ProjectScript } from "@t3tools/contracts";
@@ -44,7 +44,7 @@ index 9498f996d..f53e8ada3 100644
    resolveProjectScripts,
    setupProjectScript,
  } from "@t3tools/shared/projectScripts";
-@@ -412,7 +413,7 @@ export const make = Effect.gen(function* () {
+@@ -413,7 +414,7 @@ export const make = Effect.gen(function* () {
        .write({
          threadId: input.threadId,
          terminalId,
@@ -54,10 +54,10 @@ index 9498f996d..f53e8ada3 100644
        .pipe(
          Effect.mapError(
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 75e35d3ca..40ab46550 100644
+index 009d3baf6..cb9d432d6 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -109,6 +109,7 @@ import {
+@@ -120,6 +120,7 @@ import {
  import {
    projectScriptCwd,
    projectScriptRuntimeEnv,
@@ -65,7 +65,7 @@ index 75e35d3ca..40ab46550 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { CHAT_LIST_ANCHOR_OFFSET } from "@t3tools/shared/chatList";
-@@ -4650,7 +4651,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -4710,7 +4711,7 @@ export default function ChatView(props: ChatViewProps) {
          input: {
            threadId: activeThreadId,
            terminalId: targetTerminalId,
