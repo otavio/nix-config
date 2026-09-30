@@ -48,8 +48,6 @@ in
 
       aspell
       aspellDicts.en
-      aspellDicts.en-computers
-      aspellDicts.en-science
       aspellDicts.pt_BR
     ];
     sessionVariables.EDITOR = "emacs -nw";
