@@ -18,6 +18,7 @@
       ../features/optional/epson-l495.nix
       ../features/optional/latest-linux-kernel.nix
       ../features/optional/msmtp.nix
+      ../features/optional/mute-on-lock.nix
       ../features/optional/network-manager.nix
       ../features/optional/no-mitigations.nix
       ../features/optional/parental-controls.nix
