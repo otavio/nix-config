@@ -40,6 +40,10 @@ let
         for w in $(${pkgs.xdotool}/bin/xdotool search --name -- "[Oo]nboard" 2>/dev/null); do
           ${pkgs.xdotool}/bin/xdotool windowraise "$w" 2>/dev/null || true
         done
+        # Onboard drops repaints while xss-lock's screensaver is active and
+        # nothing exposes it again once the saver ends, leaving the keyboard
+        # mapped on top but blank until clicked. Force a repaint.
+        ${pkgs.xrefresh}/bin/xrefresh 2>/dev/null || true
         sleep 1
       done
     ) &
