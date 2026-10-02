@@ -1,6 +1,10 @@
 {
   virtualisation.docker = {
     enable = true;
+    rootless = {
+      enable = true;
+      setSocketVariable = true;
+    };
   };
 
   # Container veth link-local churn triggers ERR_NETWORK_CHANGED in Chromium.
