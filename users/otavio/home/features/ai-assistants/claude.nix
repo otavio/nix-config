@@ -24,6 +24,18 @@ let
     text = builtins.readFile ./statusline-command.sh;
   };
 
+  # Claude Code refuses `rtk git …` in a worktree-isolated subagent (cwd under
+  # .claude/worktrees): its guard cannot prove where a git run behind an
+  # unknown launcher lands. Drop the rewrite there and let git run plain.
+  rtkHook = pkgs.writeShellApplication {
+    name = "rtk-claude-hook";
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.rtk
+    ];
+    text = builtins.readFile ./rtk-claude-hook.sh;
+  };
+
   notifySoundCommand = "${pkgs.pulseaudio}/bin/paplay ${notificationSound} 2>/dev/null || true";
   notifySoundHook = {
     hooks = [
@@ -188,7 +200,7 @@ in
             hooks = [
               {
                 type = "command";
-                command = "rtk hook claude";
+                command = lib.getExe rtkHook;
               }
             ];
           }
