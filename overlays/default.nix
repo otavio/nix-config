@@ -35,32 +35,24 @@
     );
 
   modifications = final: prev: {
-    # Ahead of nixpkgs (0.0.42) on the orchestration v2 branch
-    # (https://github.com/pingdotgg/t3code/pull/2829), which the upstream
-    # preview releases are cut from, carrying my open upstream PRs rebased
-    # onto it:
-    # https://github.com/pingdotgg/t3code/pull/12095
-    # https://github.com/pingdotgg/t3code/pull/13708
-    # https://github.com/pingdotgg/t3code/pull/13734
+    # Ahead of nixpkgs (0.0.42) on an upstream nightly, carrying my
+    # upstream PRs rebased onto that tag:
+    # https://github.com/pingdotgg/t3code/pull/14957
+    # https://github.com/pingdotgg/t3code/pull/14595
     # https://github.com/pingdotgg/t3code/pull/13755
     # https://github.com/pingdotgg/t3code/pull/13903
     t3code =
       let
         unwrapped = prev.t3code.unwrapped.overrideAttrs (
           finalAttrs: old: {
-            # The -preview.<date>.<n> shape keeps the app on the preview
-            # release channel.
-            version = "0.0.44-preview.20260930.0";
-            src = final.fetchFromGitHub {
-              owner = "pingdotgg";
-              repo = "t3code";
-              rev = "0fb3731eb43762459cdab350bf9a8cc247d09548";
-              hash = "sha256-97b4/FSIdh//FMEM3w8CdD4+9R2baFkON+YnNGlCQnA=";
+            version = "0.0.46-nightly.20261003.2632";
+            src = old.src.override {
+              tag = "v${finalAttrs.version}";
+              hash = "sha256-phC+xfp3+MR+w87N9HIaxlqah2yPizvs4S9DQAhIhhQ=";
             };
             patches = (old.patches or [ ]) ++ [
               ./t3code/context-window-indicator.patch
               ./t3code/composer-focus-caret.patch
-              ./t3code/right-panel-default-width.patch
               ./t3code/direnv-environment.patch
               ./t3code/shell-history.patch
             ];
@@ -73,7 +65,7 @@
                 ;
               pnpm = final.pnpm_11;
               fetcherVersion = 4;
-              hash = "sha256-Hd2pHu58OoicTEInd4sJmy8+p6AIO3pkVubQfnNOYjc=";
+              hash = "sha256-IvBYaCbOYy/5Sf5hziU9bCkrcm5SZJHwTQsXiYW7dMo=";
             };
             # node-pty 1.2 skips node-gyp when it ships a prebuild for the
             # host, and that prebuild cannot find libstdc++ on NixOS.
