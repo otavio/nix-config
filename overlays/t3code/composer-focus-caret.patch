@@ -1,5 +1,5 @@
 diff --git a/apps/web/src/components/ComposerPromptEditorTiptap.tsx b/apps/web/src/components/ComposerPromptEditorTiptap.tsx
-index 1926e4dd27..bb24c91bf6 100644
+index 1926e4dd2..bb24c91bf 100644
 --- a/apps/web/src/components/ComposerPromptEditorTiptap.tsx
 +++ b/apps/web/src/components/ComposerPromptEditorTiptap.tsx
 @@ -1197,7 +1197,11 @@ function ComposerPromptEditorTiptapInner(props: ComposerPromptEditorProps) {
