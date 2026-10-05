@@ -2,13 +2,13 @@
 
 pkgs.stdenv.mkDerivation rec {
   pname = "kube-ps1";
-  version = "0.7.0+git";
+  version = "1.0.0";
 
   src = pkgs.fetchFromGitHub {
     owner = "jonmosco";
     repo = "kube-ps1";
-    rev = "db95d30d8f154ac6677a3232745d0326f29d72c4";
-    sha256 = "sha256-2UrUOslk60pl15DPS5KwolX/xp3TpWLZKuF2D7jup2o=";
+    tag = "v${version}";
+    sha256 = "sha256-A71FJ5o4lVa6HuSZaFIjVtjXTXN/tnS7gLkWk+A+T70=";
   };
 
   strictDeps = true;
