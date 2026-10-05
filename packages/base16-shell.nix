@@ -3,10 +3,10 @@
 pkgs.stdenv.mkDerivation {
   name = "base16-shell";
   src = pkgs.fetchFromGitHub {
-    owner = "base16-project";
-    repo = "base16-shell";
-    rev = "41848241532fd60cdda222cc8f7b2bbead9fb50d";
-    sha256 = "sha256-rkgH8J6RgI3ej04z4gPFHMabaBRZKeaXIHhk0HxXMHo=";
+    owner = "tinted-theming";
+    repo = "tinted-shell";
+    rev = "9359c5da5adec80f374a6ef62178ab3e5613c800";
+    sha256 = "sha256-4tVnlKGPbiO1Fblmces7IRtvjG7weedJhjYkMBk080Q=";
   };
 
   installPhase = ''
