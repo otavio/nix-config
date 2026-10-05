@@ -50,10 +50,12 @@ in
       dotDir = "${config.xdg.configHome}/zsh";
       history.path = "${config.xdg.stateHome}/zsh_history";
       # .zshenv so non-interactive `zsh -c` (as used by AI harnesses) gets it:
-      # unmatched globs pass through literally and `===` is not `=cmd` expansion.
+      # unmatched globs pass through literally, `===` is not `=cmd` expansion,
+      # and unquoted variables word-split like bash (non-interactive only).
       envExtra = ''
         setopt NO_NOMATCH
         unsetopt EQUALS
+        [[ -o interactive ]] || setopt SH_WORD_SPLIT
       '';
       initContent = lib.mkOrder 500 ''
         stty -ixon
