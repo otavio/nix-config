@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
-index 8c5a3a935c..665a50722b 100644
+index 1104f875f..f90d4f8d3 100644
 --- a/apps/web/src/components/settings/SettingsPanels.tsx
 +++ b/apps/web/src/components/settings/SettingsPanels.tsx
-@@ -2070,7 +2070,6 @@ function AutoSettleDaysInput({
+@@ -2075,7 +2075,6 @@ function AutoSettleDaysInput({
  // expand the section before its target can mount and scroll.
  const LEGACY_FEATURE_TARGET_IDS: ReadonlySet<string> = new Set([
    "legacy-plan-mode",
@@ -10,7 +10,7 @@ index 8c5a3a935c..665a50722b 100644
    "legacy-sidebar",
  ]);
  
-@@ -2125,19 +2124,6 @@ function LegacyFeaturesSection() {
+@@ -2130,19 +2129,6 @@ function LegacyFeaturesSection() {
                  />
                }
              />
@@ -30,7 +30,7 @@ index 8c5a3a935c..665a50722b 100644
              <SettingsRow
                {...searchableSetting("legacy-sidebar")}
                description="Restore per-project thread trees instead of the default flat sidebar."
-@@ -2824,6 +2810,33 @@ export function GeneralSettingsPanel() {
+@@ -2829,6 +2815,33 @@ export function GeneralSettingsPanel() {
            }
          />
  
@@ -65,7 +65,7 @@ index 8c5a3a935c..665a50722b 100644
            {...searchableSetting("follow-up-behavior")}
            description={
 diff --git a/apps/web/src/components/settings/settingsSearch.test.ts b/apps/web/src/components/settings/settingsSearch.test.ts
-index 76f26b2eea..523ddb560e 100644
+index 76f26b2ee..523ddb560 100644
 --- a/apps/web/src/components/settings/settingsSearch.test.ts
 +++ b/apps/web/src/components/settings/settingsSearch.test.ts
 @@ -422,7 +422,7 @@ describe("settings search targets", () => {
@@ -78,7 +78,7 @@ index 76f26b2eea..523ddb560e 100644
      }
    });
 diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
-index ae55a327d1..824a684de6 100644
+index ae55a327d..824a684de 100644
 --- a/apps/web/src/components/settings/settingsSearch.ts
 +++ b/apps/web/src/components/settings/settingsSearch.ts
 @@ -402,6 +402,12 @@ export const SETTINGS_SEARCH_ITEMS = [
@@ -108,7 +108,7 @@ index ae55a327d1..824a684de6 100644
      id: "legacy-sidebar",
      title: "Sidebar (legacy)",
 diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
-index e84ed36c97..7313632d2c 100644
+index 082459efc..75204c4f6 100644
 --- a/packages/contracts/src/settings.ts
 +++ b/packages/contracts/src/settings.ts
 @@ -439,8 +439,8 @@ export const ClientSettingsSchema = Schema.Struct({

@@ -45,10 +45,10 @@
       let
         unwrapped = prev.t3code.unwrapped.overrideAttrs (
           finalAttrs: old: {
-            version = "0.0.46-nightly.20261003.2632";
+            version = "0.0.46-nightly.20261005.2676";
             src = old.src.override {
               tag = "v${finalAttrs.version}";
-              hash = "sha256-phC+xfp3+MR+w87N9HIaxlqah2yPizvs4S9DQAhIhhQ=";
+              hash = "sha256-cy8N9Xsd0qRQWJnLx7pVP/j2wlntEiMon1V0mujohkc=";
             };
             patches = (old.patches or [ ]) ++ [
               ./t3code/context-window-indicator.patch
@@ -65,7 +65,7 @@
                 ;
               pnpm = final.pnpm_11;
               fetcherVersion = 4;
-              hash = "sha256-IvBYaCbOYy/5Sf5hziU9bCkrcm5SZJHwTQsXiYW7dMo=";
+              hash = "sha256-CByfcfZjPR2GiJjFakUAgm1BsuWKqyGM9GwDJWlYDLs=";
             };
             # node-pty 1.2 skips node-gyp when it ships a prebuild for the
             # host, and that prebuild cannot find libstdc++ on NixOS.
