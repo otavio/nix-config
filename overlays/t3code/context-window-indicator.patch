@@ -65,10 +65,10 @@ index 1104f875f..f90d4f8d3 100644
            {...searchableSetting("follow-up-behavior")}
            description={
 diff --git a/apps/web/src/components/settings/settingsSearch.test.ts b/apps/web/src/components/settings/settingsSearch.test.ts
-index 76f26b2ee..523ddb560 100644
+index 17bc6407d..de5a88ca9 100644
 --- a/apps/web/src/components/settings/settingsSearch.test.ts
 +++ b/apps/web/src/components/settings/settingsSearch.test.ts
-@@ -422,7 +422,7 @@ describe("settings search targets", () => {
+@@ -441,7 +441,7 @@ describe("settings search targets", () => {
      const streaming = getSettingsSearchTargetScope("response-streaming")!;
      expect(streaming.scope).toBe("project-defaults");
      expect(isSettingsSearchScopeAvailable(streaming.scope, "project")).toBe(true);
@@ -78,10 +78,10 @@ index 76f26b2ee..523ddb560 100644
      }
    });
 diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
-index ae55a327d..824a684de 100644
+index 4797c9b64..d0add1810 100644
 --- a/apps/web/src/components/settings/settingsSearch.ts
 +++ b/apps/web/src/components/settings/settingsSearch.ts
-@@ -402,6 +402,12 @@ export const SETTINGS_SEARCH_ITEMS = [
+@@ -412,6 +412,12 @@ export const SETTINGS_SEARCH_ITEMS = [
      to: "/settings/general",
      searchTerms: ["enter return command ctrl multiline prompt new line composer"],
    },
@@ -94,7 +94,7 @@ index ae55a327d..824a684de 100644
    {
      id: "follow-up-behavior",
      title: "Follow-up behavior",
-@@ -510,12 +516,6 @@ export const SETTINGS_SEARCH_ITEMS = [
+@@ -520,12 +526,6 @@ export const SETTINGS_SEARCH_ITEMS = [
      to: "/settings/general",
      searchTerms: ["build plan composer old"],
    },
@@ -108,7 +108,7 @@ index ae55a327d..824a684de 100644
      id: "legacy-sidebar",
      title: "Sidebar (legacy)",
 diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
-index 082459efc..75204c4f6 100644
+index 7e73079a5..67847ebae 100644
 --- a/packages/contracts/src/settings.ts
 +++ b/packages/contracts/src/settings.ts
 @@ -439,8 +439,8 @@ export const ClientSettingsSchema = Schema.Struct({

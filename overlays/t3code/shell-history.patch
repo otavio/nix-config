@@ -1,5 +1,5 @@
 diff --git a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
-index 72d868677..f68ef485f 100644
+index b7ebc569c..9cf81ae61 100644
 --- a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
 +++ b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
 @@ -23,6 +23,7 @@ import {
@@ -10,7 +10,7 @@ index 72d868677..f68ef485f 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { Alert, Platform, ScrollView, View } from "react-native";
-@@ -773,7 +774,7 @@ function ThreadRouteContent(
+@@ -772,7 +773,7 @@ function ThreadRouteContent(
            cwd,
            worktreePath: preferredWorktreePath,
            env,
@@ -20,10 +20,10 @@ index 72d868677..f68ef485f 100644
        });
        terminalDebugLog("project-script:staged", {
 diff --git a/apps/server/src/project/ProjectSetupScriptRunner.test.ts b/apps/server/src/project/ProjectSetupScriptRunner.test.ts
-index 85af1b3e3..242d95a5d 100644
+index 01976a173..4cf7ea9ea 100644
 --- a/apps/server/src/project/ProjectSetupScriptRunner.test.ts
 +++ b/apps/server/src/project/ProjectSetupScriptRunner.test.ts
-@@ -92,7 +92,7 @@ it.effect("resolves setup scripts through the standalone project service", () =>
+@@ -94,7 +94,7 @@ it.effect("resolves setup scripts through the standalone project service", () =>
        NO_COLOR: "1",
        FORCE_COLOR: "0",
      });
@@ -32,7 +32,7 @@ index 85af1b3e3..242d95a5d 100644
      const lines: string[] = [];
      const observed = yield* runner.runForThread({
        threadId: "thread-1",
-@@ -106,6 +106,8 @@ it.effect("resolves setup scripts through the standalone project service", () =>
+@@ -108,6 +108,8 @@ it.effect("resolves setup scripts through the standalone project service", () =>
        },
      });
      assert.equal(observed.status, "started");
@@ -42,7 +42,7 @@ index 85af1b3e3..242d95a5d 100644
      yield* listener({
        type: "output",
 diff --git a/apps/server/src/project/ProjectSetupScriptRunner.ts b/apps/server/src/project/ProjectSetupScriptRunner.ts
-index f97c0f4df..e39c2ba79 100644
+index 7b101226d..627ef6097 100644
 --- a/apps/server/src/project/ProjectSetupScriptRunner.ts
 +++ b/apps/server/src/project/ProjectSetupScriptRunner.ts
 @@ -2,6 +2,7 @@ import { ProjectId, type ProjectScript } from "@t3tools/contracts";
@@ -53,7 +53,7 @@ index f97c0f4df..e39c2ba79 100644
    resolveProjectScripts,
    setupProjectScript,
  } from "@t3tools/shared/projectScripts";
-@@ -413,7 +414,7 @@ export const make = Effect.gen(function* () {
+@@ -416,7 +417,7 @@ export const make = Effect.gen(function* () {
        .write({
          threadId: input.threadId,
          terminalId,
@@ -63,10 +63,10 @@ index f97c0f4df..e39c2ba79 100644
        .pipe(
          Effect.mapError(
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index ec924e2c6..015b41c8c 100644
+index 9f6256ff7..a2fab8bc1 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -124,6 +124,7 @@ import {
+@@ -125,6 +125,7 @@ import {
  import {
    projectScriptCwd,
    projectScriptRuntimeEnv,
@@ -74,7 +74,7 @@ index ec924e2c6..015b41c8c 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { CHAT_LIST_ANCHOR_OFFSET } from "@t3tools/shared/chatList";
-@@ -4893,7 +4894,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -4920,7 +4921,7 @@ export default function ChatView(props: ChatViewProps) {
          input: {
            threadId: activeThreadId,
            terminalId: targetTerminalId,

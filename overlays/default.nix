@@ -35,7 +35,7 @@
     );
 
   modifications = final: prev: {
-    # Ahead of nixpkgs (0.0.42) on an upstream nightly, carrying my
+    # Ahead of nixpkgs (0.0.44) on an upstream nightly, carrying my
     # upstream PRs rebased onto that tag:
     # https://github.com/pingdotgg/t3code/pull/14957
     # https://github.com/pingdotgg/t3code/pull/14595
@@ -45,10 +45,10 @@
       let
         unwrapped = prev.t3code.unwrapped.overrideAttrs (
           finalAttrs: old: {
-            version = "0.0.46-nightly.20261005.2676";
+            version = "0.0.46-nightly.20261006.2735";
             src = old.src.override {
               tag = "v${finalAttrs.version}";
-              hash = "sha256-cy8N9Xsd0qRQWJnLx7pVP/j2wlntEiMon1V0mujohkc=";
+              hash = "sha256-Mp3ZSNswRgOEef4zLC/ZZnZuj+J6RiSm5L8Ccxw0D+c=";
             };
             patches = (old.patches or [ ]) ++ [
               ./t3code/context-window-indicator.patch
@@ -65,7 +65,7 @@
                 ;
               pnpm = final.pnpm_11;
               fetcherVersion = 4;
-              hash = "sha256-CByfcfZjPR2GiJjFakUAgm1BsuWKqyGM9GwDJWlYDLs=";
+              hash = "sha256-Uw0fK9Jhxdw3lxYezTderBQ8yw9eqTRPq1Sa3dcvDD4=";
             };
             # node-pty 1.2 skips node-gyp when it ships a prebuild for the
             # host, and that prebuild cannot find libstdc++ on NixOS.
