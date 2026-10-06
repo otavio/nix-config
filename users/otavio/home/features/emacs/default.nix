@@ -15,12 +15,12 @@ let
     extraEmacsPackages = epkgs: [
       (epkgs.trivialBuild {
         pname = "bitbake-modes";
-        version = "0.5.3-unstable-2023-08-24";
+        version = "0.8.0-unstable-2026-02-23";
         src = pkgs.fetchFromBitbucket {
           owner = "olanilsson";
           repo = "bitbake-modes";
-          rev = "7bcfaaca9ec4646700361b293128ffeb00ba48e4";
-          hash = "sha256-tGvJ2EtYsSAfyunrm+ccgBulYgTcHoVYvBhm6hKFyHw=";
+          rev = "3515851f7100514f621dfcf8e20226f78cf6a24a";
+          hash = "sha256-l61/n/4jz8256Jk9DPG/Alm2Lj/kIwcSiJ/i8xle5yA=";
         };
 
         packageRequires = [ epkgs.mmm-mode ];
