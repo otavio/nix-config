@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/ComposerPromptEditorTiptap.tsx b/apps/web/src/components/ComposerPromptEditorTiptap.tsx
-index 1926e4dd2..bb24c91bf 100644
+index 6b7eb7df7..bac965c0b 100644
 --- a/apps/web/src/components/ComposerPromptEditorTiptap.tsx
 +++ b/apps/web/src/components/ComposerPromptEditorTiptap.tsx
-@@ -1197,7 +1197,11 @@ function ComposerPromptEditorTiptapInner(props: ComposerPromptEditorProps) {
+@@ -1210,7 +1210,11 @@ function ComposerPromptEditorTiptapInner(props: ComposerPromptEditorProps) {
    const focusAt = useCallback(
      (nextCursor: number) => {
        if (!editor) return;
