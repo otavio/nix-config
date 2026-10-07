@@ -1,8 +1,8 @@
 diff --git a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
-index b7ebc569c..9cf81ae61 100644
+index 9f1e0a941..c829de34a 100644
 --- a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
 +++ b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
-@@ -23,6 +23,7 @@ import {
+@@ -26,6 +26,7 @@ import {
  import {
    projectScriptCwd,
    projectScriptRuntimeEnv,
@@ -10,7 +10,7 @@ index b7ebc569c..9cf81ae61 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { Alert, Platform, ScrollView, View } from "react-native";
-@@ -772,7 +773,7 @@ function ThreadRouteContent(
+@@ -821,7 +822,7 @@ function ThreadRouteContent(
            cwd,
            worktreePath: preferredWorktreePath,
            env,
@@ -20,10 +20,10 @@ index b7ebc569c..9cf81ae61 100644
        });
        terminalDebugLog("project-script:staged", {
 diff --git a/apps/server/src/project/ProjectSetupScriptRunner.test.ts b/apps/server/src/project/ProjectSetupScriptRunner.test.ts
-index 01976a173..4cf7ea9ea 100644
+index a11fb1f42..e8f27545e 100644
 --- a/apps/server/src/project/ProjectSetupScriptRunner.test.ts
 +++ b/apps/server/src/project/ProjectSetupScriptRunner.test.ts
-@@ -94,7 +94,7 @@ it.effect("resolves setup scripts through the standalone project service", () =>
+@@ -106,7 +106,7 @@ it.effect("resolves setup scripts through the standalone project service", () =>
        NO_COLOR: "1",
        FORCE_COLOR: "0",
      });
@@ -32,7 +32,7 @@ index 01976a173..4cf7ea9ea 100644
      const lines: string[] = [];
      const observed = yield* runner.runForThread({
        threadId: "thread-1",
-@@ -108,6 +108,8 @@ it.effect("resolves setup scripts through the standalone project service", () =>
+@@ -120,6 +120,8 @@ it.effect("resolves setup scripts through the standalone project service", () =>
        },
      });
      assert.equal(observed.status, "started");
@@ -42,7 +42,7 @@ index 01976a173..4cf7ea9ea 100644
      yield* listener({
        type: "output",
 diff --git a/apps/server/src/project/ProjectSetupScriptRunner.ts b/apps/server/src/project/ProjectSetupScriptRunner.ts
-index 7b101226d..627ef6097 100644
+index 973617156..708029622 100644
 --- a/apps/server/src/project/ProjectSetupScriptRunner.ts
 +++ b/apps/server/src/project/ProjectSetupScriptRunner.ts
 @@ -2,6 +2,7 @@ import { ProjectId, type ProjectScript } from "@t3tools/contracts";
@@ -51,9 +51,9 @@ index 7b101226d..627ef6097 100644
    projectScriptRuntimeEnv,
 +  projectScriptTerminalInput,
    resolveProjectScripts,
+   settleProjectScript,
    setupProjectScript,
- } from "@t3tools/shared/projectScripts";
-@@ -416,7 +417,7 @@ export const make = Effect.gen(function* () {
+@@ -442,7 +443,7 @@ export const make = Effect.gen(function* () {
        .write({
          threadId: input.threadId,
          terminalId,
@@ -63,10 +63,10 @@ index 7b101226d..627ef6097 100644
        .pipe(
          Effect.mapError(
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 9f6256ff7..a2fab8bc1 100644
+index 3b08fa7e5..6169e063b 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -125,6 +125,7 @@ import {
+@@ -131,6 +131,7 @@ import {
  import {
    projectScriptCwd,
    projectScriptRuntimeEnv,
@@ -74,7 +74,7 @@ index 9f6256ff7..a2fab8bc1 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { CHAT_LIST_ANCHOR_OFFSET } from "@t3tools/shared/chatList";
-@@ -4920,7 +4921,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -5006,7 +5007,7 @@ export default function ChatView(props: ChatViewProps) {
          input: {
            threadId: activeThreadId,
            terminalId: targetTerminalId,
@@ -84,12 +84,12 @@ index 9f6256ff7..a2fab8bc1 100644
        });
        if (writeResult._tag === "Failure") {
 diff --git a/packages/shared/src/projectScripts.ts b/packages/shared/src/projectScripts.ts
-index 5cb988753..dd4f30271 100644
+index 691376e72..30c3324d9 100644
 --- a/packages/shared/src/projectScripts.ts
 +++ b/packages/shared/src/projectScripts.ts
-@@ -73,3 +73,11 @@ export function projectScriptRuntimeEnv(
- export function setupProjectScript(scripts: readonly ProjectScript[]): ProjectScript | null {
-   return scripts.find((script) => script.runOnWorktreeCreate) ?? null;
+@@ -86,3 +86,11 @@ export function projectScriptMenuLabel(script: ProjectScript): string {
+ export function settleProjectScript(scripts: readonly ProjectScript[]): ProjectScript | null {
+   return scripts.find((script) => script.runOnSettle === true) ?? null;
  }
 +
 +/**
