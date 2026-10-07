@@ -1,8 +1,8 @@
 diff --git a/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx b/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx
-index 885f26925..f0af3582b 100644
+index ae4f43b5f..193ef8f85 100644
 --- a/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx
 +++ b/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx
-@@ -400,6 +400,16 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
+@@ -423,6 +423,16 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
                        onValueChange={(value) => write({ enableAgentBrowserAccess: value })}
                      />
                    </SettingsSection>
@@ -102,19 +102,31 @@ index 4a9067529..580cc6d16 100644
              <Text className="pr-1 font-t3-medium text-3xs text-adaptive-emerald-600-400">
                Copied
 diff --git a/apps/server/src/auth/RpcAuthorization.ts b/apps/server/src/auth/RpcAuthorization.ts
-index 3cce8fbe0..6c7fb5e3c 100644
+index ee0d24e44..8fe202be5 100644
 --- a/apps/server/src/auth/RpcAuthorization.ts
 +++ b/apps/server/src/auth/RpcAuthorization.ts
-@@ -161,6 +161,7 @@ export const RPC_REQUIRED_SCOPES = {
+@@ -158,6 +158,7 @@ export const RPC_REQUIRED_SCOPES = {
    [WS_METHODS.subscribeVcsStatus]: AuthOrchestrationReadScope,
    [WS_METHODS.subscribeWorktreeSetup]: AuthOrchestrationReadScope,
    [WS_METHODS.worktreeSetupCancel]: AuthOrchestrationOperateScope,
 +  [WS_METHODS.projectEnvironmentAllowDirenv]: AuthOrchestrationOperateScope,
-   [WS_METHODS.subscribeResourceTelemetry]: AuthOrchestrationReadScope,
+   [WS_METHODS.subscribeResourceTelemetry]: AuthDiagnosticsReadScope,
    [WS_METHODS.vcsRefreshStatus]: AuthOrchestrationReadScope,
-   [WS_METHODS.vcsPull]: AuthOrchestrationOperateScope,
+   [WS_METHODS.gitResolvePullRequest]: AuthOrchestrationReadScope,
+diff --git a/apps/server/src/observability/RpcInstrumentation.ts b/apps/server/src/observability/RpcInstrumentation.ts
+index f0f51f3d9..14ca03a81 100644
+--- a/apps/server/src/observability/RpcInstrumentation.ts
++++ b/apps/server/src/observability/RpcInstrumentation.ts
+@@ -145,6 +145,7 @@ const RPC_AGGREGATES = {
+   [WS_METHODS.subscribeVcsStatus]: "vcs",
+   [WS_METHODS.subscribeWorktreeSetup]: "vcs",
+   [WS_METHODS.worktreeSetupCancel]: "vcs",
++  [WS_METHODS.projectEnvironmentAllowDirenv]: "workspace",
+   [WS_METHODS.subscribeResourceTelemetry]: "server",
+   [WS_METHODS.vcsRefreshStatus]: "vcs",
+   [WS_METHODS.vcsPull]: "git",
 diff --git a/apps/server/src/orchestration-v2/Adapters/AcpAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/AcpAdapterV2.ts
-index 6b5b1b91f..c34d8b4ed 100644
+index 179455cb6..3933f0432 100644
 --- a/apps/server/src/orchestration-v2/Adapters/AcpAdapterV2.ts
 +++ b/apps/server/src/orchestration-v2/Adapters/AcpAdapterV2.ts
 @@ -65,6 +65,7 @@ import {
@@ -206,10 +218,10 @@ index be73eaec6..b8c48728f 100644
            ...(options.settings.authMethodId ? { authMethodId: options.settings.authMethodId } : {}),
          }).pipe(
 diff --git a/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
-index 9aa6163f2..6e65e98f1 100644
+index 81f9abc00..cb6efbb97 100644
 --- a/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
 +++ b/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
-@@ -118,6 +118,7 @@ import { T3_CODE_ORCHESTRATION_INSTRUCTIONS } from "../../provider/T3Orchestrati
+@@ -117,6 +117,7 @@ import { T3_CODE_ORCHESTRATION_INSTRUCTIONS } from "../../provider/T3Orchestrati
  import { buildRuntimeInstructions } from "../../provider/RuntimeInstructions.ts";
  import { mcpToolPresentation, normalizeMcpText } from "../../provider/McpToolPresentation.ts";
  import * as McpProviderSession from "../../mcp/McpProviderSession.ts";
@@ -217,7 +229,7 @@ index 9aa6163f2..6e65e98f1 100644
  import * as IdAllocator from "../IdAllocator.ts";
  import { makeProviderFailure, makeProviderRetryTurnItem } from "../ProviderFailure.ts";
  import { turnScopedSelectionTransition } from "../ProviderSelectionTransition.ts";
-@@ -7122,7 +7123,10 @@ export function makeClaudeAdapterV2(
+@@ -7128,7 +7129,10 @@ export function makeClaudeAdapterV2(
              cwd: turnInput.runtimePolicy.cwd,
              attachmentsDir,
              settings: adapterOptions.settings,
@@ -230,10 +242,10 @@ index 9aa6163f2..6e65e98f1 100644
              ...mcpOverrides,
              permissionMode: queryPolicy.permissionMode,
 diff --git a/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts
-index 194751bd6..e27e49a9d 100644
+index d562f876d..17b089f78 100644
 --- a/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts
 +++ b/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts
-@@ -106,6 +106,7 @@ import { ProviderEventLoggers } from "../../provider/ProviderEventLoggers.ts";
+@@ -107,6 +107,7 @@ import { ProviderEventLoggers } from "../../provider/ProviderEventLoggers.ts";
  import { codexAppServerArgs, resolveCodexLaunchArgs } from "../../provider/codexLaunchArgs.ts";
  import { mergeProviderInstanceEnvironment } from "../../provider/ProviderInstanceEnvironment.ts";
  import * as McpProviderSession from "../../mcp/McpProviderSession.ts";
@@ -241,7 +253,7 @@ index 194751bd6..e27e49a9d 100644
  import {
    ProviderAdapterDriverCreateError,
    type ProviderAdapterDriver,
-@@ -1653,7 +1654,10 @@ export function makeCodexAdapterV2(adapterOptions: CodexAdapterV2Options): Provi
+@@ -1672,7 +1673,10 @@ export function makeCodexAdapterV2(adapterOptions: CodexAdapterV2Options): Provi
            providerSessionId: input.providerSessionId,
            runtimePolicy: input.runtimePolicy,
            settings: resolvedRuntime?.config ?? adapterOptions.settings,
@@ -281,7 +293,7 @@ index b446e7ff0..c9c3541e4 100644
            runtimeMode: grokLaunchRuntimeMode(runtimePolicy),
          })),
 diff --git a/apps/server/src/orchestration-v2/Adapters/OpenCodeAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/OpenCodeAdapterV2.ts
-index aad31d636..1dde86ee1 100644
+index 510a4c859..45e8d49a0 100644
 --- a/apps/server/src/orchestration-v2/Adapters/OpenCodeAdapterV2.ts
 +++ b/apps/server/src/orchestration-v2/Adapters/OpenCodeAdapterV2.ts
 @@ -58,6 +58,7 @@ import { resolveAttachmentPath } from "../../attachmentStore.ts";
@@ -292,7 +304,7 @@ index aad31d636..1dde86ee1 100644
  import type { EventNdjsonLogger } from "../../provider/EventNdjsonLogger.ts";
  import * as ProviderEventLoggers from "../../provider/ProviderEventLoggers.ts";
  import {
-@@ -960,7 +961,10 @@ export function makeOpenCodeAdapterV2(
+@@ -962,7 +963,10 @@ export function makeOpenCodeAdapterV2(
            binaryPath: options.settings.binaryPath,
            directory: cwd,
            serverUrl: options.settings.serverUrl,
@@ -305,7 +317,7 @@ index aad31d636..1dde86ee1 100644
          const client = runtime.createOpenCodeSdkClient({
            baseUrl: connection.url,
 diff --git a/apps/server/src/orchestration-v2/Adapters/PiAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/PiAdapterV2.ts
-index 87e24f92b..789b05a6b 100644
+index 9270253d5..9f06c65f7 100644
 --- a/apps/server/src/orchestration-v2/Adapters/PiAdapterV2.ts
 +++ b/apps/server/src/orchestration-v2/Adapters/PiAdapterV2.ts
 @@ -63,6 +63,7 @@ import { resolveAttachmentPath } from "../../attachmentStore.ts";
@@ -341,7 +353,7 @@ index d9bd8689f..b584727e9 100644
      ),
      Layer.succeed(
 diff --git a/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts b/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts
-index 61a3dedaf..95974a33a 100644
+index bfb076ee3..dd4f1e1a5 100644
 --- a/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts
 +++ b/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts
 @@ -33,6 +33,7 @@ import { TestClock } from "effect/testing";
@@ -352,15 +364,15 @@ index 61a3dedaf..95974a33a 100644
  import * as ServerEnvironment from "../environment/ServerEnvironment.ts";
  import * as ProjectService from "../project/ProjectService.ts";
  import * as McpProviderSession from "../mcp/McpProviderSession.ts";
-@@ -413,6 +414,7 @@ function layerTest(input: {
-   readonly beforeUnload?: Effect.Effect<void>;
+@@ -470,6 +471,7 @@ function layerTest(input: {
+   readonly scopeCloseReached?: Deferred.Deferred<void>;
    readonly serverSettingsLayer?: ReturnType<typeof ServerSettings.layerTest>;
    readonly projectServiceLayer?: Layer.Layer<ProjectService.ProjectService>;
 +  readonly direnvLayer?: Layer.Layer<DirenvEnvironment.DirenvEnvironment>;
  }) {
    const layerConfiguredEventSink =
      input.flakyReleaseWrites !== undefined
-@@ -464,6 +466,7 @@ function layerTest(input: {
+@@ -532,6 +534,7 @@ function layerTest(input: {
            layerTestStores,
            ...(input.serverSettingsLayer === undefined ? [] : [input.serverSettingsLayer]),
            ...(input.projectServiceLayer === undefined ? [] : [input.projectServiceLayer]),
@@ -368,7 +380,7 @@ index 61a3dedaf..95974a33a 100644
          ),
        ),
      ),
-@@ -3581,3 +3584,167 @@ it.effect(
+@@ -4388,3 +4391,167 @@ it.effect(
        assert.isFalse(denied?.capabilities?.has("device"));
      }),
  );
@@ -537,10 +549,10 @@ index 61a3dedaf..95974a33a 100644
 +  }),
 +);
 diff --git a/apps/server/src/orchestration-v2/ProviderSessionManager.ts b/apps/server/src/orchestration-v2/ProviderSessionManager.ts
-index 5730432aa..7b4839617 100644
+index f84441129..d99975a83 100644
 --- a/apps/server/src/orchestration-v2/ProviderSessionManager.ts
 +++ b/apps/server/src/orchestration-v2/ProviderSessionManager.ts
-@@ -40,6 +40,7 @@ import {
+@@ -41,6 +41,7 @@ import {
  import { ProviderWorkspaceMissingError } from "../provider/Errors.ts";
  import * as ProjectService from "../project/ProjectService.ts";
  import * as McpProviderSession from "../mcp/McpProviderSession.ts";
@@ -548,7 +560,7 @@ index 5730432aa..7b4839617 100644
  import * as ServerSettings from "../serverSettings.ts";
  import * as McpSessionRegistry from "../mcp/McpSessionRegistry.ts";
  import * as EventSink from "./EventSink.ts";
-@@ -63,6 +64,7 @@ const UNLOAD_THREAD_TIMEOUT_MS = 10 * 1000;
+@@ -68,6 +69,7 @@ const UNLOAD_THREAD_TIMEOUT_MS = 10 * 1000;
  
  export const ProviderSessionReleaseReason = Schema.Literals([
    "idle_timeout",
@@ -556,7 +568,7 @@ index 5730432aa..7b4839617 100644
    "runtime_error",
    "manual_shutdown",
    "server_shutdown",
-@@ -186,6 +188,14 @@ export interface ProviderSessionManagerV2Shape {
+@@ -191,6 +193,14 @@ export interface ProviderSessionManagerV2Shape {
       */
      readonly revokeMcpCredential?: boolean;
    }) => Effect.Effect<void, ProviderSessionManagerV2Error>;
@@ -571,7 +583,7 @@ index 5730432aa..7b4839617 100644
  }
  
  export class ProviderSessionManagerV2 extends Context.Service<
-@@ -218,6 +228,14 @@ interface LiveSessionEntry {
+@@ -228,6 +238,14 @@ interface LiveSessionEntry {
    readonly idleFiber: Fiber.Fiber<void, never> | null;
    /** Set when idle release is deferred for pending background work; bounds total deferral. */
    readonly pinnedSinceMs: number | null;
@@ -586,7 +598,7 @@ index 5730432aa..7b4839617 100644
  }
  
  type ProviderSessionEventSignal =
-@@ -368,6 +386,91 @@ export const layerWithOptions = (
+@@ -378,6 +396,91 @@ export const layerWithOptions = (
            );
          },
        );
@@ -678,7 +690,7 @@ index 5730432aa..7b4839617 100644
        const layerScope = yield* Effect.scope;
        // Ctrl+C, or a stop that signals the whole process group, reaches the
        // provider CLIs with the server. They report their own background work
-@@ -1713,11 +1816,20 @@ export const layerWithOptions = (
+@@ -1807,6 +1910,9 @@ export const layerWithOptions = (
              ),
            { discard: true },
          );
@@ -686,7 +698,9 @@ index 5730432aa..7b4839617 100644
 +        reportedDirenvFailures.clear();
 +        unreportedDirenvFailures.clear();
        });
-       yield* Effect.addFinalizer(() => shutdown);
+       yield* Effect.addFinalizer(() =>
+         shutdown.pipe(
+@@ -1816,6 +1922,12 @@ export const layerWithOptions = (
  
        return ProviderSessionManagerV2.of({
          shutdown,
@@ -699,7 +713,7 @@ index 5730432aa..7b4839617 100644
          open: (input) =>
            sessionOpen.withLock(
              input.providerSessionId,
-@@ -1737,6 +1849,7 @@ export const layerWithOptions = (
+@@ -1835,6 +1947,7 @@ export const layerWithOptions = (
                }
                const key = sessionKey(input.providerSessionId);
                const existing = (yield* Ref.get(sessions)).get(key);
@@ -707,7 +721,7 @@ index 5730432aa..7b4839617 100644
                if (existing !== undefined) {
                  if (
                    !existing.attachedThreadIds.has(input.threadId) &&
-@@ -1748,13 +1861,33 @@ export const layerWithOptions = (
+@@ -1846,13 +1959,33 @@ export const layerWithOptions = (
                      cause: `Provider ${existing.runtime.driver} does not support attaching multiple app threads to one session.`,
                    });
                  }
@@ -745,7 +759,7 @@ index 5730432aa..7b4839617 100644
                }
  
                const adapter = yield* registry.get(input.modelSelection.instanceId).pipe(
-@@ -1767,6 +1900,11 @@ export const layerWithOptions = (
+@@ -1865,6 +1998,11 @@ export const layerWithOptions = (
                      }),
                  ),
                );
@@ -757,7 +771,7 @@ index 5730432aa..7b4839617 100644
                const prepared = yield* prepareMcpSession(
                  input.threadId,
                  input.modelSelection.instanceId,
-@@ -1858,6 +1996,7 @@ export const layerWithOptions = (
+@@ -1965,6 +2103,7 @@ export const layerWithOptions = (
                  lastActivityAtMs: now,
                  idleFiber: null,
                  pinnedSinceMs: null,
@@ -765,7 +779,7 @@ index 5730432aa..7b4839617 100644
                };
                yield* Ref.update(sessions, (current) => {
                  const updated = new Map(current);
-@@ -2040,6 +2179,9 @@ export const layerWithOptions = (
+@@ -2157,6 +2296,9 @@ export const layerWithOptions = (
              // and the token must not outlive the thread.
              if (input.revokeMcpCredential === true) {
                yield* clearMcpSession(input.threadId);
@@ -1462,7 +1476,7 @@ index a3aa8005c..7b0463c6f 100644
    readonly onAuthorizationUrl?: (url: string) => Effect.Effect<void, EffectAcpErrors.AcpError>;
    /**
 diff --git a/apps/server/src/server.ts b/apps/server/src/server.ts
-index 1294e6bdc..4906b00c9 100644
+index ebbc73758..506b8f23a 100644
 --- a/apps/server/src/server.ts
 +++ b/apps/server/src/server.ts
 @@ -68,6 +68,7 @@ import * as DesktopBrowserChannel from "./preview/DesktopBrowserChannel.ts";
@@ -1473,7 +1487,7 @@ index 1294e6bdc..4906b00c9 100644
  import * as GitManager from "./git/GitManager.ts";
  import * as EnvironmentTheme from "./environmentTheme.ts";
  import * as Keybindings from "./keybindings.ts";
-@@ -459,6 +460,7 @@ const layerScheduledTaskWebhookOrigin = Layer.effect(
+@@ -461,6 +462,7 @@ const layerScheduledTaskWebhookOrigin = Layer.effect(
  );
  
  const layerOrchestrationV2Runtime = RuntimeLayer.layerProduction.pipe(
@@ -1482,10 +1496,10 @@ index 1294e6bdc..4906b00c9 100644
    Layer.provide(ProviderEventIngestor.layerAnalytics),
    Layer.provide(layerCheckpointStore),
 diff --git a/apps/server/src/ws.ts b/apps/server/src/ws.ts
-index 99a05b8e2..337984b70 100644
+index fab4edb44..ba8cb0f63 100644
 --- a/apps/server/src/ws.ts
 +++ b/apps/server/src/ws.ts
-@@ -202,6 +202,7 @@ import * as ReviewService from "./review/ReviewService.ts";
+@@ -198,6 +198,7 @@ import * as ReviewService from "./review/ReviewService.ts";
  import * as ProjectEnrichmentService from "./project/ProjectEnrichmentService.ts";
  import * as ProjectService from "./project/ProjectService.ts";
  import * as ManagedProjectFolders from "./project/ManagedProjectFolders.ts";
@@ -1532,21 +1546,16 @@ index 99a05b8e2..337984b70 100644
        const agentSessionScanner = yield* AgentSessionScanner.AgentSessionScanner;
        const agentSessionImporter = yield* AgentSessionImporter.AgentSessionImporter;
        const checkpointDiffQuery = yield* CheckpointDiffQuery.CheckpointDiffQuery;
-@@ -3296,6 +3329,12 @@ const layerWsRpc = (
-               .pipe(Effect.map((cancelled) => ({ cancelled }))),
-             { "rpc.aggregate": "vcs" },
-           ),
-+        [WS_METHODS.projectEnvironmentAllowDirenv]: (input) =>
-+          observeRpcEffect(
-+            WS_METHODS.projectEnvironmentAllowDirenv,
-+            allowThreadDirenv(input.threadId),
-+            { "rpc.aggregate": "workspace" },
-+          ),
-         [WS_METHODS.vcsRefreshStatus]: (input) =>
-           observeRpcEffect(
-             WS_METHODS.vcsRefreshStatus,
+@@ -2769,6 +2802,7 @@ const layerWsRpc = (
+           worktreeSetupTracker
+             .cancel(input.threadId)
+             .pipe(Effect.map((cancelled) => ({ cancelled }))),
++        [WS_METHODS.projectEnvironmentAllowDirenv]: (input) => allowThreadDirenv(input.threadId),
+         [WS_METHODS.vcsRefreshStatus]: (input) => vcsStatusBroadcaster.refreshStatus(input.cwd),
+         [WS_METHODS.vcsPull]: (input) =>
+           gitWorkflow.pullCurrentBranch(input.cwd).pipe(
 diff --git a/apps/web/src/components/chat/MessagesTimeline.tsx b/apps/web/src/components/chat/MessagesTimeline.tsx
-index 89d44b6ab..f520cc38f 100644
+index 79d216ba5..eb1dc35ca 100644
 --- a/apps/web/src/components/chat/MessagesTimeline.tsx
 +++ b/apps/web/src/components/chat/MessagesTimeline.tsx
 @@ -154,6 +154,9 @@ import type {
@@ -1559,7 +1568,7 @@ index 89d44b6ab..f520cc38f 100644
  import { useAssetUrlRefresh, useAssetUrls, useAssetUrlState } from "../../assets/assetUrls";
  import { MediaVideoPlayer } from "../media/MediaVideoPlayer";
  import { getVirtualizedScrollFadeClassName } from "../ui/scroll-area";
-@@ -4996,6 +4999,60 @@ function ReasoningTraceContent({ entries }: { entries: ReadonlyArray<TimelineWor
+@@ -5012,6 +5015,60 @@ function ReasoningTraceContent({ entries }: { entries: ReadonlyArray<TimelineWor
    );
  }
  
@@ -1620,7 +1629,7 @@ index 89d44b6ab..f520cc38f 100644
  type WorkEntryRowProps = {
    workEntry: TimelineWorkEntry;
    workspaceRoot: string | undefined;
-@@ -5336,6 +5393,9 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
+@@ -5352,6 +5409,9 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
            !toolIconAcceptsTint(entryIconName, entryToolIcon) ? (
              <XIcon aria-hidden className={cn("size-3 shrink-0", failedToolIconClassName)} />
            ) : null}
@@ -1631,10 +1640,10 @@ index 89d44b6ab..f520cc38f 100644
            <span
              className={cn(
 diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
-index f90d4f8d3..1be937ac6 100644
+index abf7b57dd..09bdd1841 100644
 --- a/apps/web/src/components/settings/SettingsPanels.tsx
 +++ b/apps/web/src/components/settings/SettingsPanels.tsx
-@@ -625,6 +625,9 @@ export function useSettingsRestore(onRestored?: () => void) {
+@@ -627,6 +627,9 @@ export function useSettingsRestore(onRestored?: () => void) {
        DEFAULT_UNIFIED_SETTINGS.enableProviderUpdateChecks
          ? ["Provider update checks"]
          : []),
@@ -1644,7 +1653,7 @@ index f90d4f8d3..1be937ac6 100644
        ...(settings.continueThreadsAfterServerUpdate !==
        DEFAULT_UNIFIED_SETTINGS.continueThreadsAfterServerUpdate
          ? ["Continue threads after restarts"]
-@@ -701,6 +704,7 @@ export function useSettingsRestore(onRestored?: () => void) {
+@@ -703,6 +706,7 @@ export function useSettingsRestore(onRestored?: () => void) {
        settings.responseStreamingMode,
        settings.persistComposerContextStrip,
        settings.enableProviderUpdateChecks,
@@ -1652,7 +1661,7 @@ index f90d4f8d3..1be937ac6 100644
        settings.continueThreadsAfterServerUpdate,
        settings.sidebarAutoSettleAfterDays,
        settings.sidebarAutoSettleOnMerge,
-@@ -815,6 +819,7 @@ export function useSettingsRestore(onRestored?: () => void) {
+@@ -817,6 +821,7 @@ export function useSettingsRestore(onRestored?: () => void) {
        snoozeLimitedThreads: DEFAULT_UNIFIED_SETTINGS.snoozeLimitedThreads,
        responseStreamingMode: DEFAULT_UNIFIED_SETTINGS.responseStreamingMode,
        enableProviderUpdateChecks: DEFAULT_UNIFIED_SETTINGS.enableProviderUpdateChecks,
@@ -1660,7 +1669,7 @@ index f90d4f8d3..1be937ac6 100644
        continueThreadsAfterServerUpdate: DEFAULT_UNIFIED_SETTINGS.continueThreadsAfterServerUpdate,
        backgroundActivity: DEFAULT_UNIFIED_SETTINGS.backgroundActivity,
        backgroundActivityProfile: DEFAULT_UNIFIED_SETTINGS.backgroundActivityProfile,
-@@ -2952,6 +2957,36 @@ export function GeneralSettingsPanel() {
+@@ -2959,6 +2964,36 @@ export function GeneralSettingsPanel() {
            }
          />
  
@@ -1698,7 +1707,7 @@ index f90d4f8d3..1be937ac6 100644
            serverScoped
            settingKeys={["backgroundActivity"]}
 diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
-index d0add1810..a4d0b3851 100644
+index b30d0f23a..7c1de7673 100644
 --- a/apps/web/src/components/settings/settingsSearch.ts
 +++ b/apps/web/src/components/settings/settingsSearch.ts
 @@ -440,6 +440,13 @@ export const SETTINGS_SEARCH_ITEMS = [
@@ -1793,13 +1802,13 @@ index f237f1ce9..5aa679c8b 100644
    const optimistic = createOptimisticThreadLifecycle(snapshotAtom);
    return {
 diff --git a/packages/contracts/src/index.ts b/packages/contracts/src/index.ts
-index 277a341f3..879b79ada 100644
+index 3a67ab2cc..0284a7b54 100644
 --- a/packages/contracts/src/index.ts
 +++ b/packages/contracts/src/index.ts
-@@ -62,3 +62,4 @@ export * from "./resourceTelemetry.ts";
- export * from "./rpc.ts";
+@@ -63,3 +63,4 @@ export * from "./rpc.ts";
  export * from "./worktreeSetup.ts";
  export * from "./secretRequest.ts";
+ export * from "./clientRpcPermissions.ts";
 +export * from "./projectEnvironment.ts";
 diff --git a/packages/contracts/src/orchestrationV2.ts b/packages/contracts/src/orchestrationV2.ts
 index c26d5a932..76224052b 100644
@@ -1862,7 +1871,7 @@ index 000000000..37a229245
 +});
 +export type ProjectEnvironmentAllowDirenvResult = typeof ProjectEnvironmentAllowDirenvResult.Type;
 diff --git a/packages/contracts/src/rpc.ts b/packages/contracts/src/rpc.ts
-index 4d6ec6e47..fd34c967c 100644
+index ba4ce8288..d62cb862b 100644
 --- a/packages/contracts/src/rpc.ts
 +++ b/packages/contracts/src/rpc.ts
 @@ -93,6 +93,10 @@ import {
@@ -1876,7 +1885,7 @@ index 4d6ec6e47..fd34c967c 100644
  import {
    WorktreeSetupCancelInput,
    WorktreeSetupCancelResult,
-@@ -529,6 +533,7 @@ export const WS_METHODS = {
+@@ -532,6 +536,7 @@ export const WS_METHODS = {
    subscribeVcsStatus: "subscribeVcsStatus",
    subscribeWorktreeSetup: "subscribeWorktreeSetup",
    worktreeSetupCancel: "worktreeSetup.cancel",
@@ -1884,7 +1893,7 @@ index 4d6ec6e47..fd34c967c 100644
    subscribeTerminalEvents: "subscribeTerminalEvents",
    subscribeTerminalMetadata: "subscribeTerminalMetadata",
    subscribePreviewEvents: "subscribePreviewEvents",
-@@ -1267,6 +1272,12 @@ const WsWorktreeSetupCancelRpc = Rpc.make(WS_METHODS.worktreeSetupCancel, {
+@@ -1270,6 +1275,12 @@ const WsWorktreeSetupCancelRpc = Rpc.make(WS_METHODS.worktreeSetupCancel, {
    error: EnvironmentAuthorizationError,
  });
  
@@ -1897,7 +1906,7 @@ index 4d6ec6e47..fd34c967c 100644
  const WsGitRunStackedActionRpc = Rpc.make(WS_METHODS.gitRunStackedAction, {
    payload: GitRunStackedActionInput,
    success: GitActionProgressEvent,
-@@ -1850,6 +1861,7 @@ export const WsRpcGroup = RpcGroup.make(
+@@ -1860,6 +1871,7 @@ export const WsRpcGroup = RpcGroup.make(
    WsSubscribeVcsStatusRpc,
    WsSubscribeWorktreeSetupRpc,
    WsWorktreeSetupCancelRpc,
@@ -1906,10 +1915,10 @@ index 4d6ec6e47..fd34c967c 100644
    WsVcsRefreshStatusRpc,
    WsGitRunStackedActionRpc,
 diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
-index 67847ebae..a98a00f72 100644
+index f1718403e..49b1f072f 100644
 --- a/packages/contracts/src/settings.ts
 +++ b/packages/contracts/src/settings.ts
-@@ -1134,6 +1134,7 @@ export const PROJECT_SCOPED_SERVER_SETTING_KEYS = [
+@@ -1170,6 +1170,7 @@ export const PROJECT_SCOPED_SERVER_SETTING_KEYS = [
    "defaultProjectScripts",
    "enableAgentBrowserAccess",
    "enableAgentDeviceAccess",
@@ -1917,7 +1926,7 @@ index 67847ebae..a98a00f72 100644
    "textGenerationModelSelection",
    "sourceControlWriterModelSelection",
    "sourceControlWritingStyle",
-@@ -1165,6 +1166,7 @@ export const ProjectSettingsOverrides = Schema.Struct({
+@@ -1201,6 +1202,7 @@ export const ProjectSettingsOverrides = Schema.Struct({
    defaultProjectScripts: Schema.optionalKey(Schema.Array(ProjectScript)),
    enableAgentBrowserAccess: Schema.optionalKey(Schema.Boolean),
    enableAgentDeviceAccess: Schema.optionalKey(Schema.Boolean),
@@ -1925,7 +1934,7 @@ index 67847ebae..a98a00f72 100644
    textGenerationModelSelection: Schema.optionalKey(ModelSelection),
    sourceControlWriterModelSelection: Schema.optionalKey(Schema.NullOr(ModelSelection)),
    sourceControlWritingStyle: Schema.optionalKey(SourceControlWritingStyleSettings),
-@@ -1291,6 +1293,12 @@ export const ServerSettings = Schema.Struct({
+@@ -1327,6 +1329,12 @@ export const ServerSettings = Schema.Struct({
     * unaffected.
     */
    enableAgentDeviceAccess: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
@@ -1938,7 +1947,7 @@ index 67847ebae..a98a00f72 100644
    /**
     * Whether this server may install and run T3's device helper processes.
     * Kept separate from agent access so enabling the user's Device panel does
-@@ -1662,6 +1670,7 @@ export const ServerSettingsPatch = Schema.Struct({
+@@ -1699,6 +1707,7 @@ export const ServerSettingsPatch = Schema.Struct({
      Schema.Record(ProjectId, Schema.NullOr(ProjectSettingsOverrides)),
    ),
    enableAgentDeviceAccess: Schema.optionalKey(Schema.Boolean),
