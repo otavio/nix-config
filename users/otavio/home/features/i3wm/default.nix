@@ -284,7 +284,7 @@ in
             criteria = {
               class = "flameshot";
             };
-            command = "floating enable, border pixel 0, fullscreen disable, focus";
+            command = "floating enable, border pixel 0, fullscreen disable, move absolute position 0 0, focus";
           }
         ];
 
