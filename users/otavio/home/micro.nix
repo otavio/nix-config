@@ -24,16 +24,11 @@
       enable = true;
       # nixpkgs' Brave wrapper does not put libvulkan on the library path, so
       # vulkanSupport alone leaves WebGPU on SwiftShader instead of RADV.
-      package =
-        (pkgs.brave.override {
-          vulkanSupport = true;
-          commandLineArgs = "--enable-unsafe-webgpu";
-        }).overrideAttrs
-          (old: {
-            preFixup = old.preFixup + ''
-              gappsWrapperArgs+=(--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ pkgs.vulkan-loader ]})
-            '';
-          });
+      package = (pkgs.brave.override { vulkanSupport = true; }).overrideAttrs (old: {
+        preFixup = old.preFixup + ''
+          gappsWrapperArgs+=(--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ pkgs.vulkan-loader ]})
+        '';
+      });
     };
     zathura.enable = true;
   };
