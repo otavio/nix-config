@@ -1,8 +1,8 @@
 diff --git a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
-index 9f1e0a941..c829de34a 100644
+index aa0ac90ec9..78dc2a801d 100644
 --- a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
 +++ b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
-@@ -26,6 +26,7 @@ import {
+@@ -24,6 +24,7 @@ import {
  import {
    projectScriptCwd,
    projectScriptRuntimeEnv,
@@ -10,7 +10,7 @@ index 9f1e0a941..c829de34a 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { Alert, Platform, ScrollView, View } from "react-native";
-@@ -821,7 +822,7 @@ function ThreadRouteContent(
+@@ -758,7 +759,7 @@ function ThreadRouteContent(
            cwd,
            worktreePath: preferredWorktreePath,
            env,
@@ -20,7 +20,7 @@ index 9f1e0a941..c829de34a 100644
        });
        terminalDebugLog("project-script:staged", {
 diff --git a/apps/server/src/project/ProjectSetupScriptRunner.test.ts b/apps/server/src/project/ProjectSetupScriptRunner.test.ts
-index a11fb1f42..e8f27545e 100644
+index a11fb1f42d..5a58674006 100644
 --- a/apps/server/src/project/ProjectSetupScriptRunner.test.ts
 +++ b/apps/server/src/project/ProjectSetupScriptRunner.test.ts
 @@ -106,7 +106,7 @@ it.effect("resolves setup scripts through the standalone project service", () =>
@@ -41,12 +41,21 @@ index a11fb1f42..e8f27545e 100644
      const listener = listeners[0]!;
      yield* listener({
        type: "output",
+@@ -138,7 +140,7 @@ it.effect("resolves setup scripts through the standalone project service", () =>
+     });
+     const settleTerminalId = settle.status === "started" ? settle.terminalId : "";
+     assert.match(settleTerminalId, /^settle-clean-/);
+-    assert.equal(write.mock.calls.at(-1)?.[0].data, "cargo clean\r");
++    assert.equal(write.mock.calls.at(-1)?.[0].data, " cargo clean\r");
+ 
+     // A clean run closes its shell once the prompt is back, not at the
+     // sentinel, so the prompt redraw is not taken for new activity.
 diff --git a/apps/server/src/project/ProjectSetupScriptRunner.ts b/apps/server/src/project/ProjectSetupScriptRunner.ts
-index 973617156..708029622 100644
+index c96f880878..661d5a524f 100644
 --- a/apps/server/src/project/ProjectSetupScriptRunner.ts
 +++ b/apps/server/src/project/ProjectSetupScriptRunner.ts
 @@ -2,6 +2,7 @@ import { ProjectId, type ProjectScript } from "@t3tools/contracts";
- import { HostProcessEnvironment, HostProcessPlatform } from "@t3tools/shared/hostProcess";
+ import * as HostProcess from "@t3tools/shared/HostProcess";
  import {
    projectScriptRuntimeEnv,
 +  projectScriptTerminalInput,
@@ -63,10 +72,10 @@ index 973617156..708029622 100644
        .pipe(
          Effect.mapError(
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 3b08fa7e5..6169e063b 100644
+index 260db2e47b..76b700bb5b 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -131,6 +131,7 @@ import {
+@@ -133,6 +133,7 @@ import {
  import {
    projectScriptCwd,
    projectScriptRuntimeEnv,
@@ -74,7 +83,7 @@ index 3b08fa7e5..6169e063b 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { CHAT_LIST_ANCHOR_OFFSET } from "@t3tools/shared/chatList";
-@@ -5006,7 +5007,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -5058,7 +5059,7 @@ export default function ChatView(props: ChatViewProps) {
          input: {
            threadId: activeThreadId,
            terminalId: targetTerminalId,
@@ -84,7 +93,7 @@ index 3b08fa7e5..6169e063b 100644
        });
        if (writeResult._tag === "Failure") {
 diff --git a/packages/shared/src/projectScripts.ts b/packages/shared/src/projectScripts.ts
-index 691376e72..30c3324d9 100644
+index 691376e723..30c3324d91 100644
 --- a/packages/shared/src/projectScripts.ts
 +++ b/packages/shared/src/projectScripts.ts
 @@ -86,3 +86,11 @@ export function projectScriptMenuLabel(script: ProjectScript): string {
