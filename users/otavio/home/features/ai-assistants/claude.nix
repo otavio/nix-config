@@ -78,6 +78,7 @@ in
     settings = {
       env = {
         CLAUDE_CODE_NO_FLICKER = "1";
+        DISABLE_EXTRA_USAGE_COMMAND = "1";
       }
       // credentialGuard.mkAgentEnv "claude";
       model = "opus";
@@ -98,7 +99,15 @@ in
 
       syncClaudeAiSkills = false;
       disableBundledSkills = true;
-      skillOverrides.plugin-authoring = "off";
+      skillOverrides = lib.genAttrs [
+        "auto-mode-setup"
+        "design"
+        "init"
+        "insights"
+        "plugin-authoring"
+        "security-review"
+        "team-onboarding"
+      ] (_: "off");
 
       includeGitInstructions = false;
 
