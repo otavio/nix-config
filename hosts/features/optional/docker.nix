@@ -1,15 +1,15 @@
 {
   virtualisation.docker = {
     enable = true;
-    daemon.settings.default-address-pools = [
-      {
-        base = "172.16.0.0/12";
-        size = 24;
-      }
-    ];
     rootless = {
       enable = true;
       setSocketVariable = true;
+      daemon.settings.default-address-pools = [
+        {
+          base = "172.16.0.0/12";
+          size = 24;
+        }
+      ];
     };
   };
 
