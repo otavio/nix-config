@@ -162,7 +162,6 @@ in
           "ReportFindings"
           "SendFeedback"
           "ScheduleWakeup"
-          "AskUserQuestion"
 
           # .env files
           "Read(.env*)"
