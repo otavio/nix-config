@@ -102,6 +102,18 @@ in
 
       includeGitInstructions = false;
 
+      autoCompactEnabled = true;
+      autoCompactWindow = 600000;
+      modelSettings =
+        lib.genAttrs
+          [
+            "claude-haiku-4-5"
+            "claude-haiku-5-5"
+          ]
+          (_: {
+            autoCompactWindow = 100000;
+          });
+
       permissions = {
         defaultMode = "bypassPermissions";
         disableAutoMode = "disable";
