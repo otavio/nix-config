@@ -96,8 +96,10 @@ in
       disableAgentView = true; # claude agents, --bg, /background, the daemon
       todoFeatureEnabled = false; # the todo panel and its tool
 
-      # The built-in commit/PR workflow prompt is superseded by the
-      # ossystems-commit skill.
+      syncClaudeAiSkills = false;
+      disableBundledSkills = true;
+      skillOverrides.plugin-authoring = "off";
+
       includeGitInstructions = false;
 
       permissions = {
@@ -262,9 +264,8 @@ in
 
       # Enable plugins from the marketplace
       enabledPlugins = {
-        "ossystems-commit@ossystems-ai-plugins" = true;
-        "ossystems-herdr@ossystems-ai-plugins" = true;
-        "ossystems-refactor-agent-instructions@ossystems-ai-plugins" = true;
+        "ossystems-commit@ossystems-ai-plugins" = false;
+        "ossystems-refactor-agent-instructions@ossystems-ai-plugins" = false;
         # auto-bmad@custom-claude-code-plugins is installed per-project
       };
     };
