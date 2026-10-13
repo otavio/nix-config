@@ -218,27 +218,6 @@ in
           };
           autoUpdate = true;
         };
-        ui-ux-pro-max-skill = {
-          source = {
-            source = "github";
-            repo = "nextlevelbuilder/ui-ux-pro-max-skill";
-          };
-          autoUpdate = true;
-        };
-        knowledge-work-plugins = {
-          source = {
-            source = "github";
-            repo = "anthropics/knowledge-work-plugins";
-          };
-          autoUpdate = true;
-        };
-        custom-claude-code-plugins = {
-          source = {
-            source = "github";
-            repo = "stefanoginella/claude-code-plugins";
-          };
-          autoUpdate = true;
-        };
         claude-plugins-official = {
           source = {
             source = "github";
@@ -246,7 +225,7 @@ in
           };
           autoUpdate = true;
         };
-        freedom-rtos-ai = {
+        freedom-rtos = {
           source = {
             source = "github";
             repo = "FreedomVeiculosEletricos/freedom-rtos-ai";
@@ -266,7 +245,6 @@ in
       enabledPlugins = {
         "ossystems-commit@ossystems-ai-plugins" = false;
         "ossystems-refactor-agent-instructions@ossystems-ai-plugins" = false;
-        # auto-bmad@custom-claude-code-plugins is installed per-project
       };
     };
 
