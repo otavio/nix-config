@@ -1,5 +1,5 @@
 diff --git a/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx b/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx
-index ae4f43b5fb..193ef8f85c 100644
+index e1702fc2a7..ec456ad238 100644
 --- a/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx
 +++ b/apps/mobile/src/features/settings/SettingsServerControlsRouteScreen.tsx
 @@ -423,6 +423,16 @@ function ServerSettingsDetail(props: { readonly page: SettingsPage }) {
@@ -20,7 +20,7 @@ index ae4f43b5fb..193ef8f85c 100644
                ) : null}
  
 diff --git a/apps/mobile/src/features/threads/thread-work-log.tsx b/apps/mobile/src/features/threads/thread-work-log.tsx
-index dc7a1f32da..a4cbf6c8cd 100644
+index a5e00b6336..c6cf04dd1f 100644
 --- a/apps/mobile/src/features/threads/thread-work-log.tsx
 +++ b/apps/mobile/src/features/threads/thread-work-log.tsx
 @@ -33,6 +33,7 @@ import {
@@ -31,7 +31,7 @@ index dc7a1f32da..a4cbf6c8cd 100644
    AppState,
    type ColorValue,
    Pressable,
-@@ -832,6 +833,57 @@ function WorkspacePreparationRetryButton(props: {
+@@ -883,6 +884,57 @@ function ReplCodeText({
    );
  }
  
@@ -89,7 +89,7 @@ index dc7a1f32da..a4cbf6c8cd 100644
  const ThreadWorkLogRow = memo(function ThreadWorkLogRow(
    props: Omit<
      ThreadWorkLogProps,
-@@ -1089,6 +1141,14 @@ const ThreadWorkLogRow = memo(function ThreadWorkLogRow(
+@@ -1141,6 +1193,14 @@ const ThreadWorkLogRow = memo(function ThreadWorkLogRow(
          )}
  
          <View className="shrink-0 flex-row items-center gap-px">
@@ -129,10 +129,10 @@ index 167ce8d11f..37d8d8e8f5 100644
    [WS_METHODS.projectsCreateNew]: "orchestration",
    [WS_METHODS.shellOpenInEditor]: "workspace",
 diff --git a/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
-index 80eb474365..c2ad60749b 100644
+index 6c3c290096..d593c30b6e 100644
 --- a/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
 +++ b/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
-@@ -147,6 +147,7 @@ import {
+@@ -156,6 +156,7 @@ import {
  import { turnScopedSelectionTransition } from "@t3tools/provider-core/server/selectionTransition";
  import { providerMessageTextWithAttachmentPaths } from "@t3tools/provider-core/server/attachmentPrompt";
  import * as ProviderAdapter from "@t3tools/provider-core/server/ProviderAdapter";
@@ -140,7 +140,7 @@ index 80eb474365..c2ad60749b 100644
  import {
    ProviderAdapterDriverCreateError,
    type ProviderAdapterDriver,
-@@ -8245,7 +8246,10 @@ export const makeClaudeAdapterV2 = Effect.fn("makeClaudeAdapterV2")(function* (
+@@ -8503,7 +8504,10 @@ export const makeClaudeAdapterV2 = Effect.fn("makeClaudeAdapterV2")(function* (
              cwd: turnInput.runtimePolicy.cwd,
              attachmentsDir,
              settings: adapterOptions.settings,
@@ -153,10 +153,10 @@ index 80eb474365..c2ad60749b 100644
              ...(mcpOverrides.allowedTools === undefined
                ? {}
 diff --git a/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts
-index d8ef1461ef..eb51771923 100644
+index 0e18e2857d..5ad66cc37c 100644
 --- a/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts
 +++ b/apps/server/src/orchestration-v2/Adapters/CodexAdapterV2.ts
-@@ -120,6 +120,7 @@ import {
+@@ -124,6 +124,7 @@ import {
    MCP_APP_RESOURCE_SCHEME,
  } from "@t3tools/shared/mcpApp";
  import { snapshotMcpApp } from "../../mcpApps/McpAppSnapshot.ts";
@@ -164,7 +164,7 @@ index d8ef1461ef..eb51771923 100644
  import {
    ProviderAdapterDriverCreateError,
    type ProviderAdapterDriver,
-@@ -1719,7 +1720,10 @@ export const makeCodexAdapterV2 = Effect.fn("makeCodexAdapterV2")(function* (
+@@ -1734,7 +1735,10 @@ export const makeCodexAdapterV2 = Effect.fn("makeCodexAdapterV2")(function* (
            providerSessionId: input.providerSessionId,
            runtimePolicy: input.runtimePolicy,
            settings: resolvedRuntime?.config ?? adapterOptions.settings,
@@ -177,7 +177,7 @@ index d8ef1461ef..eb51771923 100644
          const additionalContextByThread = yield* Ref.make(
            new Map<
 diff --git a/apps/server/src/orchestration-v2/EffectWorker.test.ts b/apps/server/src/orchestration-v2/EffectWorker.test.ts
-index 230f4d4b77..f088b70f90 100644
+index 93cc4f6b69..9ebc7fb1e5 100644
 --- a/apps/server/src/orchestration-v2/EffectWorker.test.ts
 +++ b/apps/server/src/orchestration-v2/EffectWorker.test.ts
 @@ -109,6 +109,7 @@ function layerExecutorFor(input: {
@@ -189,7 +189,7 @@ index 230f4d4b77..f088b70f90 100644
      ),
      Layer.succeed(
 diff --git a/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts b/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts
-index ceb230b008..0463292f3f 100644
+index 39bf2e2a87..82c08e222a 100644
 --- a/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts
 +++ b/apps/server/src/orchestration-v2/ProviderSessionManager.test.ts
 @@ -34,6 +34,7 @@ import { TestClock } from "effect/testing";
@@ -216,7 +216,7 @@ index ceb230b008..0463292f3f 100644
          ),
        ),
      ),
-@@ -4723,3 +4726,165 @@ it.effect(
+@@ -4759,3 +4762,165 @@ it.effect(
        assert.isFalse(denied?.capabilities?.has("device"));
      }),
  );
@@ -383,7 +383,7 @@ index ceb230b008..0463292f3f 100644
 +  }),
 +);
 diff --git a/apps/server/src/orchestration-v2/ProviderSessionManager.ts b/apps/server/src/orchestration-v2/ProviderSessionManager.ts
-index f0ec5282ef..8fc5ffca26 100644
+index d7d1e12c10..6e651c392b 100644
 --- a/apps/server/src/orchestration-v2/ProviderSessionManager.ts
 +++ b/apps/server/src/orchestration-v2/ProviderSessionManager.ts
 @@ -42,6 +42,7 @@ import {
@@ -526,7 +526,7 @@ index f0ec5282ef..8fc5ffca26 100644
        // provider CLIs with the server. They report their own background work
 @@ -2020,6 +2123,9 @@ export const layerWithOptions = (
              ),
-           { discard: true },
+           { concurrency: "unbounded", discard: true },
          );
 +        DirenvEnvironment.clearAllThreadDirenvEnvironments();
 +        reportedDirenvFailures.clear();
@@ -1276,7 +1276,7 @@ index d03ce73d09..32d329f15d 100644
    readonly onAuthorizationUrl?: (url: string) => Effect.Effect<void, EffectAcpErrors.AcpError>;
    /**
 diff --git a/apps/server/src/server.ts b/apps/server/src/server.ts
-index 3c1539a709..d4573744be 100644
+index 8148479f83..9fcea5d08a 100644
 --- a/apps/server/src/server.ts
 +++ b/apps/server/src/server.ts
 @@ -72,6 +72,7 @@ import * as DesktopBrowserChannel from "./preview/DesktopBrowserChannel.ts";
@@ -1287,7 +1287,7 @@ index 3c1539a709..d4573744be 100644
  import * as GitManager from "./git/GitManager.ts";
  import * as EnvironmentTheme from "./environmentTheme.ts";
  import * as Keybindings from "./keybindings.ts";
-@@ -485,6 +486,7 @@ const layerScheduledTaskWebhookOrigin = Layer.effect(
+@@ -482,6 +483,7 @@ const layerScheduledTaskWebhookOrigin = Layer.effect(
  );
  
  const layerOrchestrationV2Runtime = RuntimeLayer.layerProduction.pipe(
@@ -1296,10 +1296,10 @@ index 3c1539a709..d4573744be 100644
    Layer.provide(ProviderEventIngestor.layerAnalytics),
    Layer.provide(layerCheckpointStore),
 diff --git a/apps/server/src/ws.ts b/apps/server/src/ws.ts
-index 375c2ac78a..62f546b473 100644
+index 96994ee37c..94e652c54e 100644
 --- a/apps/server/src/ws.ts
 +++ b/apps/server/src/ws.ts
-@@ -202,6 +202,7 @@ import * as ReviewService from "./review/ReviewService.ts";
+@@ -206,6 +206,7 @@ import * as ReviewService from "./review/ReviewService.ts";
  import * as ProjectEnrichmentService from "./project/ProjectEnrichmentService.ts";
  import * as ProjectService from "./project/ProjectService.ts";
  import * as ManagedProjectFolders from "./project/ManagedProjectFolders.ts";
@@ -1307,7 +1307,7 @@ index 375c2ac78a..62f546b473 100644
  import { projectMutationOperation } from "./project/ProjectMutation.ts";
  import * as ProjectSetupScriptRunner from "./project/ProjectSetupScriptRunner.ts";
  import * as ProjectCloneTracker from "./project/ProjectCloneTracker.ts";
-@@ -1255,6 +1256,38 @@ const layerWsRpc = (
+@@ -1270,6 +1271,38 @@ const layerWsRpc = (
        const projectCloneTracker = yield* ProjectCloneTracker.ProjectCloneTracker;
        const repositoryIdentityResolver =
          yield* RepositoryIdentityResolver.RepositoryIdentityResolver;
@@ -1346,7 +1346,7 @@ index 375c2ac78a..62f546b473 100644
        const agentSessionScanner = yield* AgentSessionScanner.AgentSessionScanner;
        const agentSessionImporter = yield* AgentSessionImporter.AgentSessionImporter;
        const checkpointDiffQuery = yield* CheckpointDiffQuery.CheckpointDiffQuery;
-@@ -2810,6 +2843,7 @@ const layerWsRpc = (
+@@ -2825,6 +2858,7 @@ const layerWsRpc = (
            worktreeSetupTracker
              .cancel(input.threadId)
              .pipe(Effect.map((cancelled) => ({ cancelled }))),
@@ -1355,10 +1355,10 @@ index 375c2ac78a..62f546b473 100644
          [WS_METHODS.vcsPull]: (input) =>
            gitWorkflow.pullCurrentBranch(input.cwd).pipe(
 diff --git a/apps/web/src/components/chat/MessagesTimeline.tsx b/apps/web/src/components/chat/MessagesTimeline.tsx
-index ad52b716aa..5af7990fde 100644
+index d490b980e5..d6a4534169 100644
 --- a/apps/web/src/components/chat/MessagesTimeline.tsx
 +++ b/apps/web/src/components/chat/MessagesTimeline.tsx
-@@ -36,7 +36,7 @@ import {
+@@ -35,7 +35,7 @@ import {
  } from "@t3tools/contracts";
  import { parseScopedThreadKey, scopeThreadRef } from "@t3tools/client-runtime/environment";
  import { useAtomValue } from "@effect/atom-react";
@@ -1376,7 +1376,7 @@ index ad52b716aa..5af7990fde 100644
  import { useAssetUrlRefresh, useAssetUrls, useAssetUrlState } from "../../assets/assetUrls";
  import { MediaVideoPlayer } from "../media/MediaVideoPlayer";
  import { getVirtualizedScrollFadeClassName } from "../ui/scroll-area";
-@@ -5398,6 +5400,65 @@ function ReasoningTraceContent({ entries }: { entries: ReadonlyArray<TimelineWor
+@@ -5456,6 +5458,65 @@ function ReasoningTraceContent({ entries }: { entries: ReadonlyArray<TimelineWor
    );
  }
  
@@ -1442,8 +1442,8 @@ index ad52b716aa..5af7990fde 100644
  type WorkEntryRowProps = {
    workEntry: TimelineWorkEntry;
    workspaceRoot: string | undefined;
-@@ -5748,6 +5809,9 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
-           !toolIconAcceptsTint(entryIconName, entryToolIcon) ? (
+@@ -5806,6 +5867,9 @@ function WorkEntryLogRow(props: WorkEntryRowProps) {
+           !toolIconAcceptsTint(entryToolIcon) ? (
              <XIcon aria-hidden className={cn("size-3 shrink-0", failedToolIconClassName)} />
            ) : null}
 +          {workEntry.warningAction?.type === "direnv.allow" && ctx.threadRef ? (
@@ -1453,7 +1453,7 @@ index ad52b716aa..5af7990fde 100644
            <span
              className={cn(
 diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
-index 6df73fdcf7..8c9186a634 100644
+index c88920fab9..b300e40935 100644
 --- a/apps/web/src/components/settings/SettingsPanels.tsx
 +++ b/apps/web/src/components/settings/SettingsPanels.tsx
 @@ -630,6 +630,9 @@ export function useSettingsRestore(onRestored?: () => void) {
@@ -1482,7 +1482,7 @@ index 6df73fdcf7..8c9186a634 100644
        continueThreadsAfterServerUpdate: DEFAULT_UNIFIED_SETTINGS.continueThreadsAfterServerUpdate,
        backgroundActivity: DEFAULT_UNIFIED_SETTINGS.backgroundActivity,
        backgroundActivityProfile: DEFAULT_UNIFIED_SETTINGS.backgroundActivityProfile,
-@@ -2966,6 +2971,36 @@ export function GeneralSettingsPanel() {
+@@ -2967,6 +2972,36 @@ export function GeneralSettingsPanel() {
            }
          />
  
@@ -1664,7 +1664,7 @@ index 600d503ade..928894627b 100644
  export * from "./clientRpcPermissions.ts";
 +export * from "./projectEnvironment.ts";
 diff --git a/packages/contracts/src/orchestrationV2.ts b/packages/contracts/src/orchestrationV2.ts
-index 4822493765..850706bdf3 100644
+index 028d536d37..f63512dbcf 100644
 --- a/packages/contracts/src/orchestrationV2.ts
 +++ b/packages/contracts/src/orchestrationV2.ts
 @@ -1404,6 +1404,13 @@ export const OrchestrationV2UserMessageInputIntent = Schema.Literals([
@@ -1690,7 +1690,7 @@ index 4822493765..850706bdf3 100644
    }),
    Schema.Struct({
      ...OrchestrationV2TurnItemBaseFields,
-@@ -2358,6 +2367,8 @@ export const OrchestrationV2TurnItemJson = Schema.Union([
+@@ -2363,6 +2372,8 @@ export const OrchestrationV2TurnItemJson = Schema.Union([
      ...OrchestrationV2TurnItemJsonBaseFields,
      type: Schema.Literal("system_notice"),
      message: Schema.String,
@@ -1768,10 +1768,10 @@ index 61304c52f8..67e019f371 100644
    WsVcsRefreshStatusRpc,
    WsGitRunStackedActionRpc,
 diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
-index e22ea4e6f7..ba3b32ec53 100644
+index 4dea23d604..f5e6878deb 100644
 --- a/packages/contracts/src/settings.ts
 +++ b/packages/contracts/src/settings.ts
-@@ -955,6 +955,7 @@ export const PROJECT_SCOPED_SERVER_SETTING_KEYS = [
+@@ -972,6 +972,7 @@ export const PROJECT_SCOPED_SERVER_SETTING_KEYS = [
    "defaultProjectScripts",
    "enableAgentBrowserAccess",
    "enableAgentDeviceAccess",
@@ -1779,7 +1779,7 @@ index e22ea4e6f7..ba3b32ec53 100644
    "textGenerationModelSelection",
    "sourceControlWriterModelSelection",
    "reviewGuideModelSelection",
-@@ -1002,6 +1003,7 @@ export const ProjectSettingsOverrides = Schema.Struct({
+@@ -1019,6 +1020,7 @@ export const ProjectSettingsOverrides = Schema.Struct({
    defaultProjectScripts: Schema.optionalKey(Schema.Array(ProjectScript)),
    enableAgentBrowserAccess: Schema.optionalKey(Schema.Boolean),
    enableAgentDeviceAccess: Schema.optionalKey(Schema.Boolean),
@@ -1787,7 +1787,7 @@ index e22ea4e6f7..ba3b32ec53 100644
    textGenerationModelSelection: Schema.optionalKey(ModelSelection),
    sourceControlWriterModelSelection: Schema.optionalKey(Schema.NullOr(ModelSelection)),
    reviewGuideModelSelection: Schema.optionalKey(Schema.NullOr(ModelSelection)),
-@@ -1166,6 +1168,12 @@ export const ServerSettings = Schema.Struct({
+@@ -1184,6 +1186,12 @@ export const ServerSettings = Schema.Struct({
     * unaffected.
     */
    enableAgentDeviceAccess: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
@@ -1800,7 +1800,7 @@ index e22ea4e6f7..ba3b32ec53 100644
    /**
     * Whether this server may install and run T3's device helper processes.
     * Kept separate from agent access so enabling the user's Device panel does
-@@ -1550,6 +1558,7 @@ export const ServerSettingsPatch = Schema.Struct({
+@@ -1568,6 +1576,7 @@ export const ServerSettingsPatch = Schema.Struct({
      Schema.Record(ProjectId, Schema.NullOr(ProjectSettingsOverrides)),
    ),
    enableAgentDeviceAccess: Schema.optionalKey(Schema.Boolean),
@@ -1809,10 +1809,10 @@ index e22ea4e6f7..ba3b32ec53 100644
    deviceOnboardingCompleted: Schema.optionalKey(Schema.Boolean),
    deviceHosts: Schema.optionalKey(SshDeviceHostConfigs),
 diff --git a/packages/provider-acp-registry/src/server/adapter.ts b/packages/provider-acp-registry/src/server/adapter.ts
-index 0fa9a83d05..84b03bc710 100644
+index 4cc847a993..5de1b86c4d 100644
 --- a/packages/provider-acp-registry/src/server/adapter.ts
 +++ b/packages/provider-acp-registry/src/server/adapter.ts
-@@ -38,6 +38,7 @@ import * as ProviderEventLoggers from "@t3tools/provider-core/server/ProviderEve
+@@ -39,6 +39,7 @@ import * as ProviderEventLoggers from "@t3tools/provider-core/server/ProviderEve
  import { mergeProviderInstanceEnvironment } from "@t3tools/provider-core/server/instanceEnvironment";
  import * as IdAllocator from "@t3tools/provider-core/server/IdAllocator";
  import { makeProviderFailure } from "@t3tools/provider-core/server/failure";
@@ -1820,7 +1820,7 @@ index 0fa9a83d05..84b03bc710 100644
  import {
    ProviderAdapterDriverCreateError,
    type ProviderAdapterDriver,
-@@ -145,7 +146,7 @@ function makeAcpRegistryRuntime(
+@@ -146,7 +147,7 @@ function makeAcpRegistryRuntime(
      ChildProcessSpawner.ChildProcessSpawner | Crypto.Crypto | Scope.Scope
    > =>
      Effect.gen(function* () {
@@ -1829,7 +1829,7 @@ index 0fa9a83d05..84b03bc710 100644
        const resolved = yield* catalog
          .resolve(options.settings, input.cwd, options.environment)
          .pipe(
-@@ -161,11 +162,17 @@ function makeAcpRegistryRuntime(
+@@ -162,11 +163,17 @@ function makeAcpRegistryRuntime(
          AcpSessionRuntime.layer({
            ...runtimeInput,
            spawn:
@@ -1848,9 +1848,9 @@ index 0fa9a83d05..84b03bc710 100644
 +                  },
                  },
            ...(options.settings.authMethodId ? { authMethodId: options.settings.authMethodId } : {}),
-         }),
+           customModels: readCustomModelEntries(options.settings.customModels).map(
 diff --git a/packages/provider-acp/src/server/adapter.ts b/packages/provider-acp/src/server/adapter.ts
-index 6e125b2318..e32f1c3930 100644
+index 77ba680d98..b9b2513945 100644
 --- a/packages/provider-acp/src/server/adapter.ts
 +++ b/packages/provider-acp/src/server/adapter.ts
 @@ -62,6 +62,7 @@ import { makeAcpMcpOverAcpBridge, type AcpMcpOverAcpBridge } from "./mcpOverAcpB
@@ -1901,7 +1901,7 @@ index 6e125b2318..e32f1c3930 100644
              interruptPromptOnCancel: flavor.interruptPromptOnCancel ?? false,
              clientCapabilities: {
 diff --git a/packages/provider-core/package.json b/packages/provider-core/package.json
-index c45de9a9b1..71db19a8bd 100644
+index 7003e0a82c..5b87f0558e 100644
 --- a/packages/provider-core/package.json
 +++ b/packages/provider-core/package.json
 @@ -23,6 +23,10 @@
@@ -2026,7 +2026,7 @@ index b0b7f0ad29..c23f5d2cd6 100644
          const client = runtime.createOpenCodeSdkClient({
            baseUrl: connection.url,
 diff --git a/packages/provider-pi/src/server/adapter.ts b/packages/provider-pi/src/server/adapter.ts
-index 96d2783ecf..a9509c04ed 100644
+index 722ac13b39..c54dbcefee 100644
 --- a/packages/provider-pi/src/server/adapter.ts
 +++ b/packages/provider-pi/src/server/adapter.ts
 @@ -72,6 +72,7 @@ import { mergeProviderInstanceEnvironment } from "@t3tools/provider-core/server/
