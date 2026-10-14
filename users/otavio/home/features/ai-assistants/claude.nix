@@ -263,7 +263,7 @@ in
 
       # Enable plugins from the marketplace
       enabledPlugins = {
-        "ossystems-commit@ossystems-ai-plugins" = false;
+        "ossystems-commit@ossystems-ai-plugins" = true;
         "ossystems-refactor-agent-instructions@ossystems-ai-plugins" = false;
       };
     };
