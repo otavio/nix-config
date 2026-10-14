@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
-index 131e853928..6df73fdcf7 100644
+index 2d5e6fb002..c88920fab9 100644
 --- a/apps/web/src/components/settings/SettingsPanels.tsx
 +++ b/apps/web/src/components/settings/SettingsPanels.tsx
-@@ -2085,7 +2085,6 @@ function AutoSettleDaysInput({
+@@ -2086,7 +2086,6 @@ function AutoSettleDaysInput({
  // expand the section before its target can mount and scroll.
  const LEGACY_FEATURE_TARGET_IDS: ReadonlySet<string> = new Set([
    "legacy-plan-mode",
@@ -10,7 +10,7 @@ index 131e853928..6df73fdcf7 100644
    "legacy-sidebar",
  ]);
  
-@@ -2140,19 +2139,6 @@ function LegacyFeaturesSection() {
+@@ -2141,19 +2140,6 @@ function LegacyFeaturesSection() {
                  />
                }
              />
@@ -30,7 +30,7 @@ index 131e853928..6df73fdcf7 100644
              <SettingsRow
                {...searchableSetting("legacy-sidebar")}
                description="Restore per-project thread trees instead of the default flat sidebar."
-@@ -2843,6 +2829,33 @@ export function GeneralSettingsPanel() {
+@@ -2844,6 +2830,33 @@ export function GeneralSettingsPanel() {
            }
          />
  
@@ -108,7 +108,7 @@ index 0ee55ef378..a34266997c 100644
      id: "legacy-sidebar",
      title: "Sidebar (legacy)",
 diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
-index 2d3fd53e31..e22ea4e6f7 100644
+index c0de88f4ac..4dea23d604 100644
 --- a/packages/contracts/src/settings.ts
 +++ b/packages/contracts/src/settings.ts
 @@ -445,8 +445,8 @@ export const ClientSettingsSchema = Schema.Struct({

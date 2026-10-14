@@ -1,5 +1,5 @@
 diff --git a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
-index aa0ac90ec9..78dc2a801d 100644
+index 348f737772..44579e65a1 100644
 --- a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
 +++ b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
 @@ -24,6 +24,7 @@ import {
@@ -10,7 +10,7 @@ index aa0ac90ec9..78dc2a801d 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { Alert, Platform, ScrollView, View } from "react-native";
-@@ -758,7 +759,7 @@ function ThreadRouteContent(
+@@ -760,7 +761,7 @@ function ThreadRouteContent(
            cwd,
            worktreePath: preferredWorktreePath,
            env,
@@ -51,7 +51,7 @@ index a11fb1f42d..5a58674006 100644
      // A clean run closes its shell once the prompt is back, not at the
      // sentinel, so the prompt redraw is not taken for new activity.
 diff --git a/apps/server/src/project/ProjectSetupScriptRunner.ts b/apps/server/src/project/ProjectSetupScriptRunner.ts
-index c96f880878..661d5a524f 100644
+index 724b542f52..eaf82fb027 100644
 --- a/apps/server/src/project/ProjectSetupScriptRunner.ts
 +++ b/apps/server/src/project/ProjectSetupScriptRunner.ts
 @@ -2,6 +2,7 @@ import { ProjectId, type ProjectScript } from "@t3tools/contracts";
@@ -72,10 +72,10 @@ index c96f880878..661d5a524f 100644
        .pipe(
          Effect.mapError(
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 260db2e47b..76b700bb5b 100644
+index 270f1f26ac..2f1b1e5a6b 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -133,6 +133,7 @@ import {
+@@ -135,6 +135,7 @@ import {
  import {
    projectScriptCwd,
    projectScriptRuntimeEnv,
@@ -83,7 +83,7 @@ index 260db2e47b..76b700bb5b 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { CHAT_LIST_ANCHOR_OFFSET } from "@t3tools/shared/chatList";
-@@ -5058,7 +5059,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -5080,7 +5081,7 @@ export default function ChatView(props: ChatViewProps) {
          input: {
            threadId: activeThreadId,
            terminalId: targetTerminalId,
