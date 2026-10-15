@@ -1,5 +1,5 @@
-# Ahead of nixpkgs (0.0.44) on an upstream nightly, carrying my upstream PRs
-# rebased onto that tag:
+# Ahead of nixpkgs (0.0.44) on an upstream nightly, carrying my changes
+# rebased onto that tag. Upstream closed the first two without merging:
 # https://github.com/pingdotgg/t3code/pull/14957
 # https://github.com/pingdotgg/t3code/pull/13755
 # https://github.com/pingdotgg/t3code/pull/13903
