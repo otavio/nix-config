@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
-index 2d5e6fb002..c88920fab9 100644
+index ef60c9e3c3..a3cfaa195c 100644
 --- a/apps/web/src/components/settings/SettingsPanels.tsx
 +++ b/apps/web/src/components/settings/SettingsPanels.tsx
-@@ -2086,7 +2086,6 @@ function AutoSettleDaysInput({
+@@ -2094,7 +2094,6 @@ function AutoSettleDaysInput({
  // expand the section before its target can mount and scroll.
  const LEGACY_FEATURE_TARGET_IDS: ReadonlySet<string> = new Set([
    "legacy-plan-mode",
@@ -10,7 +10,7 @@ index 2d5e6fb002..c88920fab9 100644
    "legacy-sidebar",
  ]);
  
-@@ -2141,19 +2140,6 @@ function LegacyFeaturesSection() {
+@@ -2149,19 +2148,6 @@ function LegacyFeaturesSection() {
                  />
                }
              />
@@ -30,7 +30,7 @@ index 2d5e6fb002..c88920fab9 100644
              <SettingsRow
                {...searchableSetting("legacy-sidebar")}
                description="Restore per-project thread trees instead of the default flat sidebar."
-@@ -2844,6 +2830,33 @@ export function GeneralSettingsPanel() {
+@@ -2873,6 +2859,33 @@ export function GeneralSettingsPanel() {
            }
          />
  
@@ -78,7 +78,7 @@ index b3d7b0c29a..b27d087be5 100644
      }
    });
 diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
-index 0ee55ef378..a34266997c 100644
+index 5747fc59d9..54ac1a3f5c 100644
 --- a/apps/web/src/components/settings/settingsSearch.ts
 +++ b/apps/web/src/components/settings/settingsSearch.ts
 @@ -459,6 +459,12 @@ export const SETTINGS_SEARCH_ITEMS = [
@@ -108,10 +108,10 @@ index 0ee55ef378..a34266997c 100644
      id: "legacy-sidebar",
      title: "Sidebar (legacy)",
 diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
-index c0de88f4ac..4dea23d604 100644
+index 569fcf40cf..b1d73608fd 100644
 --- a/packages/contracts/src/settings.ts
 +++ b/packages/contracts/src/settings.ts
-@@ -445,8 +445,8 @@ export const ClientSettingsSchema = Schema.Struct({
+@@ -451,8 +451,8 @@ export const ClientSettingsSchema = Schema.Struct({
    // default UI; this beta flag restores it (plus the /plan and /default slash
    // commands) for users who still rely on the old workflow.
    planModeEnabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
