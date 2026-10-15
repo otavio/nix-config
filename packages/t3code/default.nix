@@ -58,6 +58,13 @@ in
   };
 }).overrideAttrs
   (old: {
+    # Device support npm-installs expo-device-hub and agent-device at runtime.
+    # Suffix so a project's own Node still wins in agent shells.
+    buildCommand = old.buildCommand + ''
+      for program in "$out/bin"/*; do
+        wrapProgram "$program" --suffix PATH : ${pkgs.lib.makeBinPath [ pkgs.nodejs ]}
+      done
+    '';
     passthru = old.passthru // {
       inherit browser;
     };
