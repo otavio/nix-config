@@ -72,10 +72,10 @@ index 724b542f52..eaf82fb027 100644
        .pipe(
          Effect.mapError(
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index 270f1f26ac..2f1b1e5a6b 100644
+index f87663989a..67dba9018b 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -135,6 +135,7 @@ import {
+@@ -137,6 +137,7 @@ import {
  import {
    projectScriptCwd,
    projectScriptRuntimeEnv,
@@ -83,15 +83,15 @@ index 270f1f26ac..2f1b1e5a6b 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { CHAT_LIST_ANCHOR_OFFSET } from "@t3tools/shared/chatList";
-@@ -5080,7 +5081,7 @@ export default function ChatView(props: ChatViewProps) {
-         input: {
-           threadId: activeThreadId,
-           terminalId: targetTerminalId,
--          data: `${script.command}\r`,
-+          data: projectScriptTerminalInput(script.command),
-         },
-       });
-       if (writeResult._tag === "Failure") {
+@@ -5043,7 +5044,7 @@ export default function ChatView(props: ChatViewProps) {
+       input: {
+         threadId: activeThreadId,
+         terminalId: targetTerminalId,
+-        data: `${script.command}\r`,
++        data: projectScriptTerminalInput(script.command),
+       },
+     });
+     if (writeResult._tag === "Failure") {
 diff --git a/packages/shared/src/projectScripts.ts b/packages/shared/src/projectScripts.ts
 index 691376e723..30c3324d91 100644
 --- a/packages/shared/src/projectScripts.ts
