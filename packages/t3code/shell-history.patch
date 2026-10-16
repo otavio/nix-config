@@ -1,16 +1,16 @@
 diff --git a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
-index 348f737772..44579e65a1 100644
+index 690973578f..0a9923c903 100644
 --- a/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
 +++ b/apps/mobile/src/features/threads/ThreadRouteScreen.tsx
-@@ -24,6 +24,7 @@ import {
+@@ -25,6 +25,7 @@ import {
  import {
    projectScriptCwd,
    projectScriptRuntimeEnv,
 +  projectScriptTerminalInput,
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
- import { Alert, Platform, ScrollView, View } from "react-native";
-@@ -760,7 +761,7 @@ function ThreadRouteContent(
+ import { Platform, ScrollView, View } from "react-native";
+@@ -741,7 +742,7 @@ function ThreadRouteContent(
            cwd,
            worktreePath: preferredWorktreePath,
            env,
@@ -20,7 +20,7 @@ index 348f737772..44579e65a1 100644
        });
        terminalDebugLog("project-script:staged", {
 diff --git a/apps/server/src/project/ProjectSetupScriptRunner.test.ts b/apps/server/src/project/ProjectSetupScriptRunner.test.ts
-index a11fb1f42d..5a58674006 100644
+index 8516c27941..91f24cd35f 100644
 --- a/apps/server/src/project/ProjectSetupScriptRunner.test.ts
 +++ b/apps/server/src/project/ProjectSetupScriptRunner.test.ts
 @@ -106,7 +106,7 @@ it.effect("resolves setup scripts through the standalone project service", () =>
@@ -48,10 +48,10 @@ index a11fb1f42d..5a58674006 100644
 -    assert.equal(write.mock.calls.at(-1)?.[0].data, "cargo clean\r");
 +    assert.equal(write.mock.calls.at(-1)?.[0].data, " cargo clean\r");
  
-     // A clean run closes its shell once the prompt is back, not at the
-     // sentinel, so the prompt redraw is not taken for new activity.
+     const observedSettle = yield* runner.runForThread({
+       threadId: "thread-1",
 diff --git a/apps/server/src/project/ProjectSetupScriptRunner.ts b/apps/server/src/project/ProjectSetupScriptRunner.ts
-index 724b542f52..eaf82fb027 100644
+index dfa850b2fd..67977c5c7f 100644
 --- a/apps/server/src/project/ProjectSetupScriptRunner.ts
 +++ b/apps/server/src/project/ProjectSetupScriptRunner.ts
 @@ -2,6 +2,7 @@ import { ProjectId, type ProjectScript } from "@t3tools/contracts";
@@ -62,7 +62,7 @@ index 724b542f52..eaf82fb027 100644
    resolveProjectScripts,
    settleProjectScript,
    setupProjectScript,
-@@ -442,7 +443,7 @@ export const make = Effect.gen(function* () {
+@@ -410,7 +411,7 @@ export const make = Effect.gen(function* () {
        .write({
          threadId: input.threadId,
          terminalId,
@@ -72,7 +72,7 @@ index 724b542f52..eaf82fb027 100644
        .pipe(
          Effect.mapError(
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index f87663989a..67dba9018b 100644
+index d5599f8c46..d66bae2e70 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
 @@ -137,6 +137,7 @@ import {
@@ -83,7 +83,7 @@ index f87663989a..67dba9018b 100644
    resolveProjectScripts,
  } from "@t3tools/shared/projectScripts";
  import { CHAT_LIST_ANCHOR_OFFSET } from "@t3tools/shared/chatList";
-@@ -5043,7 +5044,7 @@ export default function ChatView(props: ChatViewProps) {
+@@ -4890,7 +4891,7 @@ export default function ChatView(props: ChatViewProps) {
        input: {
          threadId: activeThreadId,
          terminalId: targetTerminalId,
@@ -93,10 +93,10 @@ index f87663989a..67dba9018b 100644
      });
      if (writeResult._tag === "Failure") {
 diff --git a/packages/shared/src/projectScripts.ts b/packages/shared/src/projectScripts.ts
-index 691376e723..30c3324d91 100644
+index 0312252d35..a5fb7ee487 100644
 --- a/packages/shared/src/projectScripts.ts
 +++ b/packages/shared/src/projectScripts.ts
-@@ -86,3 +86,11 @@ export function projectScriptMenuLabel(script: ProjectScript): string {
+@@ -79,3 +79,11 @@ export function projectScriptMenuLabel(script: ProjectScript): string {
  export function settleProjectScript(scripts: readonly ProjectScript[]): ProjectScript | null {
    return scripts.find((script) => script.runOnSettle === true) ?? null;
  }
