@@ -1,4 +1,4 @@
-# Ahead of nixpkgs (0.0.44) on an upstream nightly, carrying my changes
+# Ahead of nixpkgs (0.0.45) on an upstream nightly, carrying my changes
 # rebased onto that tag. Upstream closed the first two without merging:
 # https://github.com/pingdotgg/t3code/pull/14957
 # https://github.com/pingdotgg/t3code/pull/13755
@@ -14,10 +14,10 @@ let
 
   unwrapped = t3code.unwrapped.overrideAttrs (
     finalAttrs: old: {
-      version = "0.0.46-nightly.20261015.3158";
+      version = "0.1.1-nightly.20261016.3203";
       src = old.src.override {
         tag = "v${finalAttrs.version}";
-        hash = "sha256-i2UKRu6NWrXzhUhEs2/i5HZ7O1bloZsW++uBIBAD/PI=";
+        hash = "sha256-ut5nXbiRp2rdbKZkef7fIkRsu0dAGb/LFKkdg1Zylws=";
       };
       patches = (old.patches or [ ]) ++ [
         ./context-window-indicator.patch
@@ -33,7 +33,7 @@ let
           ;
         pnpm = pkgs.pnpm_11;
         fetcherVersion = 4;
-        hash = "sha256-oX4tOu20tYO3ci7VvSEL8eFgxAYWp5HlQFSfAWJGJmg=";
+        hash = "sha256-XRgN5NIC94VsLIhoMsMj8ocLtxiVfLFvG+nlK1spqmI=";
       };
       postPatch = (old.postPatch or "") + ''
         grep -qF 'const VERSION = "${browser.version}";' apps/server/src/preview/PreviewBrowser.ts \

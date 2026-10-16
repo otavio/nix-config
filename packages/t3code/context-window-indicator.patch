@@ -1,16 +1,16 @@
 diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
-index ef60c9e3c3..a3cfaa195c 100644
+index fcdc35b3c1..4a04b257ee 100644
 --- a/apps/web/src/components/settings/SettingsPanels.tsx
 +++ b/apps/web/src/components/settings/SettingsPanels.tsx
-@@ -2094,7 +2094,6 @@ function AutoSettleDaysInput({
- // expand the section before its target can mount and scroll.
+@@ -2042,7 +2042,6 @@ function AutoSettleDaysInput({
+ 
  const LEGACY_FEATURE_TARGET_IDS: ReadonlySet<string> = new Set([
    "legacy-plan-mode",
 -  "legacy-context-window-indicator",
    "legacy-sidebar",
  ]);
  
-@@ -2149,19 +2148,6 @@ function LegacyFeaturesSection() {
+@@ -2088,19 +2087,6 @@ function LegacyFeaturesSection() {
                  />
                }
              />
@@ -30,7 +30,7 @@ index ef60c9e3c3..a3cfaa195c 100644
              <SettingsRow
                {...searchableSetting("legacy-sidebar")}
                description="Restore per-project thread trees instead of the default flat sidebar."
-@@ -2873,6 +2859,33 @@ export function GeneralSettingsPanel() {
+@@ -2808,6 +2794,33 @@ export function GeneralSettingsPanel() {
            }
          />
  
@@ -65,10 +65,10 @@ index ef60c9e3c3..a3cfaa195c 100644
            {...searchableSetting("follow-up-behavior")}
            description={
 diff --git a/apps/web/src/components/settings/settingsSearch.test.ts b/apps/web/src/components/settings/settingsSearch.test.ts
-index b3d7b0c29a..b27d087be5 100644
+index 9d03969c5b..cf6984bbc5 100644
 --- a/apps/web/src/components/settings/settingsSearch.test.ts
 +++ b/apps/web/src/components/settings/settingsSearch.test.ts
-@@ -475,7 +475,7 @@ describe("settings search targets", () => {
+@@ -474,7 +474,7 @@ describe("settings search targets", () => {
      const streaming = getSettingsSearchTargetScope("response-streaming")!;
      expect(streaming.scope).toBe("project-defaults");
      expect(isSettingsSearchScopeAvailable(streaming.scope, "project")).toBe(true);
@@ -78,10 +78,10 @@ index b3d7b0c29a..b27d087be5 100644
      }
    });
 diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
-index 5747fc59d9..54ac1a3f5c 100644
+index 53032977f5..038b9ceadb 100644
 --- a/apps/web/src/components/settings/settingsSearch.ts
 +++ b/apps/web/src/components/settings/settingsSearch.ts
-@@ -459,6 +459,12 @@ export const SETTINGS_SEARCH_ITEMS = [
+@@ -420,6 +420,12 @@ export const SETTINGS_SEARCH_ITEMS = [
      to: "/settings/general",
      searchTerms: ["enter return command ctrl multiline prompt new line composer"],
    },
@@ -94,7 +94,7 @@ index 5747fc59d9..54ac1a3f5c 100644
    {
      id: "follow-up-behavior",
      title: "Follow-up behavior",
-@@ -601,12 +607,6 @@ export const SETTINGS_SEARCH_ITEMS = [
+@@ -562,12 +568,6 @@ export const SETTINGS_SEARCH_ITEMS = [
      to: "/settings/general",
      searchTerms: ["build plan composer old"],
    },
@@ -107,18 +107,3 @@ index 5747fc59d9..54ac1a3f5c 100644
    {
      id: "legacy-sidebar",
      title: "Sidebar (legacy)",
-diff --git a/packages/contracts/src/settings.ts b/packages/contracts/src/settings.ts
-index 569fcf40cf..b1d73608fd 100644
---- a/packages/contracts/src/settings.ts
-+++ b/packages/contracts/src/settings.ts
-@@ -451,8 +451,8 @@ export const ClientSettingsSchema = Schema.Struct({
-   // default UI; this beta flag restores it (plus the /plan and /default slash
-   // commands) for users who still rely on the old workflow.
-   planModeEnabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
--  // Legacy context window meter. The composer hides it by default; users who
--  // still want the old usage indicator can restore it from Settings.
-+  // Context window meter in the composer. Off by default; users who want to
-+  // track context usage enable it from Settings → General.
-   contextWindowMeterEnabled: Schema.Boolean.pipe(Schema.withDecodingDefault(Effect.succeed(false))),
-   // Desktop resting composer: scrolling an existing thread's conversation
-   // settles the composer into its single-line layout. Losing focus never does.
