@@ -31,10 +31,10 @@
         hostName = hostname;
       };
 
-      extraModules = [ inputs.colmena.nixosModules.deploymentOptions ];
-
       modules = [
         { nixpkgs.hostPlatform = system; }
+
+        inputs.colmena.nixosModules.deploymentOptions
 
         inputs.disko.nixosModules.disko
 

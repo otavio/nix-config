@@ -33,13 +33,7 @@
       mdadmConf = "PROGRAM ${pkgs.coreutils}/bin/true";
     };
   };
-  networking = {
-    # The global useDHCP flag is deprecated, therefore explicitly set to false here.
-    # Per-interface useDHCP will be mandatory in the future, so this generated config
-    # replicates the default behaviour.
-    useDHCP = false;
-    networkmanager.enable = true;
-  };
+  networking.networkmanager.enable = true;
   # Allow root login
   services.openssh.settings.PermitRootLogin = pkgs.lib.mkForce "without-password";
   disko.enableConfig = false;
