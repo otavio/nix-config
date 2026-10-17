@@ -7,10 +7,9 @@
 
 let
   # herdr owns its state files and rewrites them at runtime, so managed entries
-  # are merged in on activation rather than replacing the files. Managed
-  # entries win; the rest keep their order. `path` locates the array inside
-  # the file — empty for a top-level JSON array — and the format follows from
-  # the file name.
+  # are merged in on activation rather than replacing the files. `path` locates
+  # the array inside the file — empty for a top-level JSON array — and the
+  # format follows from the file name.
   registry =
     {
       file,
@@ -61,8 +60,7 @@ let
 
   # herdr runs each action's manifest `command` verbatim, so a bare `python3`
   # would have to sit on PATH and would collide with other python envs (e.g.
-  # talon's python312) in the home-manager profile. Rewrite the manifest to an
-  # absolute interpreter and script path so nothing python-related hits PATH.
+  # talon's python312) in the home-manager profile.
   patch =
     src:
     pkgs.runCommand "${src.name or "herdr-plugin"}-patched" { } ''
