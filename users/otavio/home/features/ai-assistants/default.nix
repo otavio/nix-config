@@ -22,8 +22,6 @@ in
     ./codex.nix
     ./opencode.nix
     ./herdr.nix
-    ./herdr-plugins.nix
-    ./herdr-config.nix
     ./t3code.nix
   ];
   home = {
