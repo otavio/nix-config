@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
-index fcdc35b3c1..4a04b257ee 100644
+index 64042f9200..495517c31c 100644
 --- a/apps/web/src/components/settings/SettingsPanels.tsx
 +++ b/apps/web/src/components/settings/SettingsPanels.tsx
-@@ -2042,7 +2042,6 @@ function AutoSettleDaysInput({
+@@ -1958,7 +1958,6 @@ function AutoSettleDaysInput({
  
  const LEGACY_FEATURE_TARGET_IDS: ReadonlySet<string> = new Set([
    "legacy-plan-mode",
@@ -10,7 +10,7 @@ index fcdc35b3c1..4a04b257ee 100644
    "legacy-sidebar",
  ]);
  
-@@ -2088,19 +2087,6 @@ function LegacyFeaturesSection() {
+@@ -2004,19 +2003,6 @@ function LegacyFeaturesSection() {
                  />
                }
              />
@@ -30,7 +30,7 @@ index fcdc35b3c1..4a04b257ee 100644
              <SettingsRow
                {...searchableSetting("legacy-sidebar")}
                description="Restore per-project thread trees instead of the default flat sidebar."
-@@ -2808,6 +2794,33 @@ export function GeneralSettingsPanel() {
+@@ -2728,6 +2714,33 @@ export function GeneralSettingsPanel() {
            }
          />
  
@@ -78,7 +78,7 @@ index 9d03969c5b..cf6984bbc5 100644
      }
    });
 diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
-index 53032977f5..038b9ceadb 100644
+index 1999ff83d3..2253e595d5 100644
 --- a/apps/web/src/components/settings/settingsSearch.ts
 +++ b/apps/web/src/components/settings/settingsSearch.ts
 @@ -420,6 +420,12 @@ export const SETTINGS_SEARCH_ITEMS = [
@@ -94,7 +94,7 @@ index 53032977f5..038b9ceadb 100644
    {
      id: "follow-up-behavior",
      title: "Follow-up behavior",
-@@ -562,12 +568,6 @@ export const SETTINGS_SEARCH_ITEMS = [
+@@ -568,12 +574,6 @@ export const SETTINGS_SEARCH_ITEMS = [
      to: "/settings/general",
      searchTerms: ["build plan composer old"],
    },

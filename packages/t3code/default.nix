@@ -14,10 +14,10 @@ let
 
   unwrapped = t3code.unwrapped.overrideAttrs (
     finalAttrs: old: {
-      version = "0.1.1-nightly.20261016.3203";
+      version = "0.1.1-nightly.20261018.3315";
       src = old.src.override {
         tag = "v${finalAttrs.version}";
-        hash = "sha256-ut5nXbiRp2rdbKZkef7fIkRsu0dAGb/LFKkdg1Zylws=";
+        hash = "sha256-lxIVl94+VlqX/j9ErCoJlkWZtGyIV2tiHH28pFjbhwk=";
       };
       patches = (old.patches or [ ]) ++ [
         ./context-window-indicator.patch
@@ -33,7 +33,7 @@ let
           ;
         pnpm = pkgs.pnpm_11;
         fetcherVersion = 4;
-        hash = "sha256-XRgN5NIC94VsLIhoMsMj8ocLtxiVfLFvG+nlK1spqmI=";
+        hash = "sha256-/eGBFRnzW2uiisxw5GsvF892S5TsTOgo2JYnZ77VYBI=";
       };
       postPatch = (old.postPatch or "") + ''
         grep -qF 'const VERSION = "${browser.version}";' apps/server/src/preview/PreviewBrowser.ts \

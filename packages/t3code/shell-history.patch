@@ -72,25 +72,30 @@ index dfa850b2fd..67977c5c7f 100644
        .pipe(
          Effect.mapError(
 diff --git a/apps/web/src/components/ChatView.tsx b/apps/web/src/components/ChatView.tsx
-index d5599f8c46..d66bae2e70 100644
+index f9c107a6e7..f39d997437 100644
 --- a/apps/web/src/components/ChatView.tsx
 +++ b/apps/web/src/components/ChatView.tsx
-@@ -137,6 +137,7 @@ import {
- import {
-   projectScriptCwd,
-   projectScriptRuntimeEnv,
+@@ -124,7 +124,11 @@ import {
+   resolvePromptInjectedEffort,
+   resolveSelectableModel,
+ } from "@t3tools/shared/model";
+-import { projectScriptCwd, resolveProjectScripts } from "@t3tools/shared/projectScripts";
++import {
++  projectScriptCwd,
 +  projectScriptTerminalInput,
-   resolveProjectScripts,
- } from "@t3tools/shared/projectScripts";
++  resolveProjectScripts,
++} from "@t3tools/shared/projectScripts";
  import { CHAT_LIST_ANCHOR_OFFSET } from "@t3tools/shared/chatList";
-@@ -4890,7 +4891,7 @@ export default function ChatView(props: ChatViewProps) {
-       input: {
-         threadId: activeThreadId,
-         terminalId: targetTerminalId,
--        data: `${script.command}\r`,
-+        data: projectScriptTerminalInput(script.command),
-       },
-     });
+ import { derivePendingBackgroundWork } from "@t3tools/shared/orchestrationV2PendingBackgroundWork";
+ import {
+@@ -3468,7 +3472,7 @@ export default function ChatView(props: ChatViewProps) {
+ 
+     const writeResult = await terminalActions.writeToTerminal(
+       targetTerminalId,
+-      `${script.command}\r`,
++      projectScriptTerminalInput(script.command),
+     );
+     if (!writeResult) return;
      if (writeResult._tag === "Failure") {
 diff --git a/packages/shared/src/projectScripts.ts b/packages/shared/src/projectScripts.ts
 index 0312252d35..a5fb7ee487 100644
