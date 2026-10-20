@@ -1,8 +1,8 @@
 diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
-index 64042f9200..495517c31c 100644
+index 16c6ff3fb8..932ffe88d8 100644
 --- a/apps/web/src/components/settings/SettingsPanels.tsx
 +++ b/apps/web/src/components/settings/SettingsPanels.tsx
-@@ -1958,7 +1958,6 @@ function AutoSettleDaysInput({
+@@ -1990,7 +1990,6 @@ function AutoSettleDaysInput({
  
  const LEGACY_FEATURE_TARGET_IDS: ReadonlySet<string> = new Set([
    "legacy-plan-mode",
@@ -10,7 +10,7 @@ index 64042f9200..495517c31c 100644
    "legacy-sidebar",
  ]);
  
-@@ -2004,19 +2003,6 @@ function LegacyFeaturesSection() {
+@@ -2036,19 +2035,6 @@ function LegacyFeaturesSection() {
                  />
                }
              />
@@ -30,7 +30,7 @@ index 64042f9200..495517c31c 100644
              <SettingsRow
                {...searchableSetting("legacy-sidebar")}
                description="Restore per-project thread trees instead of the default flat sidebar."
-@@ -2728,6 +2714,33 @@ export function GeneralSettingsPanel() {
+@@ -2789,6 +2775,33 @@ export function GeneralSettingsPanel() {
            }
          />
  
@@ -78,10 +78,10 @@ index 9d03969c5b..cf6984bbc5 100644
      }
    });
 diff --git a/apps/web/src/components/settings/settingsSearch.ts b/apps/web/src/components/settings/settingsSearch.ts
-index 1999ff83d3..2253e595d5 100644
+index 38737b2627..caa2747bfe 100644
 --- a/apps/web/src/components/settings/settingsSearch.ts
 +++ b/apps/web/src/components/settings/settingsSearch.ts
-@@ -420,6 +420,12 @@ export const SETTINGS_SEARCH_ITEMS = [
+@@ -433,6 +433,12 @@ export const SETTINGS_SEARCH_ITEMS = [
      to: "/settings/general",
      searchTerms: ["enter return command ctrl multiline prompt new line composer"],
    },
@@ -94,7 +94,7 @@ index 1999ff83d3..2253e595d5 100644
    {
      id: "follow-up-behavior",
      title: "Follow-up behavior",
-@@ -568,12 +574,6 @@ export const SETTINGS_SEARCH_ITEMS = [
+@@ -581,12 +587,6 @@ export const SETTINGS_SEARCH_ITEMS = [
      to: "/settings/general",
      searchTerms: ["build plan composer old"],
    },

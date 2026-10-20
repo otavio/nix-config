@@ -1,8 +1,7 @@
 # Ahead of nixpkgs (0.0.45) on an upstream nightly, carrying my changes
-# rebased onto that tag. Upstream closed the first two without merging:
+# rebased onto that tag. Upstream closed both without merging:
 # https://github.com/pingdotgg/t3code/pull/14957
 # https://github.com/pingdotgg/t3code/pull/13755
-# https://github.com/pingdotgg/t3code/pull/13903
 {
   pkgs,
   # The nixpkgs t3code to build on; an overlay must pass `prev.t3code`.
@@ -14,15 +13,14 @@ let
 
   unwrapped = t3code.unwrapped.overrideAttrs (
     finalAttrs: old: {
-      version = "0.1.1-nightly.20261018.3315";
+      version = "0.1.1-nightly.20261020.3438";
       src = old.src.override {
         tag = "v${finalAttrs.version}";
-        hash = "sha256-lxIVl94+VlqX/j9ErCoJlkWZtGyIV2tiHH28pFjbhwk=";
+        hash = "sha256-kIGiC/uCDgRlqt+8/zZ9K48NBuCGJ1TgqW+rpdZgZUQ=";
       };
       patches = (old.patches or [ ]) ++ [
         ./context-window-indicator.patch
         ./direnv-environment.patch
-        ./shell-history.patch
       ];
       pnpmDeps = pkgs.fetchPnpmDeps {
         inherit (finalAttrs)
@@ -33,7 +31,7 @@ let
           ;
         pnpm = pkgs.pnpm_11;
         fetcherVersion = 4;
-        hash = "sha256-/eGBFRnzW2uiisxw5GsvF892S5TsTOgo2JYnZ77VYBI=";
+        hash = "sha256-witoens1UicKE+SIQCrRk9YtbAVIW5x+2MqDrFh4F0s=";
       };
       postPatch = (old.postPatch or "") + ''
         grep -qF 'const VERSION = "${browser.version}";' apps/server/src/preview/PreviewBrowser.ts \
