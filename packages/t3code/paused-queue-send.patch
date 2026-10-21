@@ -1,0 +1,219 @@
+diff --git a/apps/web/src/components/chat/QueuedRunsControl.browser.test.tsx b/apps/web/src/components/chat/QueuedRunsControl.browser.test.tsx
+index 58da8b82f2..a176df5ec9 100644
+--- a/apps/web/src/components/chat/QueuedRunsControl.browser.test.tsx
++++ b/apps/web/src/components/chat/QueuedRunsControl.browser.test.tsx
+@@ -7,6 +7,7 @@ import { page } from "vite-plus/test/browser";
+ const state = vi.hoisted(() => ({
+   projection: null as unknown,
+   workflow: null as unknown,
++  dispatched: [] as Array<{ command: unknown; value: unknown }>,
+ }));
+ 
+ vi.mock(import("@t3tools/client-runtime/state/thread-workflows"), async (importOriginal) => ({
+@@ -21,7 +22,10 @@ vi.mock(import("../../state/entities"), async (importOriginal) => ({
+ 
+ vi.mock(import("../../state/use-atom-command"), async (importOriginal) => ({
+   ...(await importOriginal()),
+-  useAtomCommand: (() => async () => undefined) as never,
++  useAtomCommand: ((command: unknown) => async (value: unknown) => {
++    state.dispatched.push({ command, value });
++    return { _tag: "Success" };
++  }) as never,
+ }));
+ 
+ vi.mock(import("../../assets/assetUrls"), async (importOriginal) => ({
+@@ -31,11 +35,13 @@ vi.mock(import("../../assets/assetUrls"), async (importOriginal) => ({
+ }));
+ 
+ import { render as renderUi } from "../../../test/render";
++import { threadEnvironment } from "../../state/threads";
+ import { QueuedRunsControl } from "./QueuedRunsControl";
+ 
+ function setup() {
+   state.projection = null;
+   state.workflow = null;
++  state.dispatched = [];
+ }
+ 
+ const baseProps = {
+@@ -209,3 +215,42 @@ it("previews assistant quotes as readable text and preserves the citation when e
+     expect.objectContaining({ text: quoteAndText }),
+   );
+ });
++
++it("sends a message from a queue held after a failed run", async () => {
++  setup();
++  state.projection = { projection: { messages: [] } };
++  state.workflow = {
++    activeRun: null,
++    isHeld: true,
++    canPromoteToSteer: false,
++    canReorder: true,
++    queuedRuns: [
++      { run: { id: "run:first", userMessageId: "message:first" }, text: "First", attachments: [] },
++      {
++        run: { id: "run:second", userMessageId: "message:second" },
++        text: "Second",
++        attachments: [],
++      },
++    ],
++  };
++  await using _screen = await renderQueue();
++
++  await expect.element(page.getByText("Queue paused", { exact: true })).toBeVisible();
++  await expect.element(page.getByRole("button", { name: "Steer" })).not.toBeInTheDocument();
++
++  await page.getByRole("button", { name: "Send now" }).nth(1).click();
++  await vi.waitFor(() => expect(state.dispatched).toHaveLength(2));
++  expect(state.dispatched).toEqual([
++    {
++      command: threadEnvironment.reorderQueuedRun,
++      value: {
++        environmentId: baseProps.environmentId,
++        input: { threadId: baseProps.threadId, runId: "run:second", beforeRunId: "run:first" },
++      },
++    },
++    {
++      command: threadEnvironment.resumeThreadQueue,
++      value: { environmentId: baseProps.environmentId, input: { threadId: baseProps.threadId } },
++    },
++  ]);
++});
+diff --git a/apps/web/src/components/chat/QueuedRunsControl.tsx b/apps/web/src/components/chat/QueuedRunsControl.tsx
+index 63d25f6bd7..85cee5b2b8 100644
+--- a/apps/web/src/components/chat/QueuedRunsControl.tsx
++++ b/apps/web/src/components/chat/QueuedRunsControl.tsx
+@@ -83,6 +83,7 @@ export function QueuedRunsControl({
+   const reorder = useAtomCommand(threadEnvironment.reorderQueuedRun);
+   const promote = useAtomCommand(threadEnvironment.promoteQueuedRun);
+   const cancel = useAtomCommand(threadEnvironment.cancelQueuedRun);
++  const resume = useAtomCommand(threadEnvironment.resumeThreadQueue);
+   const [expanded, setExpanded] = useState(true);
+   const queueListId = useId();
+   const [busyRunId, setBusyRunId] = useState<RunId | null>(null);
+@@ -107,6 +108,9 @@ export function QueuedRunsControl({
+   const queued = workflow?.queuedRuns ?? [];
+   const activeRun = workflow?.activeRun ?? null;
+   const canReorder = workflow?.canReorder === true;
++  // The server holds the queue after a failed run so one failure does not fail
++  // every waiting message; nothing starts it again until the user resumes it.
++  const isPaused = workflow?.isHeld === true && activeRun === null;
+   const queuedImageUrlById = new Map(
+     queuedImageAttachmentUrls.flatMap((url, index) => {
+       const resource = queuedImageAttachmentResources[index];
+@@ -182,6 +186,25 @@ export function QueuedRunsControl({
+     setBusyRunId(null);
+   };
+ 
++  const sendNow = async (queuedRunId: RunId) => {
++    if (steerInFlightRef.current) return;
++    steerInFlightRef.current = true;
++    setBusyRunId(queuedRunId);
++    const head = queued[0]?.run.id;
++    const moved =
++      head === undefined || head === queuedRunId
++        ? null
++        : await reorder({
++            environmentId: props.environmentId,
++            input: { threadId: props.threadId, runId: queuedRunId, beforeRunId: head },
++          });
++    if (moved?._tag !== "Failure") {
++      await resume({ environmentId: props.environmentId, input: { threadId: props.threadId } });
++    }
++    steerInFlightRef.current = false;
++    setBusyRunId(null);
++  };
++
+   useImperativeHandle(ref, () => ({
+     steerNext(repeat) {
+       const next = queued[0];
+@@ -238,7 +261,9 @@ export function QueuedRunsControl({
+           <ComposerBanner.Icon>
+             <ListOrderedIcon />
+           </ComposerBanner.Icon>
+-          <ComposerBanner.Content className="text-muted-foreground">Queued</ComposerBanner.Content>
++          <ComposerBanner.Content className="text-muted-foreground">
++            {isPaused ? "Queue paused" : "Queued"}
++          </ComposerBanner.Content>
+           <ComposerBanner.Actions>
+             <ComposerBanner.Count>{items.length}</ComposerBanner.Count>
+             <ComposerBanner.ToggleIcon expanded={expanded} />
+@@ -419,32 +444,55 @@ export function QueuedRunsControl({
+                             {`Edit in the composer${item.serverIndex === queued.length - 1 && props.editShortcutLabel ? ` (${props.editShortcutLabel})` : ""}`}
+                           </TooltipPopup>
+                         </Tooltip>
+-                        <Tooltip>
+-                          <TooltipTrigger render={<span className="flex shrink-0" />}>
+-                            <Button
+-                              size="xs"
+-                              variant="ghost-muted"
+-                              disabled={
+-                                item.runId === null ||
+-                                busyRunId !== null ||
+-                                !workflow?.canPromoteToSteer
++                        {isPaused ? (
++                          <Tooltip>
++                            <TooltipTrigger
++                              render={
++                                <Button
++                                  size="xs"
++                                  variant="ghost-muted"
++                                  disabled={item.runId === null || busyRunId !== null}
++                                  onClick={() => {
++                                    if (item.runId !== null) void sendNow(item.runId);
++                                  }}
++                                />
+                               }
+-                              onClick={() => {
+-                                if (item.runId !== null) {
+-                                  void steer(item.runId);
+-                                }
+-                              }}
+                             >
+                               <CornerUpRightIcon />
+-                              Steer
+-                            </Button>
+-                          </TooltipTrigger>
+-                          <TooltipPopup>
+-                            {activeRun === null
+-                              ? "There is no active run to steer"
+-                              : `Send as a steer instead${item.serverIndex === 0 && props.steerShortcutLabel ? ` (${props.steerShortcutLabel})` : ""}`}
+-                          </TooltipPopup>
+-                        </Tooltip>
++                              Send now
++                            </TooltipTrigger>
++                            <TooltipPopup>
++                              The queue paused after the last run. Send this message and resume it.
++                            </TooltipPopup>
++                          </Tooltip>
++                        ) : (
++                          <Tooltip>
++                            <TooltipTrigger render={<span className="flex shrink-0" />}>
++                              <Button
++                                size="xs"
++                                variant="ghost-muted"
++                                disabled={
++                                  item.runId === null ||
++                                  busyRunId !== null ||
++                                  !workflow?.canPromoteToSteer
++                                }
++                                onClick={() => {
++                                  if (item.runId !== null) {
++                                    void steer(item.runId);
++                                  }
++                                }}
++                              >
++                                <CornerUpRightIcon />
++                                Steer
++                              </Button>
++                            </TooltipTrigger>
++                            <TooltipPopup>
++                              {activeRun === null
++                                ? "There is no active run to steer"
++                                : `Send as a steer instead${item.serverIndex === 0 && props.steerShortcutLabel ? ` (${props.steerShortcutLabel})` : ""}`}
++                            </TooltipPopup>
++                          </Tooltip>
++                        )}
+                         <Tooltip>
+                           <TooltipTrigger
+                             render={

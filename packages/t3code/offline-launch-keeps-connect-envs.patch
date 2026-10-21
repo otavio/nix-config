@@ -1,0 +1,98 @@
+diff --git a/apps/web/src/cloud/managedAuth.browser.test.tsx b/apps/web/src/cloud/managedAuth.browser.test.tsx
+new file mode 100644
+index 0000000000..5da99083d4
+--- /dev/null
++++ b/apps/web/src/cloud/managedAuth.browser.test.tsx
+@@ -0,0 +1,77 @@
++import { managedRelaySessionAtom } from "@t3tools/client-runtime/relay";
++import * as Exit from "effect/Exit";
++import { AsyncResult } from "effect/reactivity";
++import { afterEach, describe, expect, it, vi } from "vite-plus/test";
++
++import { appAtomRegistry } from "../rpc/atomRegistry";
++import { render, type Screen } from "../../test/render";
++import { deactivateManagedRelayAuthentication, ManagedRelayAuthProvider } from "./managedAuth";
++
++const testState = vi.hoisted(() => ({
++  auth: { isLoaded: false, isSignedIn: false, userId: null as string | null },
++  getToken: async () => "token",
++  removeRelayEnvironments: vi.fn(),
++}));
++
++vi.mock(import("@clerk/react"), async (original) => ({
++  ...(await original()),
++  useAuth: (() => ({ ...testState.auth, getToken: testState.getToken })) as never,
++}));
++
++vi.mock(import("../state/use-atom-command"), async (original) => ({
++  ...(await original()),
++  useAtomCommand: (() => testState.removeRelayEnvironments) as never,
++}));
++
++vi.mock(import("../lib/runtime"), async (original) => ({
++  ...(await original()),
++  runtime: { runPromiseExit: vi.fn(async () => Exit.void) } as never,
++}));
++
++let screen: Screen | null = null;
++
++afterEach(async () => {
++  await screen?.[Symbol.asyncDispose]();
++  screen = null;
++  testState.auth = { isLoaded: false, isSignedIn: false, userId: null };
++  testState.removeRelayEnvironments.mockReset();
++  deactivateManagedRelayAuthentication();
++});
++
++async function renderAuth(auth: typeof testState.auth) {
++  testState.auth = auth;
++  testState.removeRelayEnvironments.mockResolvedValue(AsyncResult.success(undefined));
++  const element = <ManagedRelayAuthProvider>{null}</ManagedRelayAuthProvider>;
++  if (screen) {
++    await screen.rerender(element);
++  } else {
++    screen = await render(element, { router: false });
++  }
++}
++
++const signedOut = { isLoaded: true, isSignedIn: false, userId: null };
++const signedInAs = (userId: string) => ({ isLoaded: true, isSignedIn: true, userId });
++
++describe("ManagedRelayAuthProvider account cleanup", () => {
++  it("keeps relay environments when the first loaded state is signed out", async () => {
++    await renderAuth({ isLoaded: false, isSignedIn: false, userId: null });
++    await renderAuth(signedOut);
++
++    expect(testState.removeRelayEnvironments).not.toHaveBeenCalled();
++  });
++
++  it("removes relay environments when a signed-in account signs out", async () => {
++    await renderAuth(signedInAs("account-1"));
++    await renderAuth(signedOut);
++
++    expect(testState.removeRelayEnvironments).toHaveBeenCalledTimes(1);
++  });
++
++  it("removes relay environments when the account changes", async () => {
++    await renderAuth(signedInAs("account-1"));
++    await renderAuth(signedInAs("account-2"));
++
++    expect(testState.removeRelayEnvironments).toHaveBeenCalledTimes(1);
++    expect(appAtomRegistry.get(managedRelaySessionAtom)?.accountId).toBe("account-2");
++  });
++});
+diff --git a/apps/web/src/cloud/managedAuth.tsx b/apps/web/src/cloud/managedAuth.tsx
+index f9bf1c966f..2e536f836d 100644
+--- a/apps/web/src/cloud/managedAuth.tsx
++++ b/apps/web/src/cloud/managedAuth.tsx
+@@ -71,7 +71,9 @@ export function ManagedRelayAuthProvider({ children }: { readonly children: Reac
+ 
+     if (!isSignedIn || !userId) {
+       deactivateManagedRelayAuthentication();
+-      if (previousAccount !== null) {
++      // Clerk can load signed out while offline, so only a signed-in account
++      // observed in this session is cleaned up.
++      if (previousAccount !== undefined && previousAccount !== null) {
+         void queueAccountCleanup();
+       }
+     } else {

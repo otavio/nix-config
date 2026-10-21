@@ -1,0 +1,663 @@
+diff --git a/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.test.ts b/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.test.ts
+index 138528263f..5a23383b8f 100644
+--- a/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.test.ts
++++ b/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.test.ts
+@@ -88,6 +88,10 @@ import { WorktreeToolkit } from "../../mcp/toolkits/worktree/tools.ts";
+ import { ThreadToolkit } from "../../mcp/toolkits/thread/tools.ts";
+ import { OrchestratorToolkit } from "../../mcp/toolkits/orchestrator/tools.ts";
+ import { ClaudeExecutableFileCheck } from "../../provider/Drivers/ClaudeExecutable.ts";
++import {
++  BUNDLED_CLAUDE_MODEL_CATALOG,
++  withClaudeReportedModels,
++} from "../../provider/ClaudeModelCatalog.ts";
+ import * as ProviderEventLoggers from "@t3tools/provider-core/server/ProviderEventLoggers";
+ import * as ProviderAdapter from "@t3tools/provider-core/server/ProviderAdapter";
+ import type * as ProviderContinuationRequests from "@t3tools/provider-core/server/ProviderContinuationRequests";
+@@ -278,6 +282,36 @@ describe("ClaudeAdapterV2 runtime query policy", () => {
+     assert.include(options.settings, { alwaysThinkingEnabled: false });
+   });
+ 
++  it("sends the effort chosen for a model Claude Code reported", () => {
++    const modelSelection = {
++      ...CLAUDE_TEST_MODEL_SELECTION,
++      model: "anthropic/claude-gateway",
++      options: [{ id: "effort", value: "max" }],
++    };
++    const modelCatalog = withClaudeReportedModels(
++      BUNDLED_CLAUDE_MODEL_CATALOG,
++      [],
++      [
++        {
++          value: "anthropic/claude-gateway",
++          displayName: "Gateway Claude",
++          description: "",
++          supportsEffort: true,
++          supportedEffortLevels: ["low", "high", "max"],
++        },
++      ],
++    );
++    const base = { nativeThreadId: "gateway-thread", resume: false, cwd: "/workspace" };
++
++    const options = ClaudeAdapterV2.makeClaudeQueryOptions({
++      ...base,
++      modelSelection,
++      modelCatalog,
++    });
++    assert.equal(options.model, "anthropic/claude-gateway");
++    assert.equal(options.effort, "max");
++  });
++
+   it.each([
+     ["--permission-mode acceptEdits", "acceptEdits"],
+     ["--dangerously-skip-permissions", "bypassPermissions"],
+diff --git a/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts b/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
+index 3d9f4c1690..d262cf0a3f 100644
+--- a/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
++++ b/apps/server/src/orchestration-v2/Adapters/ClaudeAdapterV2.ts
+@@ -1243,6 +1243,8 @@ function claudeLiveSelectionFlagSettings(
+ 
+ export function makeClaudeQueryOptions(input: {
+   readonly modelSelection: ModelSelection;
++  /** Resolves model options; defaults to the bundled catalog. */
++  readonly modelCatalog?: ClaudeModelCatalog;
+   readonly nativeThreadId: string;
+   readonly resume: boolean;
+   readonly resumeSessionAt?: string;
+@@ -1262,7 +1264,7 @@ export function makeClaudeQueryOptions(input: {
+   readonly allowDangerouslySkipPermissions?: boolean;
+   readonly appendSystemPromptFileText?: string;
+ }): ClaudeAgentSdkQueryOptions {
+-  const compiledSelection = compileClaudeModelSelection(input.modelSelection);
++  const compiledSelection = compileClaudeModelSelection(input.modelSelection, input.modelCatalog);
+   const {
+     "permission-mode": launchArgPermissionMode,
+     "dangerously-skip-permissions": launchArgSkipPermissions,
+@@ -3801,6 +3803,12 @@ export interface ClaudeAdapterV2Options {
+   readonly queryRunner: ClaudeAgentSdkQueryRunnerShape;
+   readonly scopedLimitNames?: Ref.Ref<ClaudeScopedLimitNames>;
+   readonly onUsageLimits?: ManagedServerProvider["applyUsageLimits"];
++  /**
++   * The instance's model catalog, read per query so models Claude Code
++   * reports (such as gateway-discovered ones) resolve their options.
++   * Defaults to the bundled catalog.
++   */
++  readonly modelCatalog?: Effect.Effect<ClaudeModelCatalog>;
+   readonly continuationRequests?: {
+     readonly offer: (
+       request: ProviderContinuationRequests.ProviderContinuationRequest,
+@@ -3820,6 +3828,7 @@ export const makeClaudeAdapterV2 = Effect.fn("makeClaudeAdapterV2")(function* (
+   const continuationRequests = adapterOptions.continuationRequests ?? {
+     offer: () => Effect.void,
+   };
++  const modelCatalog = adapterOptions.modelCatalog ?? Effect.succeed(BUNDLED_CLAUDE_MODEL_CATALOG);
+   const homePath = yield* resolveClaudeHomePath(
+     adapterOptions.settings,
+     adapterOptions.environment,
+@@ -5535,7 +5544,8 @@ export const makeClaudeAdapterV2 = Effect.fn("makeClaudeAdapterV2")(function* (
+             existingSubagent === undefined
+               ? (input.effort ??
+                 input.owner?.effort ??
+-                compileClaudeModelSelection(input.context.input.modelSelection).effort)
++                compileClaudeModelSelection(input.context.input.modelSelection, yield* modelCatalog)
++                  .effort)
+               : existingSubagent.effort;
+           const model = input.model ?? priorTask?.model ?? null;
+           const task = {
+@@ -9044,7 +9054,8 @@ export const makeClaudeAdapterV2 = Effect.fn("makeClaudeAdapterV2")(function* (
+               : { allowedTools: queryPolicy.allowedTools }),
+           });
+           const queryPolicyKey = claudeEffectiveQueryPolicyKey(queryPolicy, mcpOverrides);
+-          const compiledSelection = compileClaudeModelSelection(turnInput.modelSelection);
++          const catalog = yield* modelCatalog;
++          const compiledSelection = compileClaudeModelSelection(turnInput.modelSelection, catalog);
+           const resumeSessionAt = yield* getNativeConversationHeadId(turnInput.providerThread);
+           const existing = yield* Ref.get(queryContext);
+           // A continuation prompts nothing: it drains output the live process
+@@ -9145,6 +9156,7 @@ export const makeClaudeAdapterV2 = Effect.fn("makeClaudeAdapterV2")(function* (
+             resumeSessionAt !== undefined || openedWithResume || hasPersistedProviderTurn;
+           const queryOptions = makeClaudeQueryOptions({
+             modelSelection: turnInput.modelSelection,
++            modelCatalog: catalog,
+             nativeThreadId,
+             resume: shouldResume,
+             ...(resumeSessionAt === undefined ? {} : { resumeSessionAt }),
+@@ -9335,7 +9347,8 @@ export const makeClaudeAdapterV2 = Effect.fn("makeClaudeAdapterV2")(function* (
+                 : yield* makeClaudeUserMessageWithAttachments({
+                     text: applyClaudePromptEffortPrefix(
+                       turnInput.message.text,
+-                      compileClaudeModelSelection(turnInput.modelSelection).promptEffort,
++                      compileClaudeModelSelection(turnInput.modelSelection, yield* modelCatalog)
++                        .promptEffort,
+                     ),
+                     attachments: turnInput.message.attachments,
+                     attachmentsDir,
+@@ -9765,7 +9778,8 @@ export const makeClaudeAdapterV2 = Effect.fn("makeClaudeAdapterV2")(function* (
+             const userMessage = yield* makeClaudeUserMessageWithAttachments({
+               text: applyClaudePromptEffortPrefix(
+                 turnInput.message.text,
+-                compileClaudeModelSelection(currentTurn.input.modelSelection).promptEffort,
++                compileClaudeModelSelection(currentTurn.input.modelSelection, yield* modelCatalog)
++                  .promptEffort,
+               ),
+               attachments: turnInput.message.attachments,
+               priority: "now",
+@@ -10329,7 +10343,7 @@ export type ClaudeAdapterV2DriverEnv =
+ export const createClaudeAdapterV2 = Effect.fn("ClaudeAdapterV2Driver.create")(
+   function* (
+     input: ProviderAdapterDriverCreateInput<ClaudeSettings>,
+-    hooks: Pick<ClaudeAdapterV2Options, "scopedLimitNames" | "onUsageLimits"> = {},
++    hooks: Pick<ClaudeAdapterV2Options, "scopedLimitNames" | "onUsageLimits" | "modelCatalog"> = {},
+   ) {
+     const { instanceId, environment, enabled, config } = input;
+     const fileSystem = yield* FileSystem.FileSystem;
+diff --git a/apps/server/src/provider/ClaudeCapabilitiesProbe.test.ts b/apps/server/src/provider/ClaudeCapabilitiesProbe.test.ts
+index bba7bd940e..a03c4ae54e 100644
+--- a/apps/server/src/provider/ClaudeCapabilitiesProbe.test.ts
++++ b/apps/server/src/provider/ClaudeCapabilitiesProbe.test.ts
+@@ -400,6 +400,36 @@ it.effect("fails a hung initialization probe with a timeout", () =>
+   }).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
+ );
+ 
++it.effect("keeps the probe subprocess alive while gateway model discovery can finish", () =>
++  Effect.gen(function* () {
++    let abortSignal: AbortSignal | undefined;
++    const query = vi.spyOn(ClaudeSdk, "query").mockImplementation(({ options }) => {
++      abortSignal = options?.abortController?.signal;
++      return {
++        initializationResult: async () => ({
++          account: { email: "dev@example.com", subscriptionType: "pro", tokenSource: "oauth" },
++          commands: [{ name: "review", description: "Review changes", argumentHint: "[path]" }],
++        }),
++        usage_EXPERIMENTAL_MAY_CHANGE_DO_NOT_RELY_ON_THIS_API_YET: () =>
++          new Promise((_, reject) => reject(new Error("usage unavailable"))),
++      } as ReturnType<typeof ClaudeSdk.query>;
++    });
++    yield* Effect.addFinalizer(() => Effect.sync(() => query.mockRestore()));
++    const capabilities = yield* probeClaudeCapabilities(
++      decodeClaudeSettings({ binaryPath: "claude" }),
++      {
++        ...process.env,
++        ANTHROPIC_BASE_URL: "https://gateway.example",
++        CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY: "1",
++      },
++    );
++    assert.isDefined(capabilities);
++    assert.equal(abortSignal?.aborted, false);
++    yield* TestClock.adjust("3 seconds");
++    assert.equal(abortSignal?.aborted, true);
++  }).pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
++);
++
+ it.effect("asks for usage without the local transcript scan", () =>
+   Effect.gen(function* () {
+     let usageOptions: unknown;
+diff --git a/apps/server/src/provider/ClaudeModelCatalog.test.ts b/apps/server/src/provider/ClaudeModelCatalog.test.ts
+index da61038215..99ef956d62 100644
+--- a/apps/server/src/provider/ClaudeModelCatalog.test.ts
++++ b/apps/server/src/provider/ClaudeModelCatalog.test.ts
+@@ -14,6 +14,7 @@ import {
+   resolveClaudeModelSlug,
+   resolveClaudeUpdateRequiredModels,
+   scopeClaudeModelCatalog,
++  withClaudeReportedModels,
+ } from "./ClaudeModelCatalog.ts";
+ 
+ const manifest = (): ModelManifestData => ({
+@@ -254,4 +255,62 @@ describe("Claude model catalog", () => {
+       ["claude-synthetic-next", "claude-custom-tuned"],
+     );
+   });
++
++  it("resolves effort for models Claude Code reports from its own capabilities", () => {
++    const catalog = withClaudeReportedModels(
++      catalogFromManifest(manifest()),
++      [],
++      [
++        { value: "synthetic", displayName: "Synthetic", description: "", supportsEffort: true },
++        {
++          value: "anthropic/claude-gateway",
++          displayName: "Gateway Claude",
++          description: "From gateway",
++          supportsEffort: true,
++          supportedEffortLevels: ["low", "high", "max"],
++          supportsFastMode: true,
++        },
++        { value: "claude-gateway-plain", displayName: "Plain", description: "From gateway" },
++      ],
++    );
++
++    assert.deepStrictEqual(
++      resolveClaudeModelsForVersion(catalog, "3.2.0").map((model) => model.slug),
++      ["claude-synthetic-next", "anthropic/claude-gateway", "claude-gateway-plain"],
++    );
++    assert.strictEqual(
++      resolveClaudeCatalogEffort(catalog, "anthropic/claude-gateway", "max"),
++      "max",
++    );
++    assert.strictEqual(
++      resolveClaudeCatalogEffort(catalog, "anthropic/claude-gateway", undefined),
++      "high",
++    );
++    assert.strictEqual(
++      resolveClaudeCatalogApiModelId(catalog, {
++        instanceId: ProviderInstanceId.make("claudeAgent"),
++        model: "anthropic/claude-gateway",
++        options: [{ id: "effort", value: "max" }],
++      }),
++      "anthropic/claude-gateway",
++    );
++    assert.strictEqual(
++      resolveClaudeCatalogEffort(catalog, "claude-gateway-plain", "max"),
++      undefined,
++    );
++  });
++
++  it("lists a reported model once regardless of context-window suffix or order", () => {
++    const reported = (value: string) => ({ value, displayName: "Gateway", description: "" });
++    const catalog = withClaudeReportedModels(
++      catalogFromManifest(manifest()),
++      [],
++      [reported("gateway/model[1m]"), reported("gateway/model"), reported("gateway/model[1m]")],
++    );
++
++    assert.deepStrictEqual(
++      resolveClaudeModelsForVersion(catalog, "3.2.0").map((model) => model.slug),
++      ["claude-synthetic-next", "gateway/model[1m]"],
++    );
++  });
+ });
+diff --git a/apps/server/src/provider/ClaudeModelCatalog.ts b/apps/server/src/provider/ClaudeModelCatalog.ts
+index db40907775..dcdc006a42 100644
+--- a/apps/server/src/provider/ClaudeModelCatalog.ts
++++ b/apps/server/src/provider/ClaudeModelCatalog.ts
+@@ -6,6 +6,7 @@ import {
+   type ServerProviderModel,
+   type ServerProviderUpdateRequiredModel,
+ } from "@t3tools/contracts";
++import type { ModelInfo as ClaudeModelInfo } from "@anthropic-ai/claude-agent-sdk";
+ import * as Option from "effect/Option";
+ import {
+   getModelSelectionStringOptionValue,
+@@ -116,6 +117,90 @@ export function scopeClaudeModelCatalog(
+   return { models: [...builtInModels, ...customCatalogModels] };
+ }
+ 
++const CLAUDE_EFFORT_LABELS: Record<string, string> = {
++  low: "Low",
++  medium: "Medium",
++  high: "High",
++  xhigh: "Extra High",
++  max: "Max",
++};
++
++/** Strip Claude Code's context-window suffix, e.g. `opus[1m]` -> `opus`. */
++function stripClaudeModelSuffix(value: string): string {
++  return value.replace(/\[[^\]]*\]$/, "").trim();
++}
++
++/** Option descriptors for a model from what Claude Code reports it supports. */
++function claudeReportedModelCapabilities(info: ClaudeModelInfo): ModelCapabilities {
++  const efforts = info.supportsEffort ? (info.supportedEffortLevels ?? []) : [];
++  const defaultEffort = efforts.includes("high") ? "high" : undefined;
++  return {
++    optionDescriptors: [
++      ...(efforts.length
++        ? [
++            {
++              id: "effort",
++              label: "Reasoning",
++              type: "select" as const,
++              options: efforts.map((id) => ({
++                id,
++                label: CLAUDE_EFFORT_LABELS[id] ?? id,
++                ...(id === defaultEffort ? { isDefault: true } : {}),
++              })),
++            },
++          ]
++        : []),
++      ...(info.supportsFastMode
++        ? [{ id: "fastMode", label: "Fast Mode", type: "boolean" as const }]
++        : []),
++    ],
++  };
++}
++
++/**
++ * Append models Claude Code reports that the catalog does not know, such as
++ * ids from an Anthropic-compatible gateway with model discovery on. Catalog
++ * models, including ones the installed version cannot run, are never
++ * duplicated and keep T3's descriptors. A custom model with the same slug keeps
++ * its settings-owned row. Discovered models take their options from what
++ * Claude Code reports and are passed to it verbatim at runtime.
++ */
++export function withClaudeReportedModels(
++  catalog: ClaudeModelCatalog,
++  customModels: ReadonlyArray<CustomModelSetting>,
++  reportedModels: ReadonlyArray<ClaudeModelInfo> | undefined,
++): ClaudeModelCatalog {
++  if (!reportedModels?.length) return catalog;
++  const known = new Set<string>();
++  for (const { model } of catalog.models) {
++    known.add(model.slug.toLowerCase());
++    for (const alias of model.aliases ?? []) known.add(alias.toLowerCase());
++  }
++  for (const entry of readCustomModelEntries(customModels)) known.add(entry.slug.toLowerCase());
++  const discovered: Array<ClaudeCatalogModel> = [];
++  for (const info of reportedModels) {
++    const slug = info.value.trim();
++    // `default` is Claude Code's pointer at its own default model, not a model.
++    if (!slug || slug === "default") continue;
++    const ids = [slug, info.resolvedModel ?? ""].map((id) =>
++      stripClaudeModelSuffix(id).toLowerCase(),
++    );
++    if (ids.some((id) => id && known.has(id))) continue;
++    for (const id of ids) if (id) known.add(id);
++    discovered.push({
++      model: {
++        slug,
++        name: info.displayName.trim() || slug,
++        isCustom: false,
++        capabilities: claudeReportedModelCapabilities(info),
++      },
++      runtime: {},
++      compatibility: {},
++    });
++  }
++  return discovered.length ? { models: [...catalog.models, ...discovered] } : catalog;
++}
++
+ function resolveClaudeCatalogModel(
+   catalog: ClaudeModelCatalog,
+   slugOrAlias: string | null | undefined,
+diff --git a/apps/server/src/provider/ClaudeProvider.ts b/apps/server/src/provider/ClaudeProvider.ts
+index e0deb753c3..d09f918e84 100644
+--- a/apps/server/src/provider/ClaudeProvider.ts
++++ b/apps/server/src/provider/ClaudeProvider.ts
+@@ -18,6 +18,7 @@ import { createModelCapabilities } from "@t3tools/shared/model";
+ import { resolveSpawnCommand } from "@t3tools/shared/shell";
+ import {
+   query as claudeQuery,
++  type ModelInfo as ClaudeModelInfo,
+   type Options as ClaudeQueryOptions,
+   type SlashCommand as ClaudeSlashCommand,
+   type SDKControlGetUsageResponse,
+@@ -51,6 +52,7 @@ import {
+   formatClaudeVersionUpgradeMessage,
+   resolveClaudeModelsForVersion,
+   resolveClaudeUpdateRequiredModels,
++  withClaudeReportedModels,
+ } from "./ClaudeModelCatalog.ts";
+ 
+ const DEFAULT_CLAUDE_MODEL_CAPABILITIES: ModelCapabilities = createModelCapabilities({
+@@ -259,6 +261,8 @@ export type ClaudeCapabilitiesProbe = {
+    */
+   readonly apiProvider: string | undefined;
+   readonly slashCommands: ReadonlyArray<ServerProviderSlashCommand>;
++  /** Models Claude Code reports, including gateway-discovered ones. */
++  readonly models?: ReadonlyArray<ClaudeModelInfo>;
+   /**
+    * Subscription windows from the SDK's `get_usage` control request, or
+    * `undefined` when the request itself failed. Absent windows on an
+@@ -340,11 +344,31 @@ function waitForAbortSignal(signal: AbortSignal): Promise<void> {
+   });
+ }
+ 
++/** Claude Code's default for `CLAUDE_CODE_GATEWAY_MODEL_DISCOVERY_TIMEOUT_MS`. */
++const CLAUDE_GATEWAY_DISCOVERY_TIMEOUT_MS = 3_000;
++
++/**
++ * How long a probe subprocess must outlive initialization so gateway model
++ * discovery can finish. Claude Code reports gateway models from its on-disk
++ * cache and refreshes that cache in the background after startup, so aborting
++ * right after initialization means a cold config dir never learns them.
++ */
++function claudeGatewayDiscoveryGraceMs(environment: NodeJS.ProcessEnv): number {
++  const enabled = environment.CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY?.trim();
++  if (!enabled || enabled === "0" || enabled.toLowerCase() === "false") return 0;
++  if (!environment.ANTHROPIC_BASE_URL?.trim()) return 0;
++  const configured = Number(environment.CLAUDE_CODE_GATEWAY_MODEL_DISCOVERY_TIMEOUT_MS);
++  return Number.isFinite(configured) && configured > 0
++    ? configured
++    : CLAUDE_GATEWAY_DISCOVERY_TIMEOUT_MS;
++}
++
+ /**
+  * We pass a never-yielding AsyncIterable as the prompt so that no user message is ever written
+  * to the subprocess stdin. This means the Claude Code subprocess completes its local
+  * initialization IPC (returning account info and slash commands) but never starts an API
+- * request to Anthropic.
++ * request to Anthropic. The subprocess is aborted once initialization is read, after a grace
++ * period when gateway model discovery is enabled.
+  */
+ const probeClaudeCapabilities = (
+   claudeSettings: ClaudeSettings,
+@@ -353,8 +377,13 @@ const probeClaudeCapabilities = (
+   includeUsage = true,
+ ) => {
+   const abort = new AbortController();
++  let abortGraceMs = 0;
++  const abortProbe = Effect.sync(() => {
++    if (!abort.signal.aborted) abort.abort();
++  });
+   return Effect.gen(function* () {
+     const claudeEnvironment = yield* makeClaudeEnvironment(claudeSettings, environment);
++    abortGraceMs = claudeGatewayDiscoveryGraceMs(claudeEnvironment);
+     const executablePath = yield* resolveClaudeSdkExecutablePath(
+       claudeSettings.binaryPath,
+       claudeEnvironment,
+@@ -415,14 +444,23 @@ const probeClaudeCapabilities = (
+           apiKeySource: account?.apiKeySource,
+           apiProvider: account?.apiProvider,
+           slashCommands: parseClaudeInitializationCommands(init.commands),
++          ...(init.models?.length ? { models: init.models } : {}),
+           ...(usage ? { usage, usageCheckedAt } : {}),
+         } satisfies ClaudeCapabilitiesProbe;
+       }),
+     ),
++    // Return the capabilities right away, but let a gateway discovery that is
++    // still in flight write Claude Code's cache so the next probe reports it.
+     Effect.ensuring(
+-      Effect.sync(() => {
+-        if (!abort.signal.aborted) abort.abort();
+-      }),
++      Effect.suspend(() =>
++        abortGraceMs > 0
++          ? Effect.sleep(abortGraceMs).pipe(
++              Effect.andThen(abortProbe),
++              Effect.forkDetach,
++              Effect.asVoid,
++            )
++          : abortProbe,
++      ),
+     ),
+     Effect.tapError((error) =>
+       Effect.logWarning("Claude capability probe failed.", { errorTag: error._tag }),
+@@ -582,11 +620,6 @@ export const checkClaudeProviderStatus = Effect.fn("checkClaudeProviderStatus")(
+     });
+   }
+ 
+-  const models = providerModelsFromSettings(
+-    resolveClaudeModelsForVersion(modelCatalog, parsedVersion),
+-    claudeSettings.customModels,
+-    DEFAULT_CLAUDE_MODEL_CAPABILITIES,
+-  );
+   const updateRequiredModels = resolveClaudeUpdateRequiredModels(modelCatalog, parsedVersion);
+   const versionUpgradeMessage = formatClaudeVersionUpgradeMessage(modelCatalog, parsedVersion);
+ 
+@@ -597,6 +630,14 @@ export const checkClaudeProviderStatus = Effect.fn("checkClaudeProviderStatus")(
+     probeResult && Result.isSuccess(probeResult) ? probeResult.success : undefined;
+   const probeFailure =
+     probeResult && Result.isFailure(probeResult) ? probeResult.failure : undefined;
++  const models = providerModelsFromSettings(
++    resolveClaudeModelsForVersion(
++      withClaudeReportedModels(modelCatalog, claudeSettings.customModels, capabilities?.models),
++      parsedVersion,
++    ),
++    claudeSettings.customModels,
++    DEFAULT_CLAUDE_MODEL_CAPABILITIES,
++  );
+   const skills = yield* discoverClaudeSkills(claudeSettings, cwd, resolvedEnvironment);
+   const slashCommands = [COMPACT_SLASH_COMMAND, ...(capabilities?.slashCommands ?? [])];
+   const dedupedSlashCommands = dedupeSlashCommands(slashCommands);
+diff --git a/apps/server/src/provider/Drivers/ClaudeDriver.ts b/apps/server/src/provider/Drivers/ClaudeDriver.ts
+index 86832d53d3..cbf7b97f5d 100644
+--- a/apps/server/src/provider/Drivers/ClaudeDriver.ts
++++ b/apps/server/src/provider/Drivers/ClaudeDriver.ts
+@@ -1,3 +1,4 @@
++import type { ModelInfo as ClaudeModelInfo } from "@anthropic-ai/claude-agent-sdk";
+ import { ClaudeSettings, ProviderDriverKind } from "@t3tools/contracts";
+ import * as Cache from "effect/Cache";
+ import * as Duration from "effect/Duration";
+@@ -35,7 +36,7 @@ import {
+ } from "../ClaudeProvider.ts";
+ import { makeManagedServerProvider } from "@t3tools/provider-core/server/managedProvider";
+ import * as ModelCatalog from "@t3tools/provider-core/server/ModelCatalog";
+-import { resolveClaudeModelCatalog } from "../ClaudeModelCatalog.ts";
++import { resolveClaudeModelCatalog, withClaudeReportedModels } from "../ClaudeModelCatalog.ts";
+ import {
+   defaultProviderContinuationIdentity,
+   type ProviderDriver,
+@@ -169,6 +170,15 @@ export const ClaudeDriver: ProviderDriver<ClaudeSettings, ClaudeDriverEnv, Path.
+       continuationGroupKey,
+     });
+ 
++    // Models from the last successful capabilities probe, so sessions can
++    // resolve options for gateway-discovered models the manifest lacks.
++    const reportedModels = yield* Ref.make<ReadonlyArray<ClaudeModelInfo>>([]);
++    const sessionModelCatalog = Effect.all([modelCatalog, Ref.get(reportedModels)]).pipe(
++      Effect.map(([catalog, models]) =>
++        withClaudeReportedModels(catalog, effectiveConfig.customModels, models),
++      ),
++    );
++
+     const scopedLimitNames = yield* makeClaudeScopedLimitNames;
+     const orchestrationAdapter = yield* createClaudeAdapterV2(
+       {
+@@ -179,7 +189,11 @@ export const ClaudeDriver: ProviderDriver<ClaudeSettings, ClaudeDriverEnv, Path.
+         enabled,
+         config,
+       },
+-      { scopedLimitNames, onUsageLimits: (update) => snapshot.applyUsageLimits(update) },
++      {
++        scopedLimitNames,
++        modelCatalog: sessionModelCatalog,
++        onUsageLimits: (update) => snapshot.applyUsageLimits(update),
++      },
+     ).pipe(
+       Effect.mapError(
+         (cause) =>
+@@ -194,7 +208,7 @@ export const ClaudeDriver: ProviderDriver<ClaudeSettings, ClaudeDriverEnv, Path.
+     const textGeneration = yield* makeClaudeTextGeneration(
+       effectiveConfig,
+       processEnv,
+-      modelCatalog,
++      sessionModelCatalog,
+     );
+ 
+     // Per-instance capabilities cache: keyed on binary + resolved HOME so
+@@ -204,6 +218,7 @@ export const ClaudeDriver: ProviderDriver<ClaudeSettings, ClaudeDriverEnv, Path.
+     const capabilitiesProbeCache = yield* Cache.makeWith(
+       () =>
+         probeClaudeCapabilities(effectiveConfig, processEnv, stateDir).pipe(
++          Effect.tap((capabilities) => Ref.set(reportedModels, capabilities.models ?? [])),
+           Effect.flatMap((capabilities) =>
+             ClaudeResetCredits.readClaudeOrganizationId(accountConfigPath).pipe(
+               Effect.map((workspaceId) => ({
+diff --git a/apps/server/src/provider/ProviderRegistry.test.ts b/apps/server/src/provider/ProviderRegistry.test.ts
+index a44aadbd2f..dc6c0529e3 100644
+--- a/apps/server/src/provider/ProviderRegistry.test.ts
++++ b/apps/server/src/provider/ProviderRegistry.test.ts
+@@ -4,6 +4,7 @@ import * as ServerSecretStore from "../auth/ServerSecretStore.ts";
+ import * as CodexInstallation from "./CodexInstallation.ts";
+ import * as ServerEnvironment from "../environment/ServerEnvironment.ts";
+ import * as NodeServices from "@effect/platform-node/NodeServices";
++import type { ModelInfo } from "@anthropic-ai/claude-agent-sdk";
+ import { describe, it, assert, expect } from "@effect/vitest";
+ import * as Cause from "effect/Cause";
+ import * as DateTime from "effect/DateTime";
+@@ -185,6 +186,7 @@ type TestClaudeCapabilities = {
+   readonly apiKeySource: string | undefined;
+   readonly apiProvider: string | undefined;
+   readonly slashCommands: ReadonlyArray<ServerProviderSlashCommand>;
++  readonly models?: ReadonlyArray<ModelInfo>;
+ };
+ 
+ function claudeCapabilities(overrides: Partial<TestClaudeCapabilities> = {}) {
+@@ -4209,6 +4211,77 @@ it.layer(
+       ),
+     );
+ 
++    it.effect("adds models Claude Code reports that the catalog does not know", () =>
++      Effect.gen(function* () {
++        const status = yield* checkClaudeProviderStatus(
++          {
++            ...defaultClaudeSettings,
++            customModels: [
++              { slug: "my-custom", name: "My Custom" },
++              { slug: "gateway/kimi-3", name: "Kimi (mine)" },
++            ],
++          },
++          claudeCapabilities({
++            models: [
++              { value: "default", displayName: "Default", description: "" },
++              {
++                value: "opus[1m]",
++                resolvedModel: "claude-opus-5[1m]",
++                displayName: "Opus",
++                description: "",
++              },
++              { value: "sonnet", displayName: "Sonnet", description: "" },
++              { value: "gateway/glm-5", displayName: "GLM 5", description: "" },
++              {
++                value: "gateway/claude-relay",
++                displayName: "Claude Relay",
++                description: "",
++                supportsEffort: true,
++                supportedEffortLevels: ["low", "high"],
++              },
++              { value: "gateway/kimi-3", displayName: "Kimi 3", description: "" },
++            ],
++          }),
++        );
++        const reported = status.models.filter(
++          (model) => !model.isCustom && !model.slug.startsWith("claude-"),
++        );
++        assert.deepStrictEqual(
++          reported.map((model) => [model.slug, model.name]),
++          [
++            ["gateway/glm-5", "GLM 5"],
++            ["gateway/claude-relay", "Claude Relay"],
++          ],
++        );
++        assert.deepStrictEqual(reported[0]?.capabilities, { optionDescriptors: [] });
++        assert.deepStrictEqual(reported[1]?.capabilities, {
++          optionDescriptors: [
++            {
++              id: "effort",
++              label: "Reasoning",
++              type: "select",
++              options: [
++                { id: "low", label: "Low" },
++                { id: "high", label: "High", isDefault: true },
++              ],
++            },
++          ],
++        });
++        assert.deepStrictEqual(
++          status.models.filter((model) => model.isCustom).map((model) => model.name),
++          ["My Custom", "Kimi (mine)"],
++        );
++      }).pipe(
++        Effect.provide(
++          layerMockSpawner((args) => {
++            const joined = args.join(" ");
++            if (joined === "--version") return { stdout: "1.0.0\n", stderr: "", code: 0 };
++            throw new Error(`Unexpected args: ${joined}`);
++          }),
++        ),
++      ),
++    );
++
+     it.effect("reports a logged-out CLI as unauthenticated", () =>
+       Effect.gen(function* () {
+         // The capability probe resolves for a logged-out CLI, so `tokenSource:
