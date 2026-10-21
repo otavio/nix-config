@@ -25,9 +25,9 @@
       # nixpkgs' Brave wrapper does not put libvulkan on the library path, so
       # vulkanSupport alone leaves WebGPU on SwiftShader instead of RADV.
       #
-      # Hardware video encoding (WebRTC camera in meetings) hangs the Polaris
-      # VCE ring and the following GPU reset never recovers, so encode in
-      # software and keep VA-API for decode only.
+      # Hardware video encoding hangs the Polaris VCE ring and the following
+      # GPU reset never recovers. VCE only encodes H.264, so in practice only
+      # Teams calls hit it; encode in software and keep VA-API for decode.
       package =
         (pkgs.brave.override {
           vulkanSupport = true;
