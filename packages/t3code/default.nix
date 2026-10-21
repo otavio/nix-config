@@ -1,7 +1,15 @@
 # Ahead of nixpkgs (0.0.45) on an upstream nightly, carrying my changes
-# rebased onto that tag. Upstream closed both without merging:
+# rebased onto that tag. Upstream closed these without merging:
 # https://github.com/pingdotgg/t3code/pull/14957
 # https://github.com/pingdotgg/t3code/pull/13755
+# The rest are still open:
+# https://github.com/pingdotgg/t3code/pull/22294
+# https://github.com/pingdotgg/t3code/pull/18465
+# https://github.com/pingdotgg/t3code/pull/15174
+# https://github.com/pingdotgg/t3code/pull/13913
+# https://github.com/pingdotgg/t3code/pull/22611
+# https://github.com/pingdotgg/t3code/pull/22608
+# https://github.com/pingdotgg/t3code/pull/22605
 {
   pkgs,
   # The nixpkgs t3code to build on; an overlay must pass `prev.t3code`.
@@ -21,6 +29,13 @@ let
       patches = (old.patches or [ ]) ++ [
         ./context-window-indicator.patch
         ./direnv-environment.patch
+        ./desktop-topology-push.patch
+        ./offline-launch-keeps-connect-envs.patch
+        ./archived-threads-list.patch
+        ./claude-model-discovery.patch
+        ./paused-queue-send.patch
+        ./acp-token-spend-handoff.patch
+        ./thread-details-tooltip.patch
       ];
       pnpmDeps = pkgs.fetchPnpmDeps {
         inherit (finalAttrs)

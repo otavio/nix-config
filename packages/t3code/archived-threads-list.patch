@@ -1,0 +1,996 @@
+diff --git a/apps/mobile/src/features/archive/ArchivedThreadsRouteScreen.tsx b/apps/mobile/src/features/archive/ArchivedThreadsRouteScreen.tsx
+index 9ad4790faa..d0f011f3b6 100644
+--- a/apps/mobile/src/features/archive/ArchivedThreadsRouteScreen.tsx
++++ b/apps/mobile/src/features/archive/ArchivedThreadsRouteScreen.tsx
+@@ -1,8 +1,7 @@
+ import type { EnvironmentId } from "@t3tools/contracts";
+ import * as Arr from "effect/Array";
+ import * as Order from "effect/Order";
+-import { useFocusEffect } from "@react-navigation/native";
+-import { useCallback, useMemo, useState } from "react";
++import { useMemo, useState } from "react";
+ 
+ import { useSavedRemoteConnections } from "../../state/use-remote-environment-registry";
+ import { useArchivedThreadListActions } from "../home/useThreadListActions";
+@@ -11,10 +10,7 @@ import {
+   type ArchivedThreadsHeaderEnvironment,
+ } from "./ArchivedThreadsScreen";
+ import { buildArchivedThreadGroups, type ArchivedThreadSortOrder } from "./archivedThreadList";
+-import {
+-  refreshArchivedThreadsForEnvironment,
+-  useArchivedThreadSnapshots,
+-} from "./useArchivedThreadSnapshots";
++import { useArchivedThreadSnapshots } from "./useArchivedThreadSnapshots";
+ 
+ export function ArchivedThreadsRouteScreen() {
+   const { savedConnectionsById } = useSavedRemoteConnections();
+@@ -57,20 +53,7 @@ export function ArchivedThreadsRouteScreen() {
+       }),
+     [environmentLabels, searchQuery, selectedEnvironmentId, snapshots, sortOrder],
+   );
+-  const refreshChangedEnvironment = useCallback(
+-    (thread: { readonly environmentId: EnvironmentId }) => {
+-      refreshArchivedThreadsForEnvironment(thread.environmentId);
+-    },
+-    [],
+-  );
+-  const { unarchiveThread, confirmDeleteThread } =
+-    useArchivedThreadListActions(refreshChangedEnvironment);
+-
+-  useFocusEffect(
+-    useCallback(() => {
+-      refresh();
+-    }, [refresh]),
+-  );
++  const { unarchiveThread, confirmDeleteThread } = useArchivedThreadListActions();
+ 
+   return (
+     <ArchivedThreadsScreen
+diff --git a/apps/mobile/src/features/archive/useArchivedThreadSnapshots.ts b/apps/mobile/src/features/archive/useArchivedThreadSnapshots.ts
+index d18cc230c6..3c17a7c9eb 100644
+--- a/apps/mobile/src/features/archive/useArchivedThreadSnapshots.ts
++++ b/apps/mobile/src/features/archive/useArchivedThreadSnapshots.ts
+@@ -7,25 +7,20 @@ import {
+ import type { EnvironmentId } from "@t3tools/contracts";
+ import { useCallback, useMemo } from "react";
+ 
++import { environmentCatalog } from "../../connection/catalog";
+ import { appAtomRegistry } from "../../state/atom-registry";
+ import { orchestrationEnvironment } from "../../state/orchestration";
+ 
+ function archivedSnapshotAtom(environmentId: EnvironmentId) {
+-  return orchestrationEnvironment.archivedShellSnapshot({
+-    environmentId,
+-    input: {},
+-  });
++  return orchestrationEnvironment.archivedShell({ environmentId, input: {} });
+ }
+ 
+ const archivedSnapshotsAtom = createArchivedThreadSnapshotsAtomFamily({
+   getSnapshotAtom: archivedSnapshotAtom,
++  getConnectionStateAtom: environmentCatalog.stateAtom,
+   labelPrefix: "mobile:archived-thread-snapshots",
+ });
+ 
+-export function refreshArchivedThreadsForEnvironment(environmentId: EnvironmentId): void {
+-  appAtomRegistry.refresh(archivedSnapshotAtom(environmentId));
+-}
+-
+ export function useArchivedThreadSnapshots(environmentIds: ReadonlyArray<EnvironmentId>): {
+   readonly snapshots: ReadonlyArray<ArchivedSnapshotEntry>;
+   readonly error: string | null;
+diff --git a/apps/mobile/src/features/home/useThreadListActions.test.ts b/apps/mobile/src/features/home/useThreadListActions.test.ts
+index 93b3ef3cb4..8262a8aa74 100644
+--- a/apps/mobile/src/features/home/useThreadListActions.test.ts
++++ b/apps/mobile/src/features/home/useThreadListActions.test.ts
+@@ -48,9 +48,6 @@ vi.mock("../../components/ui/Dialog", () => ({
+     state.alerts.push({ title, buttons }),
+   confirm: (dialog: { onConfirm: () => void }) => state.dialogs.push(dialog),
+ }));
+-vi.mock("../archive/useArchivedThreadSnapshots", () => ({
+-  refreshArchivedThreadsForEnvironment: () => {},
+-}));
+ vi.mock("../../state/session", () => ({
+   readEnvironmentScope: (environmentId: string, scope: string) =>
+     state.scopes.get(environmentId)?.has(scope) === true,
+@@ -243,7 +240,7 @@ describe("thread list operation permissions", () => {
+   });
+ 
+   it("unarchives with only task permission and blocks a later revoked callback", async () => {
+-    const actions = useArchivedThreadListActions(() => {});
++    const actions = useArchivedThreadListActions();
+     const thread = makeThread({ archivedAt: "2026-09-02T00:00:00.000Z" });
+     await actions.unarchiveThread(thread);
+     expect(state.requests).toEqual([expect.objectContaining({ action: "unarchive" })]);
+@@ -257,7 +254,7 @@ describe("thread list operation permissions", () => {
+ 
+   it("keeps delete independent of terminal and source-control permissions", async () => {
+     vi.stubEnv("EXPO_OS", "android");
+-    useArchivedThreadListActions(() => {}).confirmDeleteThread(makeThread());
++    useArchivedThreadListActions().confirmDeleteThread(makeThread());
+     await state.dialogs[0]!.onConfirm();
+ 
+     expect(state.requests).toEqual([expect.objectContaining({ action: "delete" })]);
+diff --git a/apps/mobile/src/features/home/useThreadListActions.ts b/apps/mobile/src/features/home/useThreadListActions.ts
+index 4ca0fc5614..3c8a4d6cab 100644
+--- a/apps/mobile/src/features/home/useThreadListActions.ts
++++ b/apps/mobile/src/features/home/useThreadListActions.ts
+@@ -9,7 +9,6 @@ import { useRef } from "react";
+ import { withThreadDismissal } from "./thread-dismissal";
+ import * as Dialog from "../../components/ui/Dialog";
+ import { scopedThreadKey } from "../../lib/scopedEntities";
+-import { refreshArchivedThreadsForEnvironment } from "../archive/useArchivedThreadSnapshots";
+ import { pinOrderKeyBetween } from "@t3tools/client-runtime/state/thread-sort";
+ import { appAtomRegistry } from "../../state/atom-registry";
+ import { environmentServerConfigsAtom } from "../../state/server";
+@@ -115,9 +114,7 @@ function checkThreadOperationPermission(thread: EnvironmentThreadShell, title: s
+   return false;
+ }
+ 
+-function useThreadActionExecutor(
+-  onCompleted?: (action: ThreadListAction, thread: EnvironmentThreadShell) => void,
+-) {
++function useThreadActionExecutor() {
+   const archiveMutation = useAtomCommand(threadEnvironment.archive, { reportFailure: false });
+   const unarchiveMutation = useAtomCommand(threadEnvironment.unarchive, { reportFailure: false });
+   const deleteMutation = useAtomCommand(threadEnvironment.delete, { reportFailure: false });
+@@ -180,10 +177,6 @@ function useThreadActionExecutor(
+         Dialog.alert(actionFailureTitle(action), actionFailureMessage(action, result.cause));
+         return false;
+       }
+-      if (action === "archive" || action === "unarchive" || action === "delete") {
+-        refreshArchivedThreadsForEnvironment(thread.environmentId);
+-      }
+-      onCompleted?.(action, thread);
+       return true;
+     })();
+     inFlightThreadKeys.current.delete(key);
+@@ -682,16 +675,11 @@ export function useThreadListActions(): {
+   };
+ }
+ 
+-export function useArchivedThreadListActions(
+-  onCompleted: (thread: EnvironmentThreadShell) => void,
+-): {
++export function useArchivedThreadListActions(): {
+   readonly unarchiveThread: (thread: EnvironmentThreadShell) => void;
+   readonly confirmDeleteThread: (thread: EnvironmentThreadShell) => void;
+ } {
+-  const handleCompleted = (_action: ThreadListAction, thread: EnvironmentThreadShell) => {
+-    onCompleted(thread);
+-  };
+-  const executeAction = useThreadActionExecutor(handleCompleted);
++  const executeAction = useThreadActionExecutor();
+   const unarchiveThread = (thread: EnvironmentThreadShell) => {
+     void executeAction("unarchive", thread);
+   };
+diff --git a/apps/server/src/orchestration-v2/ShellStream.test.ts b/apps/server/src/orchestration-v2/ShellStream.test.ts
+index 240bd8d3e2..55399c679a 100644
+--- a/apps/server/src/orchestration-v2/ShellStream.test.ts
++++ b/apps/server/src/orchestration-v2/ShellStream.test.ts
+@@ -1,6 +1,7 @@
+ import { describe, expect, it } from "@effect/vitest";
+ import type {
+   ApplicationStoredEvent,
++  OrchestrationV2ArchivedShellSnapshot,
+   OrchestrationV2ShellSnapshot,
+   OrchestrationV2ShellStreamItem,
+   OrchestrationV2StoredEvent,
+@@ -21,6 +22,7 @@ import * as Stream from "effect/Stream";
+ import * as TestClock from "effect/testing/TestClock";
+ 
+ import {
++  archivedShellStream,
+   archivedShellStreamItemFromThreadShell,
+   buildActiveShellSnapshot,
+   bufferShellLiveStream,
+@@ -324,6 +326,73 @@ describe("archivedShellStreamItemFromThreadShell", () => {
+   });
+ });
+ 
++describe("archivedShellStream", () => {
++  const archivedAt = "2026-07-30T00:00:00.000Z" as never;
++  const archivedSnapshot = (
++    snapshotSequence: number,
++    projectIds: ReadonlyArray<string>,
++    title = "Project",
++  ): OrchestrationV2ArchivedShellSnapshot =>
++    ({
++      schemaVersion: 1,
++      snapshotSequence,
++      projects: projectIds.map((id) => ({ id: ProjectId.make(id), title })),
++      threads: [],
++    }) as unknown as OrchestrationV2ArchivedShellSnapshot;
++  const archived = (sequence: number, id: string, projectId: string) => ({
++    kind: "thread.updated" as const,
++    sequence,
++    thread: shellFixture({
++      id: ThreadId.make(id),
++      projectId: ProjectId.make(projectId),
++      archivedAt,
++    }),
++  });
++
++  it.effect("restarts from a fresh snapshot, outside the live budget, for an unseen project", () =>
++    Effect.gen(function* () {
++      // Larger than the live budget's byte limit.
++      const fresh = {
++        ...archivedSnapshot(7, ["project-known", "project-new"], "x".repeat(9 << 20)),
++        threads: [archived(3, "thread-b", "project-new").thread],
++      };
++      const initial = archivedSnapshot(1, ["project-known"]);
++      const knownUpdate = archived(2, "thread-a", "project-known");
++      const resumedUpdate = archived(8, "thread-d", "project-new");
++      const removal = {
++        kind: "thread.removed" as const,
++        sequence: 9,
++        threadId: resumedUpdate.thread.id,
++      };
++      const segments: Array<number> = [];
++      const items = yield* archivedShellStream({
++        snapshot: initial,
++        loadSnapshot: Effect.succeed(fresh),
++        batchesFrom: (afterSequence) => {
++          segments.push(afterSequence);
++          return afterSequence === 1
++            ? Stream.make(
++                [knownUpdate],
++                [archived(3, "thread-b", "project-new")],
++                // Covered by the fresh snapshot, so the old segment must stop.
++                [archived(4, "thread-c", "project-known")],
++              )
++            : Stream.make([resumedUpdate, removal]);
++        },
++      }).pipe(Stream.runCollect);
++
++      expect(segments).toEqual([1, 7]);
++      expect(items).toEqual([
++        { kind: "snapshot", snapshot: initial },
++        knownUpdate,
++        { kind: "snapshot", snapshot: fresh },
++        resumedUpdate,
++        removal,
++      ]);
++    }),
++  );
++});
++
+ describe("shellStreamItemFromEnrichmentRefresh", () => {
+   it("batches nearby completion roots onto one snapshot item", () => {
+     expect(
+diff --git a/apps/server/src/orchestration-v2/ShellStream.ts b/apps/server/src/orchestration-v2/ShellStream.ts
+index 057fd77d80..d054edccdb 100644
+--- a/apps/server/src/orchestration-v2/ShellStream.ts
++++ b/apps/server/src/orchestration-v2/ShellStream.ts
+@@ -1,6 +1,7 @@
+ import type {
+   ApplicationStoredEvent,
+   OrchestrationProjectShell,
++  OrchestrationV2ArchivedShellSnapshot,
+   OrchestrationV2ArchivedShellStreamItem,
+   OrchestrationV2ShellSnapshot,
+   OrchestrationV2ThreadShell,
+@@ -24,7 +25,12 @@ import * as Schema from "effect/Schema";
+ import type * as SqlClient from "effect/sql/SqlClient";
+ import * as Stream from "effect/Stream";
+ 
+-import { bufferLatestLiveStream } from "./LiveStreamBudget.ts";
++import { rpcInitialItems } from "../rpcInitialItems.ts";
++import {
++  bufferLatestLiveStream,
++  bufferLiveStream,
++  type LiveStreamBufferError,
++} from "./LiveStreamBudget.ts";
+ 
+ type ShellDelta = Extract<OrchestrationV2ShellStreamItem, { readonly sequence: number }>;
+ 
+@@ -50,6 +56,7 @@ export const bufferShellLiveStream = <E, R>(
+     limits,
+   );
+ 
++/** Build the regular navigation shell without duplicating the archive dataset. */
+ export function buildActiveShellSnapshot(input: {
+   readonly projects: ReadonlyArray<OrchestrationProjectShell>;
+   readonly threads: OrchestrationV2ThreadShellSnapshot;
+@@ -386,6 +393,56 @@ export function shellStreamItemFromThreadShell(input: {
+   };
+ }
+ 
++/**
++ * Streams the archive from `snapshot`. When a batch archives a thread in a
++ * project the subscriber has not seen, the live segment ends and a new one
++ * starts from a fresh snapshot. Snapshots go out like the initial one, outside
++ * the live budget, so a large archive cannot overflow it.
++ */
++export function archivedShellStream<E, R, E2, R2>(input: {
++  readonly snapshot: OrchestrationV2ArchivedShellSnapshot;
++  readonly loadSnapshot: Effect.Effect<OrchestrationV2ArchivedShellSnapshot, E, R>;
++  readonly batchesFrom: (
++    afterSequence: number,
++  ) => Stream.Stream<ReadonlyArray<OrchestrationV2ArchivedShellStreamItem>, E2, R2>;
++}): Stream.Stream<OrchestrationV2ArchivedShellStreamItem, E | E2 | LiveStreamBufferError, R | R2> {
++  // Closures below must not reference `input`, or a delivered snapshot would
++  // stay alive for the whole segment.
++  const { loadSnapshot, batchesFrom } = input;
++  const knownProjectIds = new Set(input.snapshot.projects.map((project) => project.id));
++  let resync: OrchestrationV2ArchivedShellSnapshot | undefined;
++  const live = batchesFrom(input.snapshot.snapshotSequence).pipe(
++    Stream.mapEffect((items) =>
++      // Archive deltas cannot supply metadata for an unseen project.
++      items.some(
++        (item) => item.kind === "thread.updated" && !knownProjectIds.has(item.thread.projectId),
++      )
++        ? Effect.map(loadSnapshot, (fresh) => {
++            resync = fresh;
++            return [];
++          })
++        : Effect.succeed(items),
++    ),
++    Stream.takeUntil(() => resync !== undefined),
++    Stream.flatMap(Stream.fromIterable),
++    (stream) => bufferLiveStream(stream),
++  );
++  return Stream.concat(
++    rpcInitialItems([{ kind: "snapshot" as const, snapshot: input.snapshot }]),
++    Stream.concat(
++      live,
++      Stream.suspend(() => {
++        const snapshot = resync;
++        resync = undefined;
++        return snapshot === undefined
++          ? Stream.empty
++          : archivedShellStream({ snapshot, loadSnapshot, batchesFrom });
++      }),
++    ),
++  );
++}
++
++/** Converts a committed event into an archive-only delta when it changes archive membership. */
+ export function archivedShellStreamItemFromThreadShell(input: {
+   readonly stored: OrchestrationV2StoredEvent;
+   readonly shell: OrchestrationV2ThreadShell | null;
+diff --git a/apps/server/src/ws.ts b/apps/server/src/ws.ts
+index 70f6b8d81b..3104830ffa 100644
+--- a/apps/server/src/ws.ts
++++ b/apps/server/src/ws.ts
+@@ -119,6 +119,7 @@ import * as IdAllocator from "@t3tools/provider-core/server/IdAllocator";
+ import * as ScheduledTasks from "./scheduledTasks/ScheduledTaskService.ts";
+ import * as SecretRequests from "./secrets/SecretRequests.ts";
+ import {
++  archivedShellStream,
+   archivedShellStreamItemFromThreadShell,
+   buildActiveShellSnapshot,
+   bufferShellLiveStream,
+@@ -1785,36 +1786,36 @@ export const layerWsRpc = (
+         "ws.orchestrationV2.subscribeArchivedShell",
+       )(function* () {
+         const snapshot = yield* getOrchestrationV2ArchivedShellSnapshot;
+-        const live = threadManagement
+-          .streamStoredEventsFrom({ afterSequence: snapshot.snapshotSequence })
+-          .pipe(
+-            Stream.groupedWithin(512, Duration.millis(50)),
+-            Stream.mapEffect((events) =>
+-              Effect.forEach(
+-                coalesceStoredThreadEvents(Array.from(events)),
+-                (stored) =>
+-                  threadManagement
+-                    .getThreadShell(stored.event.threadId)
+-                    .pipe(
+-                      Effect.map((shell) =>
+-                        archivedShellStreamItemFromThreadShell({ stored, shell }),
++        return archivedShellStream({
++          snapshot,
++          loadSnapshot: getOrchestrationV2ArchivedShellSnapshot,
++          batchesFrom: (afterSequence) =>
++            threadManagement.streamStoredEventsFrom({ afterSequence }).pipe(
++              Stream.groupedWithin(512, Duration.millis(50)),
++              Stream.mapEffect((events) =>
++                Effect.forEach(
++                  coalesceStoredThreadEvents(Array.from(events)),
++                  (stored) =>
++                    threadManagement
++                      .getThreadShell(stored.event.threadId)
++                      .pipe(
++                        Effect.map((shell) =>
++                          archivedShellStreamItemFromThreadShell({ stored, shell }),
++                        ),
+                       ),
+-                    ),
+-                { concurrency: 8 },
++                  { concurrency: 8 },
++                ).pipe(Effect.map((items) => items.filter((item) => item !== null))),
+               ),
+             ),
+-            Stream.flatMap(Stream.fromIterable),
+-            Stream.filterMap((item) => (item === null ? Result.failVoid : Result.succeed(item))),
+-            (stream) => bufferLiveStream(stream),
+-            Stream.mapError(
+-              (cause) =>
+-                new OrchestrationV2GetShellSnapshotError({
+-                  message: "Failed while streaming archived threads",
+-                  cause,
+-                }),
+-            ),
+-          );
+-        return Stream.concat(rpcInitialItems([{ kind: "snapshot" as const, snapshot }]), live);
++        }).pipe(
++          Stream.mapError(
++            (cause) =>
++              new OrchestrationV2GetShellSnapshotError({
++                message: "Failed while streaming archived threads",
++                cause,
++              }),
++          ),
++        );
+       });
+ 
+       const mutateProject = Effect.fn("ws.projects.mutate")(function* (mutation: ProjectMutation) {
+diff --git a/apps/web/src/components/settings/SettingsPanels.tsx b/apps/web/src/components/settings/SettingsPanels.tsx
+index 7ee4639f9c..be6677727f 100644
+--- a/apps/web/src/components/settings/SettingsPanels.tsx
++++ b/apps/web/src/components/settings/SettingsPanels.tsx
+@@ -3406,7 +3406,6 @@ export function ArchivedThreadsPanel() {
+     snapshots: archivedSnapshots,
+     error: archiveError,
+     isLoading: isLoadingArchive,
+-    refresh: refreshArchivedThreads,
+   } = useArchivedThreadSnapshots(scope.environmentIds);
+ 
+   const { groups: archivedGroups, hasMultipleEnvironments } = (() => {
+@@ -3517,9 +3516,7 @@ export function ArchivedThreadsPanel() {
+ 
+     if (clicked === "unarchive") {
+       const result = await unarchiveThread(threadRef);
+-      if (result._tag === "Success") {
+-        refreshArchivedThreads();
+-      } else if (!isAtomCommandInterrupted(result)) {
++      if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
+         const error = squashAtomCommandFailure(result);
+         toastManager.add(
+           stackedThreadToast({
+@@ -3534,9 +3531,7 @@ export function ArchivedThreadsPanel() {
+ 
+     if (clicked === "delete") {
+       const result = await confirmAndDeleteThread(threadRef);
+-      if (result._tag === "Success") {
+-        refreshArchivedThreads();
+-      } else if (!isAtomCommandInterrupted(result)) {
++      if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
+         const error = squashAtomCommandFailure(result);
+         toastManager.add(
+           stackedThreadToast({
+@@ -3634,11 +3629,7 @@ export function ArchivedThreadsPanel() {
+                         const result = await unarchiveThread(
+                           scopeThreadRef(thread.environmentId, thread.id),
+                         );
+-                        if (result._tag === "Success") {
+-                          refreshArchivedThreads();
+-                          return;
+-                        }
+-                        if (!isAtomCommandInterrupted(result)) {
++                        if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
+                           const error = squashAtomCommandFailure(result);
+                           toastManager.add(
+                             stackedThreadToast({
+diff --git a/apps/web/src/hooks/useThreadActions.permissions.test.ts b/apps/web/src/hooks/useThreadActions.permissions.test.ts
+index 2e6875925a..3f544d45f0 100644
+--- a/apps/web/src/hooks/useThreadActions.permissions.test.ts
++++ b/apps/web/src/hooks/useThreadActions.permissions.test.ts
+@@ -134,9 +134,6 @@ vi.mock("../uiStateStore", () => ({
+       markThreadVisited: () => state.localEffects.push("mark-visited"),
+     }),
+ }));
+-vi.mock("../lib/archivedThreadsState", () => ({
+-  refreshArchivedThreadsForEnvironment: () => state.localEffects.push("refresh-archive"),
+-}));
+ vi.mock("../lib/composerDraftUploads", () => ({
+   releaseComposerDraftUploads: () => state.localEffects.push("release-uploads"),
+ }));
+diff --git a/apps/web/src/hooks/useThreadActions.ts b/apps/web/src/hooks/useThreadActions.ts
+index 1c2f1f0f0a..1d8d9ba546 100644
+--- a/apps/web/src/hooks/useThreadActions.ts
++++ b/apps/web/src/hooks/useThreadActions.ts
+@@ -31,7 +31,6 @@ import { isScratchProject } from "@t3tools/client-runtime/state/projects";
+ import { threadEnvironment } from "../state/threads";
+ import { vcsEnvironment } from "../state/vcs";
+ import { useNewThreadHandler } from "./useHandleNewThread";
+-import { refreshArchivedThreadsForEnvironment } from "../lib/archivedThreadsState";
+ import { releaseComposerDraftUploads } from "../lib/composerDraftUploads";
+ import { readLocalApi } from "../localApi";
+ import {
+@@ -329,7 +328,6 @@ export function useThreadActions() {
+     if (result._tag === "Failure") {
+       return result;
+     }
+-    refreshArchivedThreadsForEnvironment(target.environmentId);
+     if (opts.navigate) {
+       return settlePromise(() =>
+         router.navigate({
+@@ -373,7 +371,6 @@ export function useThreadActions() {
+     if (wokeAt !== null) {
+       markThreadVisited(scopedThreadKey(threadRef), wokeAt);
+     }
+-    refreshArchivedThreadsForEnvironment(threadRef.environmentId);
+     opts.onArchived?.();
+     showThreadUndoNotice({
+       action: "Archived",
+@@ -408,7 +405,6 @@ export function useThreadActions() {
+         input: { threadId: target.threadId },
+       });
+       if (result._tag === "Success") {
+-        refreshArchivedThreadsForEnvironment(target.environmentId);
+         clearThreadPreviewState(target);
+       }
+       return result;
+@@ -508,7 +504,6 @@ export function useThreadActions() {
+     if (deleteResult._tag === "Failure") {
+       return deleteResult;
+     }
+-    refreshArchivedThreadsForEnvironment(threadRef.environmentId);
+     releaseComposerDraftUploads(threadRef);
+     clearComposerDraftForThread(threadRef);
+     clearProjectDraftThreadById(
+diff --git a/apps/web/src/hooks/useThreadActions.undo.test.ts b/apps/web/src/hooks/useThreadActions.undo.test.ts
+index 9950911bee..d22749f662 100644
+--- a/apps/web/src/hooks/useThreadActions.undo.test.ts
++++ b/apps/web/src/hooks/useThreadActions.undo.test.ts
+@@ -37,7 +37,6 @@ vi.mock("./useHandleNewThread", () => ({ useNewThreadHandler: () => vi.fn() }));
+ vi.mock("../composerDraftStore", () => ({ useComposerDraftStore: () => vi.fn() }));
+ vi.mock("../terminalUiStateStore", () => ({ useTerminalUiStateStore: () => vi.fn() }));
+ vi.mock("../uiStateStore", () => ({ useUiStateStore: () => vi.fn() }));
+-vi.mock("../lib/archivedThreadsState", () => ({ refreshArchivedThreadsForEnvironment: vi.fn() }));
+ const threadShell = vi.hoisted(() => ({
+   title: "Thread",
+   pinOrderKey: "a0",
+diff --git a/apps/web/src/lib/archivedThreadsState.ts b/apps/web/src/lib/archivedThreadsState.ts
+index a84e072255..acb2118af7 100644
+--- a/apps/web/src/lib/archivedThreadsState.ts
++++ b/apps/web/src/lib/archivedThreadsState.ts
+@@ -6,11 +6,11 @@ import {
+ } from "@t3tools/client-runtime/state/threads";
+ import type { EnvironmentId } from "@t3tools/contracts";
+ 
++import { environmentCatalog } from "../connection/catalog";
+ import { orchestrationEnvironment } from "../state/orchestration";
+-import { appAtomRegistry } from "../rpc/atomRegistry";
+ 
+ function archivedSnapshotAtom(environmentId: EnvironmentId) {
+-  return orchestrationEnvironment.archivedShellSnapshot({
++  return orchestrationEnvironment.archivedShell({
+     environmentId,
+     input: {},
+   });
+@@ -18,29 +18,15 @@ function archivedSnapshotAtom(environmentId: EnvironmentId) {
+ 
+ const archivedSnapshotsAtom = createArchivedThreadSnapshotsAtomFamily({
+   getSnapshotAtom: archivedSnapshotAtom,
++  getConnectionStateAtom: environmentCatalog.stateAtom,
+   labelPrefix: "web:archived-thread-snapshots",
+ });
+ 
+-export function refreshArchivedThreadsForEnvironment(environmentId: EnvironmentId): void {
+-  appAtomRegistry.refresh(archivedSnapshotAtom(environmentId));
+-}
+-
+ export function useArchivedThreadSnapshots(environmentIds: ReadonlyArray<EnvironmentId>): {
+   readonly snapshots: ReadonlyArray<ArchivedSnapshotEntry>;
+   readonly error: string | null;
+   readonly isLoading: boolean;
+-  readonly refresh: () => void;
+ } {
+   const environmentKey = makeArchivedThreadsEnvironmentKey(environmentIds);
+-  const result = useAtomValue(archivedSnapshotsAtom(environmentKey));
+-  const refresh = () => {
+-    for (const environmentId of environmentIds) {
+-      appAtomRegistry.refresh(archivedSnapshotAtom(environmentId));
+-    }
+-  };
+-
+-  return {
+-    ...result,
+-    refresh,
+-  };
++  return useAtomValue(archivedSnapshotsAtom(environmentKey));
+ }
+diff --git a/docs/internals/performance-regressions.md b/docs/internals/performance-regressions.md
+index 0e395564f1..4607a62b00 100644
+--- a/docs/internals/performance-regressions.md
++++ b/docs/internals/performance-regressions.md
+@@ -42,7 +42,7 @@ The v2 checks pin these invariants:
+   route output deltas through `turn_item.updated`: a busy command would flood the event store and
+   block ingestion for every other thread.
+ - The initial shell contains active navigation rows only. Archived rows use the dedicated archive
+-  query, and transcript message bodies stay in thread detail regardless of message size.
++  snapshot/stream, and transcript message bodies stay in thread detail regardless of message size.
+ - Shell resume sends deltas plus compact repository-enrichment metadata, not another full project
+   and thread snapshot.
+ - Auto, steer, and restart sends resolve delivery from authoritative state inside the
+diff --git a/packages/client-runtime/src/rpc/client.ts b/packages/client-runtime/src/rpc/client.ts
+index c364b3448d..d3d27ed7b2 100644
+--- a/packages/client-runtime/src/rpc/client.ts
++++ b/packages/client-runtime/src/rpc/client.ts
+@@ -52,6 +52,7 @@ export type EnvironmentSubscriptionRpcTag =
+   | typeof WS_METHODS.codexAuthCallbackSubscribe
+   | typeof WS_METHODS.providerAuthSubscribe
+   | typeof WS_METHODS.providerInstallSubscribe
++  | typeof ORCHESTRATION_V2_WS_METHODS.subscribeArchivedShell
+   | typeof ORCHESTRATION_V2_WS_METHODS.subscribeShell
+   | typeof ORCHESTRATION_V2_WS_METHODS.subscribeThread
+   | typeof ORCHESTRATION_V2_WS_METHODS.subscribeCommandOutput
+diff --git a/packages/client-runtime/src/state/archivedThreads.test.ts b/packages/client-runtime/src/state/archivedThreads.test.ts
+index 7680a73f26..064eb391d5 100644
+--- a/packages/client-runtime/src/state/archivedThreads.test.ts
++++ b/packages/client-runtime/src/state/archivedThreads.test.ts
+@@ -1,7 +1,36 @@
+-import { EnvironmentId, type OrchestrationV2ArchivedShellSnapshot } from "@t3tools/contracts";
++import { expect, it } from "@effect/vitest";
++import {
++  EnvironmentId,
++  ORCHESTRATION_V2_WS_METHODS,
++  type OrchestrationV2ArchivedShellSnapshot,
++  type OrchestrationV2ArchivedShellStreamItem,
++  ThreadId,
++} from "@t3tools/contracts";
+ import * as Cause from "effect/Cause";
++import * as Deferred from "effect/Deferred";
+ import { AsyncResult, Atom, AtomRegistry } from "effect/reactivity";
+-import { expect, it } from "vite-plus/test";
++import * as Effect from "effect/Effect";
++import * as Layer from "effect/Layer";
++import * as Option from "effect/Option";
++import * as Queue from "effect/Queue";
++import * as Stream from "effect/Stream";
++import * as SubscriptionRef from "effect/SubscriptionRef";
++import { FetchHttpClient } from "effect/http";
++
++import {
++  AVAILABLE_CONNECTION_STATE,
++  ConnectionTransientError,
++  PrimaryConnectionTarget,
++  type PreparedConnection,
++  type SupervisorConnectionState,
++} from "../connection/model.ts";
++import * as EnvironmentRegistry from "../connection/registry.ts";
++import * as EnvironmentSupervisor from "../connection/supervisor.ts";
++import type { WsRpcProtocolClient } from "../rpc/protocol.ts";
++import type { RpcSession } from "../rpc/session.ts";
++import { createEnvironmentCatalogAtoms } from "./connections.ts";
++import { createOrchestrationEnvironmentAtoms } from "./orchestration.ts";
++import { v2Now, v2Project, v2ThreadShell } from "./orchestrationV2TestFixtures.ts";
+ 
+ import {
+   createArchivedThreadSnapshotsAtomFamily,
+@@ -26,6 +55,7 @@ it("does not expose an archived snapshot failure message", () => {
+           Cause.fail(new Error("credential=secret-value")),
+         ),
+       ),
++    getConnectionStateAtom: () => Atom.make(AsyncResult.initial<SupervisorConnectionState>()),
+     labelPrefix: "test:archived-thread-snapshots",
+   });
+   const registry = AtomRegistry.make();
+@@ -38,3 +68,208 @@ it("does not expose an archived snapshot failure message", () => {
+ 
+   registry.dispose();
+ });
++
++it.effect("keeps environment archives live and replaces stale data on reconnect", () =>
++  Effect.gen(function* () {
++    const connectedState: SupervisorConnectionState = {
++      ...AVAILABLE_CONNECTION_STATE,
++      desired: true,
++      network: "online",
++      phase: "connected",
++      attempt: 1,
++      generation: 1,
++    };
++    const makeConnection = Effect.fnUntraced(function* (id: string, state = connectedState) {
++      const events = yield* Queue.unbounded<OrchestrationV2ArchivedShellStreamItem>();
++      const subscribed = yield* Deferred.make<void>();
++      const client = {
++        [ORCHESTRATION_V2_WS_METHODS.subscribeArchivedShell]: () =>
++          Stream.fromQueue(events).pipe(Stream.onStart(Deferred.succeed(subscribed, undefined))),
++      } as unknown as WsRpcProtocolClient;
++      const session: RpcSession = {
++        client,
++        initialConfig: Effect.never,
++        subscribeServerConfig: () => Stream.never,
++        ready: Effect.void,
++        probe: Effect.void,
++        closed: Effect.never,
++      };
++      const target = new PrimaryConnectionTarget({
++        environmentId: EnvironmentId.make(id),
++        label: id,
++        httpBaseUrl: "https://environment.example.test",
++        wsBaseUrl: "wss://environment.example.test",
++      });
++      const prepared: PreparedConnection = {
++        environmentId: target.environmentId,
++        label: target.label,
++        httpBaseUrl: target.httpBaseUrl,
++        socketUrl: target.wsBaseUrl,
++        httpAuthorization: null,
++        target,
++      };
++      const supervisor = EnvironmentSupervisor.EnvironmentSupervisor.of({
++        target,
++        state: yield* SubscriptionRef.make(state),
++        session: yield* SubscriptionRef.make(
++          state.phase === "connected" ? Option.some(session) : Option.none<RpcSession>(),
++        ),
++        prepared: yield* SubscriptionRef.make(
++          state.phase === "connected" ? Option.some(prepared) : Option.none<PreparedConnection>(),
++        ),
++        connect: Effect.void,
++        disconnect: Effect.void,
++        retryNow: Effect.void,
++      });
++      return { events, subscribed, session, prepared, supervisor };
++    });
++    const a = yield* makeConnection("env-a");
++    const b = yield* makeConnection("env-b", {
++      ...connectedState,
++      network: "offline",
++      phase: "offline",
++      lastFailure: new ConnectionTransientError({
++        reason: "network",
++        detail: "credential=secret-value",
++      }),
++    });
++    const envA = a.supervisor.target.environmentId;
++    const envB = b.supervisor.target.environmentId;
++    const environments = EnvironmentRegistry.EnvironmentRegistry.of({
++      followStream: (environmentId, stream) =>
++        Stream.provideService(
++          stream,
++          EnvironmentSupervisor.EnvironmentSupervisor,
++          environmentId === envA ? a.supervisor : b.supervisor,
++        ),
++    } as EnvironmentRegistry.EnvironmentRegistry["Service"]);
++    const runtime = Atom.runtime(
++      Layer.merge(
++        Layer.succeed(EnvironmentRegistry.EnvironmentRegistry, environments),
++        FetchHttpClient.layer,
++      ),
++    );
++    const atoms = createOrchestrationEnvironmentAtoms(runtime);
++    const catalog = createEnvironmentCatalogAtoms(runtime);
++    const snapshots = createArchivedThreadSnapshotsAtomFamily({
++      getSnapshotAtom: (environmentId) => atoms.archivedShell({ environmentId, input: {} }),
++      getConnectionStateAtom: catalog.stateAtom,
++      labelPrefix: "test:archived-thread-snapshots",
++    })(makeArchivedThreadsEnvironmentKey([envA, envB]));
++    const registry = yield* Effect.acquireRelease(Effect.sync(AtomRegistry.make), (registry) =>
++      Effect.sync(() => registry.dispose()),
++    );
++    for (const [environmentId, phase] of [
++      [envA, "connected"],
++      [envB, "offline"],
++    ] as const) {
++      yield* AtomRegistry.toStream(registry, catalog.stateAtom(environmentId)).pipe(
++        Stream.filter((result) =>
++          Option.exists(AsyncResult.value(result), (state) => state.phase === phase),
++        ),
++        Stream.runHead,
++      );
++    }
++    registry.mount(snapshots);
++    expect(registry.get(snapshots).isLoading).toBe(true);
++
++    const initial: OrchestrationV2ArchivedShellSnapshot = {
++      schemaVersion: 1,
++      snapshotSequence: 2,
++      projects: [v2Project],
++      threads: [],
++    };
++    const archived = { ...v2ThreadShell, archivedAt: v2Now };
++    const onlineSnapshot = { ...initial, snapshotSequence: 1, threads: [archived] };
++    const otherEnvironment = { ...initial, snapshotSequence: 1, threads: [archived] };
++    const waitForSequence = (environmentId: EnvironmentId, sequence: number) =>
++      AtomRegistry.toStream(registry, snapshots).pipe(
++        Stream.filter((state) =>
++          state.snapshots.some(
++            (entry) =>
++              entry.environmentId === environmentId && entry.snapshot.snapshotSequence === sequence,
++          ),
++        ),
++        Stream.runHead,
++      );
++    yield* Queue.offer(a.events, { kind: "snapshot", snapshot: onlineSnapshot });
++    yield* waitForSequence(envA, 1);
++    expect(registry.get(snapshots).snapshots).toEqual([
++      { environmentId: envA, snapshot: onlineSnapshot },
++    ]);
++    // Keep exercising recovery and live updates when the offline-state regression fails.
++    expect.soft(registry.get(snapshots).isLoading).toBe(false);
++    expect.soft(registry.get(snapshots).error).toBe("Failed to load archived threads.");
++
++    yield* SubscriptionRef.set(b.supervisor.state, {
++      ...connectedState,
++      phase: "connecting",
++      stage: "opening",
++      attempt: 2,
++      generation: 2,
++    });
++    yield* AtomRegistry.toStream(registry, snapshots).pipe(
++      Stream.filter((state) => state.isLoading),
++      Stream.runHead,
++    );
++    yield* SubscriptionRef.set(b.supervisor.prepared, Option.some(b.prepared));
++    yield* SubscriptionRef.set(b.supervisor.session, Option.some(b.session));
++    yield* SubscriptionRef.set(b.supervisor.state, {
++      ...connectedState,
++      attempt: 2,
++      generation: 2,
++    });
++    yield* Deferred.await(b.subscribed);
++    expect(registry.get(snapshots).isLoading).toBe(true);
++    expect(registry.get(snapshots).snapshots).toEqual([
++      { environmentId: envA, snapshot: onlineSnapshot },
++    ]);
++    yield* Queue.offer(b.events, { kind: "snapshot", snapshot: otherEnvironment });
++    yield* waitForSequence(envB, 1);
++
++    const check = (snapshot: OrchestrationV2ArchivedShellSnapshot) =>
++      expect(registry.get(snapshots)).toEqual({
++        snapshots: [
++          { environmentId: envA, snapshot },
++          { environmentId: envB, snapshot: otherEnvironment },
++        ],
++        error: null,
++        isLoading: false,
++      });
++    check(onlineSnapshot);
++    yield* Queue.offer(a.events, { kind: "snapshot", snapshot: initial });
++    yield* waitForSequence(envA, 2);
++    check(initial);
++    yield* Queue.offer(a.events, { kind: "thread.updated", sequence: 3, thread: archived });
++    yield* waitForSequence(envA, 3);
++    check({ ...initial, snapshotSequence: 3, threads: [archived] });
++    const renamed = { ...archived, title: "Renamed by another client" };
++    yield* Queue.offer(a.events, { kind: "thread.updated", sequence: 4, thread: renamed });
++    yield* waitForSequence(envA, 4);
++    check({ ...initial, snapshotSequence: 4, threads: [renamed] });
++    yield* Queue.offer(a.events, { kind: "thread.removed", sequence: 5, threadId: archived.id });
++    yield* waitForSequence(envA, 5);
++    check({ ...initial, snapshotSequence: 5 });
++
++    yield* Queue.offer(a.events, { kind: "thread.updated", sequence: 6, thread: archived });
++    yield* waitForSequence(envA, 6);
++    const reconnected = yield* makeConnection("env-a");
++    const replacement = { ...initial, snapshotSequence: 9, projects: [] };
++    yield* SubscriptionRef.set(a.supervisor.session, Option.some(reconnected.session));
++    yield* Queue.offer(reconnected.events, { kind: "snapshot", snapshot: replacement });
++    yield* waitForSequence(envA, 9);
++    check(replacement);
++    const newThread = { ...archived, id: ThreadId.make("thread-after-reconnect") };
++    const refreshed = { ...initial, snapshotSequence: 10, threads: [newThread] };
++    yield* Queue.offer(reconnected.events, { kind: "snapshot", snapshot: refreshed });
++    yield* waitForSequence(envA, 10);
++    check(refreshed);
++    yield* Queue.offer(reconnected.events, {
++      kind: "thread.removed",
++      sequence: 11,
++      threadId: newThread.id,
++    });
++    yield* waitForSequence(envA, 11);
++    check({ ...initial, snapshotSequence: 11 });
++  }),
++);
+diff --git a/packages/client-runtime/src/state/archivedThreads.ts b/packages/client-runtime/src/state/archivedThreads.ts
+index 7160d2f83f..f0401d4903 100644
+--- a/packages/client-runtime/src/state/archivedThreads.ts
++++ b/packages/client-runtime/src/state/archivedThreads.ts
+@@ -1,10 +1,16 @@
+-import { EnvironmentId, type OrchestrationV2ArchivedShellSnapshot } from "@t3tools/contracts";
++import {
++  EnvironmentId,
++  type OrchestrationV2ArchivedShellSnapshot,
++  type OrchestrationV2ArchivedShellStreamItem,
++} from "@t3tools/contracts";
+ import * as Arr from "effect/Array";
+ import { pipe } from "effect/Function";
+ import * as Option from "effect/Option";
+ import * as Order from "effect/Order";
+ import { AsyncResult, Atom } from "effect/reactivity";
+ 
++import type { SupervisorConnectionState } from "../connection/model.ts";
++
+ export interface ArchivedSnapshotEntry {
+   readonly environmentId: EnvironmentId;
+   readonly snapshot: OrchestrationV2ArchivedShellSnapshot;
+@@ -37,10 +43,32 @@ export function parseArchivedThreadsEnvironmentKey(key: string): ReadonlyArray<E
+   );
+ }
+ 
++/**
++ * Folds the archived-shell stream into a snapshot. Every (re)subscription
++ * starts with a full snapshot, so deltas before one have nothing to apply to.
++ */
++export function applyArchivedShellStreamItem(
++  snapshot: OrchestrationV2ArchivedShellSnapshot | null,
++  item: OrchestrationV2ArchivedShellStreamItem,
++): OrchestrationV2ArchivedShellSnapshot | null {
++  if (item.kind === "snapshot") return item.snapshot;
++  if (snapshot === null) return null;
++  const threadId = item.kind === "thread.updated" ? item.thread.id : item.threadId;
++  const threads = snapshot.threads.filter((thread) => thread.id !== threadId);
++  return {
++    ...snapshot,
++    snapshotSequence: item.sequence,
++    threads: item.kind === "thread.updated" ? [...threads, item.thread] : threads,
++  };
++}
++
+ export function createArchivedThreadSnapshotsAtomFamily<E>(options: {
+   readonly getSnapshotAtom: (
+     environmentId: EnvironmentId,
+   ) => Atom.Atom<AsyncResult.AsyncResult<OrchestrationV2ArchivedShellSnapshot, E>>;
++  readonly getConnectionStateAtom: (
++    environmentId: EnvironmentId,
++  ) => Atom.Atom<AsyncResult.AsyncResult<SupervisorConnectionState, unknown>>;
+   readonly labelPrefix: string;
+ }) {
+   return Atom.family((environmentKey: string) =>
+@@ -51,14 +79,22 @@ export function createArchivedThreadSnapshotsAtomFamily<E>(options: {
+ 
+       for (const environmentId of parseArchivedThreadsEnvironmentKey(environmentKey)) {
+         const result = get(options.getSnapshotAtom(environmentId));
+-        isLoading ||= result.waiting;
++        const connection = get(options.getConnectionStateAtom(environmentId));
++        const state = Option.getOrNull(AsyncResult.value(connection));
++        const unavailable =
++          connection._tag === "Failure" ||
++          state?.phase === "available" ||
++          state?.phase === "offline" ||
++          state?.phase === "blocked";
++        // Live snapshots stay `waiting` while subscribed; only the first load counts.
++        isLoading ||= result._tag === "Initial" && !unavailable;
+ 
+         const snapshot = Option.getOrNull(AsyncResult.value(result));
+         if (snapshot !== null) {
+           snapshots.push({ environmentId, snapshot });
+         }
+ 
+-        if (error === null && result._tag === "Failure") {
++        if (error === null && (result._tag === "Failure" || unavailable)) {
+           error = "Failed to load archived threads.";
+         }
+       }
+diff --git a/packages/client-runtime/src/state/orchestration.ts b/packages/client-runtime/src/state/orchestration.ts
+index 8bef9762a2..3c7f3332dd 100644
+--- a/packages/client-runtime/src/state/orchestration.ts
++++ b/packages/client-runtime/src/state/orchestration.ts
+@@ -1,11 +1,13 @@
+ import { ORCHESTRATION_V2_WS_METHODS, type ThreadId } from "@t3tools/contracts";
+ import * as Effect from "effect/Effect";
+ import * as Option from "effect/Option";
++import * as Predicate from "effect/Predicate";
+ import * as Stream from "effect/Stream";
+ import * as SubscriptionRef from "effect/SubscriptionRef";
+ import type { HttpClient } from "effect/http";
+ import { Atom } from "effect/reactivity";
+ 
++import { applyArchivedShellStreamItem } from "./archivedThreads.ts";
+ import { applyCommandOutputFrame, EMPTY_COMMAND_OUTPUT } from "./commandOutput.ts";
+ 
+ import {
+@@ -124,9 +126,15 @@ export function createOrchestrationEnvironmentAtoms<R, E>(
+       staleTimeMs: 30_000,
+       idleTtlMs: 60_000,
+     }),
+-    archivedShellSnapshot: createEnvironmentRpcQueryAtomFamily(runtime, {
+-      label: "environment-data:orchestration:archived-shell-snapshot",
+-      tag: ORCHESTRATION_V2_WS_METHODS.getArchivedShellSnapshot,
++    // Live, so archives from agents, scheduled tasks, and other clients show up.
++    archivedShell: createEnvironmentRpcSubscriptionAtomFamily(runtime, {
++      label: "environment-data:orchestration:archived-shell",
++      tag: ORCHESTRATION_V2_WS_METHODS.subscribeArchivedShell,
++      transform: (stream) =>
++        stream.pipe(
++          Stream.scan(() => null, applyArchivedShellStreamItem),
++          Stream.filter(Predicate.isNotNull),
++        ),
+     }),
+   };
+ }
