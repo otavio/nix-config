@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 let
-  inherit (pkgs.t3code) browser;
+  browser = pkgs.callPackage ./chrome-headless-shell.nix { };
 in
 {
   home = {

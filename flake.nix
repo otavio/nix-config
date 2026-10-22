@@ -45,6 +45,11 @@
       url = "github:numtide/llm-agents.nix";
     };
 
+    t3code-nix = {
+      url = "github:OSSystems/t3code-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     herdr-plugin-hunk = {
       url = "github:edmundmiller/herdr-plugin-hunk";
       flake = false;
