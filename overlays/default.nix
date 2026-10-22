@@ -34,12 +34,7 @@
       ) nixFiles
     );
 
-  modifications = final: prev: {
-    t3code = import ../packages/t3code {
-      pkgs = final;
-      inherit (prev) t3code;
-    };
-  };
+  t3code = inputs.t3code-nix.overlays.default;
 
   llm-agents = final: _: {
     inherit (inputs.llm-agents.packages.${final.stdenv.hostPlatform.system})

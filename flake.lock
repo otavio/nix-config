@@ -464,6 +464,7 @@
         "pedantix": "pedantix",
         "red-tape": "red-tape",
         "sops-nix": "sops-nix",
+        "t3code-nix": "t3code-nix",
         "treefmt-nix": "treefmt-nix_2",
         "whisrs": "whisrs"
       }
@@ -546,6 +547,26 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "t3code-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792710503,
+        "narHash": "sha256-hKb9OJjiAyo+p6V8sXpMCRR9S1ggdf8QTFAmDcI/Fxc=",
+        "owner": "OSSystems",
+        "repo": "t3code-nix",
+        "rev": "464e13dd20468eab2ff875c57ec122f73e872a04",
+        "type": "github"
+      },
+      "original": {
+        "owner": "OSSystems",
+        "repo": "t3code-nix",
         "type": "github"
       }
     },

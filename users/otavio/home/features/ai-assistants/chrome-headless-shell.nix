@@ -29,7 +29,7 @@
 
 let
   # Must match VERSION and ARCHIVES in apps/server/src/preview/PreviewBrowser.ts;
-  # the t3code build checks it.
+  # update it with each t3code bump.
   archives = {
     x86_64-linux = {
       platform = "linux64";
