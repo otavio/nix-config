@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ config, lib, ... }:
 
 let
   servers = {
@@ -35,4 +35,7 @@ in
   environment.etc."dnssec-trust-anchors.d/private.negative".text = lib.concatLines (
     lib.attrNames servers
   );
+  systemd.services.systemd-resolved.restartTriggers = [
+    config.environment.etc."dnssec-trust-anchors.d/private.negative".source
+  ];
 }
