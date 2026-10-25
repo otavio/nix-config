@@ -84,9 +84,21 @@
 
     (writeShellApplication {
       name = "scrcpy";
-      runtimeInputs = with pkgs; [ scrcpy ];
+      runtimeInputs = with pkgs; [
+        android-tools
+        coreutils
+        gawk
+        scrcpy
+      ];
       text = ''
-        scrcpy -M --no-audio
+        # A long-running adb server can miss a phone that reconnected after it started.
+        if ! adb devices | awk 'NR > 1 && $2 == "device" { found = 1 } END { exit !found }'; then
+          adb kill-server
+          adb start-server
+          timeout 5 adb wait-for-device || true
+        fi
+
+        exec scrcpy -M --no-audio
       '';
     })
 
