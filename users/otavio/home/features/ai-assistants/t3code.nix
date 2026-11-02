@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 let
-  browser = pkgs.callPackage ./chrome-headless-shell.nix { };
+  browser = pkgs.t3code-chrome-headless-shell;
 in
 {
   home = {
