@@ -2,7 +2,7 @@
 
 let
   servers = {
-    "intranet.freedom.ind.br" = "192.168.0.233";
+    "intranet.freedom.ind.br" = "192.168.0.240";
     "lab.ossystems" = "10.5.3.1";
   };
 in
