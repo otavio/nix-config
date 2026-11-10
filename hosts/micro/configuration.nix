@@ -39,6 +39,7 @@
       ./split-dns.nix
       ./openweathermap.nix
       ./partitioning.nix
+      ./shellhub-agent.nix
       ./whisrs.nix
       ./wireguard.nix
     ];
