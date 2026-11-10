@@ -20,24 +20,17 @@
     ./features/zsh
   ];
   programs = {
-    brave = {
+    chromium = {
       enable = true;
-      # nixpkgs' Brave wrapper does not put libvulkan on the library path, so
-      # vulkanSupport alone leaves WebGPU on SwiftShader instead of RADV.
-      #
       # Hardware video encoding hangs the Polaris VCE ring and the following
       # GPU reset never recovers. VCE only encodes H.264, so in practice only
       # Teams calls hit it; encode in software and keep VA-API for decode.
-      package =
-        (pkgs.brave.override {
-          vulkanSupport = true;
-          commandLineArgs = "--enable-unsafe-webgpu --disable-accelerated-video-encode";
-        }).overrideAttrs
-          (old: {
-            preFixup = old.preFixup + ''
-              gappsWrapperArgs+=(--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ pkgs.vulkan-loader ]})
-            '';
-          });
+      commandLineArgs = [
+        "--enable-features=AcceleratedVideoDecodeLinuxGL,Vulkan"
+        "--disable-features=UseChromeOSDirectVideoDecoder"
+        "--enable-unsafe-webgpu"
+        "--disable-accelerated-video-encode"
+      ];
     };
     zathura.enable = true;
   };
@@ -59,7 +52,7 @@
       notification = true;
     }
     {
-      command = "brave";
+      command = "chromium";
       notification = true;
     }
     {

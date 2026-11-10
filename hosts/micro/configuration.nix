@@ -35,7 +35,7 @@
 
       flake.nixosModules.restic-r2
 
-      ./brave.nix
+      ./chromium.nix
       ./split-dns.nix
       ./openweathermap.nix
       ./partitioning.nix
