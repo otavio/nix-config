@@ -125,7 +125,7 @@ in
           "${browserWs}" = [
             { class = "Google-chrome"; }
             { class = "Firefox"; }
-            { class = "chromium"; }
+            { class = "Chromium"; }
           ];
 
           "${triviaWs}" = [
