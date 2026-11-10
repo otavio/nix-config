@@ -125,7 +125,6 @@ in
           "${browserWs}" = [
             { class = "Google-chrome"; }
             { class = "Firefox"; }
-            { class = "Brave"; }
             { class = "chromium"; }
           ];
 
