@@ -557,11 +557,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1794314612,
-        "narHash": "sha256-lKHGE6ksJ4PlR4izd9AzBpx+SyDWdD95nHePd2xxP+A=",
+        "lastModified": 1794521579,
+        "narHash": "sha256-42hDXG7mFnu99bxARMqbmjc2N5UPiBF3Skiqjp2V7QY=",
         "owner": "OSSystems",
         "repo": "t3code-nix",
-        "rev": "62b361e161107492fdf1e1e94100a3906c1d8ea9",
+        "rev": "39b99f53649a23e6e226af80f226b0034ac1bf49",
         "type": "github"
       },
       "original": {
