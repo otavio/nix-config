@@ -45,7 +45,13 @@
       buildOnTarget = true;
     };
   };
-  services.timekpr.adminUsers = [ "bruna" ];
+  services = {
+    timekpr.adminUsers = [ "bruna" ];
+    logind.settings.Login = {
+      IdleAction = "hibernate";
+      IdleActionSec = "30min";
+    };
+  };
   home-manager.users = {
     bruna = import ../../users/bruna/home;
     kadu = import ../../users/kadu/home;
@@ -62,5 +68,9 @@
       kernelModules = [ ];
     };
     kernelModules = [ "kvm-intel" ];
+    resumeDevice = "/dev/disk/by-partlabel/root";
+    # From `btrfs inspect-internal map-swapfile -r /.swapvol/swapfile`;
+    # recreating the swapfile changes it.
+    kernelParams = [ "resume_offset=20227328" ];
   };
 }
