@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ pkgs, ... }:
 
 let
   basePrompt = ''
@@ -88,7 +88,7 @@ in
 
   services.whisrs = {
     enable = true;
-    package = inputs.whisrs.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    package = pkgs.whisrs;
     openai.apiKeyFile = "/run/secrets/openai_api_key";
 
     xkb = {

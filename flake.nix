@@ -73,11 +73,6 @@
       # instead of rebuilding from source on every nixpkgs bump.
       url = "github:zhaofengli/colmena";
     };
-
-    whisrs = {
-      url = "github:y0sif/whisrs";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =

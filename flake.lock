@@ -189,24 +189,6 @@
         "type": "github"
       }
     },
-    "flake-utils": {
-      "inputs": {
-        "systems": "systems_3"
-      },
-      "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
     "git-hooks-nix": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -465,8 +447,7 @@
         "red-tape": "red-tape",
         "sops-nix": "sops-nix",
         "t3code-nix": "t3code-nix",
-        "treefmt-nix": "treefmt-nix_2",
-        "whisrs": "whisrs"
+        "treefmt-nix": "treefmt-nix_2"
       }
     },
     "sops-nix": {
@@ -535,21 +516,6 @@
         "type": "github"
       }
     },
-    "systems_3": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    },
     "t3code-nix": {
       "inputs": {
         "nixpkgs": [
@@ -608,27 +574,6 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "type": "github"
-      }
-    },
-    "whisrs": {
-      "inputs": {
-        "flake-utils": "flake-utils",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1794589602,
-        "narHash": "sha256-iP23donjJpw8X5r/UUNekW0YIC0Km9ne/swPhEn4b20=",
-        "owner": "y0sif",
-        "repo": "whisrs",
-        "rev": "a3f1710c4c0d852bb11209f63d7ab6f115b02beb",
-        "type": "github"
-      },
-      "original": {
-        "owner": "y0sif",
-        "repo": "whisrs",
         "type": "github"
       }
     }
