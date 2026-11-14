@@ -78,6 +78,7 @@ in
     settings = {
       env = {
         CLAUDE_CODE_NO_FLICKER = "1";
+        CLAUDE_CODE_EXPERIMENTAL_CODE_MODE = "1";
         DISABLE_EXTRA_USAGE_COMMAND = "1";
       }
       // credentialGuard.mkAgentEnv "claude";
