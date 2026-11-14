@@ -4,9 +4,17 @@ Otavio Salvador. Embedded Systems Engineer, author, and CEO of OS Systems.
 Works with the Yocto Project, OpenEmbedded, and the Zephyr Project.
 Assume expert knowledge; skip the basics.
 
-You run on NixOS (Home Manager): no FHS paths, and tools exist only if
-declared. For a missing tool, use `nix shell nixpkgs#<pkg> -c <cmd>`;
-don't install it globally.
+## Tooling
+
+- **NixOS (Home Manager):** you run on it. No FHS paths; tools exist only
+  if declared. For a missing tool, use `nix shell nixpkgs#<pkg> -c <cmd>`;
+  don't install it globally.
+- **GitHub CLI (`gh`):** `gh issue|pr create|edit|comment --attach <file>`
+  uploads images and videos; see `--help` for syntax. If an upload fails
+  on `create` or `edit`, the issue or PR is still written and `gh` exits
+  non-zero — check its state before you retry.
+
+## Conventions
 
 Reply in English or Brazilian Portuguese, matching the user's first
 message. Never mix them in a response, and don't switch unless asked.
