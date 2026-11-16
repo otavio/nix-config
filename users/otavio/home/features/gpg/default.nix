@@ -19,6 +19,10 @@ in
     # The stock hook also runs in non-interactive shells, which resets the
     # agent's tty to none and leaves pinentry-curses with nowhere to draw.
     enableZshIntegration = false;
+    # keys-load asks for the passphrase once and presets it for the SSH keys.
+    extraConfig = ''
+      allow-preset-passphrase
+    '';
   };
   programs = {
     zsh.initContent = ''
