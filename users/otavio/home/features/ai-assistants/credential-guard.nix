@@ -15,7 +15,8 @@
 { pkgs }:
 
 let
-  realPinentry = pkgs.lib.getExe' pkgs.pinentry-curses "pinentry-curses";
+  # Qt dialog on X; falls back to curses when there is no display.
+  realPinentry = pkgs.lib.getExe' pkgs.pinentry-qt "pinentry-qt";
 
   # Minimal Assuan pinentry: acknowledge the handshake/options, then refuse the
   # first passphrase or confirmation with a canceled error (GPG_ERR_CANCELED,
@@ -26,11 +27,33 @@ let
   # immediately rather than looping for a BYE that gpg-agent may never send.
   pinentry = pkgs.writeShellApplication {
     name = "pinentry";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.findutils
+    ];
     text = ''
+      # SSH requests reach gpg-agent without the caller's environment, so an AI
+      # agent's ssh registers itself in agentSshDir (see sshStartupEnv). While
+      # any of those is alive, or was registered in the last few seconds, every
+      # prompt is refused: one that belongs to the user can be retried.
+      agentSsh=false
+      for f in "${agentSshDir}"/*; do
+        [ -e "$f" ] || continue
+        pid="''${f##*/}"
+        if [ "$(cat "/proc/$pid/comm" 2>/dev/null)" = ssh ] || [ -n "$(find "$f" -newermt '15 seconds ago')" ]; then
+          agentSsh=true
+        else
+          rm -f "$f"
+        fi
+      done
+
       case "''${PINENTRY_USER_DATA:-}" in
         agent:*) ;;
-        *) exec ${realPinentry} "$@" ;;
+        *) $agentSsh || exec ${realPinentry} "$@" ;;
       esac
+
+      ${pkgs.libnotify}/bin/notify-send -u critical "Passphrase refused" \
+        "An AI agent needed a GPG/SSH key unlocked. Run keys-load or the command yourself." > /dev/null 2>&1 || true
 
       notice="GPG passphrase entry is disabled inside AI agents. Ask the user to run this command or unlock the key (gpg/gpg-agent) themselves; do not retry."
 
@@ -81,9 +104,28 @@ let
       exit 1
     '';
   };
+
+  agentSshDir = "\${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/agent-ssh";
+
+  # Run from ssh's Match exec. A user's ssh hands gpg-agent its tty and display
+  # so pinentry shows up where they are. An AI agent's ssh leaves that env
+  # alone and registers its pid instead, which the pinentry wrapper refuses.
+  sshStartupEnv = pkgs.writeShellApplication {
+    name = "gpg-agent-ssh-startup-env";
+    runtimeInputs = [ pkgs.coreutils ];
+    text = ''
+      case "''${PINENTRY_USER_DATA:-}" in
+        agent:*)
+          mkdir -p "${agentSshDir}"
+          : > "${agentSshDir}/$PPID"
+          ;;
+        *) ${pkgs.gnupg}/bin/gpg-connect-agent --quiet updatestartuptty /bye > /dev/null ;;
+      esac
+    '';
+  };
 in
 {
-  inherit askpass pinentry;
+  inherit askpass pinentry sshStartupEnv;
 
   mkAgentEnv = marker: {
     PINENTRY_USER_DATA = "agent:${marker}";

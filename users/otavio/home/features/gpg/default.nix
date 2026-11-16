@@ -13,8 +13,8 @@ in
     defaultCacheTtlSsh = 3600;
     maxCacheTtl = 28800;
     maxCacheTtlSsh = 28800;
-    # Wrapper around pinentry-curses that refuses passphrase entry inside AI
-    # agents; behaves as the normal curses pinentry everywhere else.
+    # Wrapper around pinentry-qt that refuses passphrase entry inside AI
+    # agents; behaves as the normal pinentry everywhere else.
     pinentry.package = guard.pinentry;
     # The stock hook also runs in non-interactive shells, which resets the
     # agent's tty to none and leaves pinentry-curses with nowhere to draw.
@@ -29,9 +29,8 @@ in
       export GPG_TTY=$TTY
       [[ -t 0 ]] && ${updateStartupTty} > /dev/null
     '';
-    # SSH requests carry no tty, so point pinentry at the terminal running ssh.
-    # ssh redirects stdin of Match exec to /dev/null; stderr is still the tty.
-    ssh.settings.gpg-agent-tty.header = "Match host * exec \"test -t 2 && ${updateStartupTty}\"";
+    # SSH requests carry no environment of their own; see sshStartupEnv.
+    ssh.settings.gpg-agent-tty.header = "Match host * exec \"${pkgs.lib.getExe guard.sshStartupEnv}\"";
     gpg.enable = true;
   };
 }
