@@ -127,33 +127,44 @@ in
 
         keys-load() {
             mkdir -p /tmp/otavio/keys
-            if [ -z "$1" ]; then
-                echo Decriptando particao...
-                sudo ${cryptsetup} -v luksOpen /dev/disk/by-uuid/faae5ddb-df82-4a23-8a24-eedd6356ccff keys && \
-                    sudo mount /dev/mapper/keys /tmp/otavio/keys && \
-                    echo done || echo ERROR
-
-                gpg-connect-agent --quiet updatestartuptty /bye > /dev/null
-
-                echo Carregando chave GPG ...
-                echo | gpg --local-user EB70FEF3CDFC6E4F --clearsign > /dev/null
-
-                # TODO: drop id_rsa once nothing depends on it anymore.
-                echo Carregando chaves SSH ...
-                for key in id_ed25519 id_rsa; do
-                    ssh-add -T "$HOME/.ssh/$key.pub" || echo "ERROR: $key (importe com: ssh-add ~/.ssh/$key)"
-                done
+            if ! mountpoint -q /tmp/otavio/keys; then
+                if [ ! -e /dev/mapper/keys ]; then
+                    echo Decrypting partition...
+                    sudo ${cryptsetup} -v luksOpen /dev/disk/by-uuid/faae5ddb-df82-4a23-8a24-eedd6356ccff keys || { echo ERROR; return 1; }
+                fi
+                sudo mount /dev/mapper/keys /tmp/otavio/keys || { echo ERROR; return 1; }
+                echo done
             fi
+
+            gpg-connect-agent --quiet updatestartuptty /bye > /dev/null
+
+            echo Loading GPG key...
+            echo | gpg --local-user EB70FEF3CDFC6E4F --clearsign > /dev/null
+
+            # TODO: drop id_rsa once nothing depends on it anymore.
+            echo Loading SSH keys...
+            for key in id_ed25519 id_rsa; do
+                ssh-add -T "$HOME/.ssh/$key.pub" || echo "ERROR: $key (import with: ssh-add ~/.ssh/$key)"
+            done
         }
 
         keys-close() {
-            echo Descarregando chaves GPG e SSH
+            echo Unloading GPG and SSH keys
             gpgconf --kill gpg-agent
-            echo -n Desligando particao encriptada...
-            sudo umount /tmp/otavio/keys > /dev/null
-            sudo ${cryptsetup} -v luksClose keys && \
-                echo done || echo ERROR
-            rmdir -p /tmp/otavio/keys
+            echo -n Closing encrypted partition...
+            mountpoint -q /tmp/otavio/keys && { sudo umount /tmp/otavio/keys || { echo ERROR; return 1; }; }
+            local majmin=$(lsblk -dno MAJ:MIN /dev/mapper/keys 2>/dev/null | tr -d ' ')
+            local dm=$(basename "$(readlink -f /dev/mapper/keys)")
+            if ! sudo ${cryptsetup} luksClose keys 2>/dev/null; then
+                echo
+                echo "WARNING: device still in use; close deferred until released by:"
+                sudo sh -c "grep -l ' $majmin ' /proc/[0-9]*/mountinfo; find /proc/[0-9]*/fd -lname /dev/$dm" 2>/dev/null \
+                    | cut -d/ -f3 | sort -u | xargs -r ps -o pid,unit,cmd -p | cut -c1-160
+                sudo ${cryptsetup} close --deferred keys || { echo ERROR; return 1; }
+                return 0
+            fi
+            rmdir /tmp/otavio/keys /tmp/otavio 2>/dev/null
+            echo done
         }
 
         transfer() {
@@ -210,8 +221,6 @@ in
             # cleanup
             rm -f $tmpfile
         }
-
-        keys-load "not-ask"
 
         [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
 
