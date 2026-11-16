@@ -9,7 +9,6 @@
 - [[#package-management][Package Management]]
 - [[#keep-emacsd-clean][Keep .emacs.d Clean]]
 - [[#default-coding-system][Default Coding System]]
-- [[#keychain-environment][keychain-environment]]
 - [[#direnv-support][Direnv support]]
 - [[#undo-tree][Undo tree]]
 - [[#keybinding-panel-which-key][Keybinding Panel (which-key)]]
@@ -196,16 +195,6 @@ Set the coding system the default to UTF-8.
 
   (set-default-coding-systems 'utf-8)
 
-#+end_src
-
-* keychain-environment
-
-Allow loading the ~keychain~ environment variables so we can use the SSH and GNU GPG keys inside the Emacs. To load the environment variables, we can call ~keychain-refresh-environment~.
-
-#+begin_src emacs-lisp
-  (use-package keychain-environment
-    :init
-    (keychain-refresh-environment))
 #+end_src
 
 * Direnv support
