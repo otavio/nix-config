@@ -6,7 +6,6 @@
 }:
 let
   cryptsetup = "${pkgs.cryptsetup}/bin/cryptsetup";
-  keychain = "${pkgs.keychain}/bin/keychain";
 
   nix-differ = pkgs.writeScriptBin "nix-differ" ''
     nix run nixpkgs#nix-diff /run/current-system $(nix eval .#nixosConfigurations.$(hostname).config.system.build.toplevel --raw)
@@ -134,27 +133,21 @@ in
                     sudo mount /dev/mapper/keys /tmp/otavio/keys && \
                     echo done || echo ERROR
 
-                echo Carregando chave SSH ...
-                ssh-add "$HOME/.ssh/id_rsa" "$HOME/.ssh/id_ed25519"
+                gpg-connect-agent --quiet updatestartuptty /bye > /dev/null
 
                 echo Carregando chave GPG ...
-                DISPLAY="" ${keychain} --agents gpg EB70FEF3CDFC6E4F 306736ED8C77E0D5
-            fi
+                echo | gpg --local-user EB70FEF3CDFC6E4F --clearsign > /dev/null
 
-            [ -f $HOME/.keychain/$(hostname)-sh-gpg ] && source $HOME/.keychain/$(hostname)-sh-gpg
-
-            # Bridge the fixed ssh-agent socket to the systemd user env so
-            # GUI apps see it instead of the gnome-keyring socket i3 inherited
-            # from the X session.
-            if [ -n "$SSH_AUTH_SOCK" ] && command -v systemctl >/dev/null 2>&1; then
-                systemctl --user import-environment SSH_AUTH_SOCK 2>/dev/null
+                # TODO: drop id_rsa once nothing depends on it anymore.
+                echo Carregando chaves SSH ...
+                for key in id_ed25519 id_rsa; do
+                    ssh-add -T "$HOME/.ssh/$key.pub" || echo "ERROR: $key (importe com: ssh-add ~/.ssh/$key)"
+                done
             fi
         }
 
         keys-close() {
-            echo Descarregando chave SSH
-            ssh-add -D
-            echo Descarregando chave GPG
+            echo Descarregando chaves GPG e SSH
             gpgconf --kill gpg-agent
             echo -n Desligando particao encriptada...
             sudo umount /tmp/otavio/keys > /dev/null
