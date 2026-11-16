@@ -33,13 +33,9 @@ let
       '';
 in
 {
-  nixpkgs.config.permittedInsecurePackages =
-    # Issue: https://github.com/NixOS/nixpkgs/issues/273611
-    pkgs.lib.optional (pkgs.obsidian.version == "1.5.3") "electron-25.9.0";
   home = {
     packages = with pkgs; [
       awscli2
-      obsidian
       oe-ws
     ];
     file = {

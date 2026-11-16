@@ -13,6 +13,7 @@
     ./features/gtk
     ./features/i3wm
     ./features/irssi
+    ./features/obsidian
     ./features/ossystems-specific
     ./features/talon
     ./features/whisrs
