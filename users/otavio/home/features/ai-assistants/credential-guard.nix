@@ -33,26 +33,31 @@ let
       # A prompt cannot be tied to the ssh that caused it, so any live or recent
       # registration refuses all prompts; one that belongs to the user can be
       # retried.
-      agentSsh=false
+      # Background fetches repeat every few minutes, so only agents notify.
+      refuse=false
+      notify=false
       for f in "${agentSshDir}"/*; do
         [ -e "$f" ] || continue
         pid="''${f##*/}"
         if [ "$(cat "/proc/$pid/comm" 2>/dev/null)" = ssh ] || [ -n "$(find "$f" -newermt '15 seconds ago')" ]; then
-          agentSsh=true
+          refuse=true
+          [ "$(cat "$f" 2>/dev/null)" = background ] || notify=true
         else
           rm -f "$f"
         fi
       done
 
       case "''${PINENTRY_USER_DATA:-}" in
-        agent:*) ;;
-        *) $agentSsh || exec ${realPinentry} "$@" ;;
+        agent:*) refuse=true; notify=true ;;
       esac
+      $refuse || exec ${realPinentry} "$@"
 
-      ${pkgs.libnotify}/bin/notify-send -u critical "Passphrase refused" \
-        "An AI agent needed a GPG/SSH key unlocked. Run keys-load or the command yourself." > /dev/null 2>&1 || true
+      if $notify; then
+        ${pkgs.libnotify}/bin/notify-send -u critical "Passphrase refused" \
+          "An AI agent needed a GPG/SSH key unlocked. Run keys-load or the command yourself." > /dev/null 2>&1 || true
+      fi
 
-      notice="GPG passphrase entry is disabled inside AI agents. Ask the user to run this command or unlock the key (gpg/gpg-agent) themselves; do not retry."
+      notice="Passphrase entry is refused for AI agents and background processes. Ask the user to unlock the key (keys-load) or run this command themselves; do not retry."
 
       printf 'OK Pleased to meet you\n'
       while IFS= read -r line; do
@@ -104,18 +109,28 @@ let
 
   # Run from ssh's Match exec, whose parent is ssh itself. A user's ssh hands
   # gpg-agent its tty and display so pinentry shows up where they are. Nobody
-  # is watching an AI agent's ssh, so it registers instead.
+  # is watching an AI agent's ssh or one without a controlling terminal
+  # (periodic git fetches from T3 or Obsidian), so those register instead.
   sshStartupEnv = pkgs.writeShellApplication {
     name = "gpg-agent-ssh-startup-env";
     runtimeInputs = [ pkgs.coreutils ];
     text = ''
+      kind=
       case "''${PINENTRY_USER_DATA:-}" in
-        agent:*)
-          mkdir -p "${agentSshDir}"
-          : > "${agentSshDir}/$PPID"
+        agent:*) kind=agent ;;
+        *)
+          stat=$(cat "/proc/$PPID/stat")
+          read -r _ _ _ _ tty _ <<< "''${stat##*) }"
+          [ "$tty" = 0 ] && kind=background
           ;;
-        *) ${pkgs.gnupg}/bin/gpg-connect-agent --quiet updatestartuptty /bye > /dev/null ;;
       esac
+
+      if [ -n "$kind" ]; then
+        mkdir -p "${agentSshDir}"
+        echo "$kind" > "${agentSshDir}/$PPID"
+      else
+        ${pkgs.gnupg}/bin/gpg-connect-agent --quiet updatestartuptty /bye > /dev/null
+      fi
     '';
   };
 in
