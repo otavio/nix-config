@@ -15,8 +15,8 @@ in
     defaultCacheTtlSsh = 3600;
     maxCacheTtl = 28800;
     maxCacheTtlSsh = 28800;
-    # Wrapper around pinentry-qt that refuses passphrase entry inside AI
-    # agents; behaves as the normal pinentry everywhere else.
+    # Wrapper around pinentry-qt that refuses passphrase entry for AI agents
+    # and background ssh; behaves as the normal pinentry everywhere else.
     pinentry.package = guard.pinentry;
     # The stock hook also runs in non-interactive shells, which resets the
     # agent's tty to none and leaves pinentry-curses with nowhere to draw.
