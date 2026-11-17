@@ -18,6 +18,40 @@ let
   # Qt dialog on X; falls back to curses when there is no display.
   realPinentry = pkgs.lib.getExe' pkgs.pinentry-qt "pinentry-qt";
 
+  keysLoad = import ../gpg/keys-load.nix { inherit pkgs; };
+  lockedIcon = pkgs.writeText "keys-locked.svg" ''
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="31" fill="#e01b24"/>
+      <path d="M22 29v-6a10 10 0 0 1 20 0v6" fill="none" stroke="#fff" stroke-width="5"/>
+      <rect x="16" y="29" width="32" height="22" rx="3" fill="#fff"/>
+      <circle cx="32" cy="38" r="3.5" fill="#e01b24"/>
+      <rect x="30.5" y="38" width="3" height="8" fill="#e01b24"/>
+    </svg>
+  '';
+
+  # Stays until keys-load stops it, so a refusal waits for the user instead of
+  # interrupting them. The tooltip follows the callers file, so requests
+  # refused after the icon appeared are listed too.
+  unlockTray = pkgs.writeShellApplication {
+    name = "keys-unlock-tray";
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.yad
+    ];
+    text = ''
+      title="Credentials locked: click to unlock"
+      seen=
+      tail -n +1 -F "$1" 2> /dev/null | while IFS= read -r line; do
+        # yad unescapes tooltip text, so literal backslashes are doubled.
+        line=''${line//\\/\\\\}
+        case "$seen" in *"• $line"*) continue ;; esac
+        seen+="\\n• $line"
+        printf 'tooltip:%s\\n\\nRequested by:%s\n' "$title" "$seen"
+      done | yad --notification --listen --no-markup --image=${lockedIcon} \
+        --text="$title" --command="${pkgs.lib.getExe keysLoad} --gui"
+    '';
+  };
+
   # Refuses with GPG_ERR_CANCELED, which stops gpg retrying. It never writes to
   # the caller's tty: pinentry is spawned by the detached gpg-agent, so that tty
   # is the agent's own terminal and a raw write corrupts a full-screen TUI; gpg
@@ -28,39 +62,36 @@ let
     runtimeInputs = [
       pkgs.coreutils
       pkgs.findutils
+      pkgs.gnused
     ];
     text = ''
       # A prompt cannot be tied to the ssh that caused it, so any live or recent
       # registration refuses all prompts; one that belongs to the user can be
       # retried.
-      # Background fetches repeat every few minutes, so only agents notify.
       refuse=false
-      notify=false
       callers=
       for f in "${agentSshDir}"/*; do
         [ -e "$f" ] || continue
         pid="''${f##*/}"
         if [ "$(cat "/proc/$pid/comm" 2>/dev/null)" = ssh ] || [ -n "$(find "$f" -newermt '15 seconds ago')" ]; then
           refuse=true
-          caller=$(cat "$f" 2>/dev/null || true)
-          callers+="• $caller"$'\n'
-          [ "''${caller%%:*}" = background ] || notify=true
+          callers+="$(cat "$f" 2>/dev/null || true)"$'\n'
         else
           rm -f "$f"
         fi
       done
 
       case "''${PINENTRY_USER_DATA:-}" in
-        agent:*) refuse=true; notify=true; callers+="• ''${PINENTRY_USER_DATA#agent:}: gpg"$'\n' ;;
+        agent:*) refuse=true; callers+="''${PINENTRY_USER_DATA#agent:}: gpg"$'\n' ;;
       esac
       $refuse || exec ${realPinentry} "$@"
 
-      if $notify; then
-        ${pkgs.libnotify}/bin/notify-send -u critical "Passphrase refused" \
-          "An AI agent needed a GPG/SSH key unlocked. Run keys-load or the command yourself.
-
-$callers" > /dev/null 2>&1 || true
-      fi
+      list="${agentSshDir}/.callers"
+      printf '%s' "$callers" | sed '/^$/d' >> "$list"
+      ${pkgs.systemd}/bin/systemd-run --user --quiet --collect --unit=keys-unlock-tray \
+        -E DISPLAY="''${DISPLAY:-:0}" ''${XAUTHORITY:+-E XAUTHORITY="$XAUTHORITY"} \
+        -p ExecStopPost="${pkgs.coreutils}/bin/rm -f $list" \
+        ${pkgs.lib.getExe unlockTray} "$list" > /dev/null 2>&1 || true
 
       notice="Passphrase entry is refused for AI agents and background processes. Ask the user to unlock the key (keys-load) or run this command themselves; do not retry."
 
@@ -129,7 +160,6 @@ $callers" > /dev/null 2>&1 || true
           [ "$tty" = 0 ] && kind=background
           ;;
       esac
-
       describe() {
         local args remote what dir
         mapfile -d "" -t args < "/proc/$PPID/cmdline"

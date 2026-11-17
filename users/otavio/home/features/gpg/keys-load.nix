@@ -15,13 +15,14 @@ pkgs.writeShellApplication {
     gnupg
     openssh
     pinentry-qt
+    systemd
     util-linux
     yad
   ];
   text = ''
     # One passphrase opens the keys partition and is preset for every SSH key;
     # GPG keys still prompt through pinentry when used. --gui asks through
-    # pinentry-qt instead of the terminal.
+    # pinentry-qt instead of the terminal, for the tray icon.
     gui=false
     [ "''${1:-}" = --gui ] && gui=true
 
@@ -106,6 +107,7 @@ pkgs.writeShellApplication {
       ssh-add -T "$HOME/.ssh/$key.pub" 2>/dev/null || errors+="$key does not sign; import it with: ssh-add ~/.ssh/$key"$'\n'
     done
 
+    systemctl --user stop --no-block keys-unlock-tray.service 2> /dev/null || true
     [ -z "$errors" ] || fail "''${errors%$'\n'}"
     $gui || echo "Keys loaded."
   '';
