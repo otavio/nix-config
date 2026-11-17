@@ -21,9 +21,13 @@
       CacheFromLocalhost = "yes";
     };
   };
-  networking.networkmanager = {
-    enable = true;
-    dns = "systemd-resolved";
-    wifi.backend = "iwd";
+  networking = {
+    networkmanager = {
+      enable = true;
+      dns = "systemd-resolved";
+      wifi.backend = "iwd";
+    };
+    # Equal-width bands tie on estimated throughput, so 2.4 GHz wins on signal.
+    wireless.iwd.settings.Rank.BandModifier5GHz = 1.5;
   };
 }
