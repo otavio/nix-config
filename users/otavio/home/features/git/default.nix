@@ -31,7 +31,7 @@
       settings = {
         user = {
           name = "Otavio Salvador";
-          email = "otavio@ossystems.com.br";
+          email = "otavio@ossystems.tech";
         };
 
         aliases =
