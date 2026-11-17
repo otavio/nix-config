@@ -36,25 +36,30 @@ let
       # Background fetches repeat every few minutes, so only agents notify.
       refuse=false
       notify=false
+      callers=
       for f in "${agentSshDir}"/*; do
         [ -e "$f" ] || continue
         pid="''${f##*/}"
         if [ "$(cat "/proc/$pid/comm" 2>/dev/null)" = ssh ] || [ -n "$(find "$f" -newermt '15 seconds ago')" ]; then
           refuse=true
-          [ "$(cat "$f" 2>/dev/null)" = background ] || notify=true
+          caller=$(cat "$f" 2>/dev/null || true)
+          callers+="• $caller"$'\n'
+          [ "''${caller%%:*}" = background ] || notify=true
         else
           rm -f "$f"
         fi
       done
 
       case "''${PINENTRY_USER_DATA:-}" in
-        agent:*) refuse=true; notify=true ;;
+        agent:*) refuse=true; notify=true; callers+="• ''${PINENTRY_USER_DATA#agent:}: gpg"$'\n' ;;
       esac
       $refuse || exec ${realPinentry} "$@"
 
       if $notify; then
         ${pkgs.libnotify}/bin/notify-send -u critical "Passphrase refused" \
-          "An AI agent needed a GPG/SSH key unlocked. Run keys-load or the command yourself." > /dev/null 2>&1 || true
+          "An AI agent needed a GPG/SSH key unlocked. Run keys-load or the command yourself.
+
+$callers" > /dev/null 2>&1 || true
       fi
 
       notice="Passphrase entry is refused for AI agents and background processes. Ask the user to unlock the key (keys-load) or run this command themselves; do not retry."
@@ -125,9 +130,23 @@ let
           ;;
       esac
 
+      describe() {
+        local args remote what dir
+        mapfile -d "" -t args < "/proc/$PPID/cmdline"
+        remote=''${args[-1]//\'/}
+        case "$remote" in
+          git-upload-pack\ *) what="fetch ''${remote#* }" ;;
+          git-receive-pack\ *) what="push ''${remote#* }" ;;
+          *) what="ssh ''${args[*]:1}" ;;
+        esac
+        dir=$(readlink "/proc/$PPID/cwd")
+        echo "$kind: $what in ''${dir/#$HOME/\~}"
+      }
+
       if [ -n "$kind" ]; then
         mkdir -p "${agentSshDir}"
-        echo "$kind" > "${agentSshDir}/$PPID"
+        # The redirection registers the pid even if describing it fails.
+        describe > "${agentSshDir}/$PPID" 2> /dev/null || true
       else
         ${pkgs.gnupg}/bin/gpg-connect-agent --quiet updatestartuptty /bye > /dev/null
       fi
