@@ -6,7 +6,6 @@
 }:
 let
   cryptsetup = "${pkgs.cryptsetup}/bin/cryptsetup";
-  presetPassphrase = "${pkgs.gnupg}/libexec/gpg-preset-passphrase";
 
   nix-differ = pkgs.writeScriptBin "nix-differ" ''
     nix run nixpkgs#nix-diff /run/current-system $(nix eval .#nixosConfigurations.$(hostname).config.system.build.toplevel --raw)
@@ -124,39 +123,6 @@ in
 
         what-is-my-ip() {
             echo "My IP: $(curl -s ifconfig.me)"
-        }
-
-        keys-load() {
-            local pass
-            read -rs "pass?Passphrase (partition + SSH keys): "
-            echo
-
-            mkdir -p /tmp/otavio/keys
-            if ! mountpoint -q /tmp/otavio/keys; then
-                if [ ! -e /dev/mapper/keys ]; then
-                    echo Decrypting partition...
-                    local luks=/dev/disk/by-uuid/faae5ddb-df82-4a23-8a24-eedd6356ccff
-                    printf '%s' "$pass" | sudo ${cryptsetup} luksOpen --key-file=- $luks keys 2>/dev/null || \
-                        sudo ${cryptsetup} -v luksOpen $luks keys || { echo ERROR; return 1; }
-                fi
-                sudo mount /dev/mapper/keys /tmp/otavio/keys || { echo ERROR; return 1; }
-                echo done
-            fi
-
-            gpg-connect-agent --quiet updatestartuptty /bye > /dev/null
-
-            # Only SSH keys are preset; GPG keys prompt through pinentry when used.
-            local grip
-            for grip in $(awk '!/^#/ && NF { print $1 }' ~/.gnupg/sshcontrol); do
-                printf '%s' "$pass" | ${presetPassphrase} --preset "$grip"
-            done
-            unset pass
-
-            # TODO: drop id_rsa once nothing depends on it anymore.
-            echo Loading SSH keys...
-            for key in id_ed25519 id_rsa; do
-                ssh-add -T "$HOME/.ssh/$key.pub" || echo "ERROR: $key (import with: ssh-add ~/.ssh/$key)"
-            done
         }
 
         keys-close() {

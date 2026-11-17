@@ -2,9 +2,11 @@
 
 let
   guard = import ../ai-assistants/credential-guard.nix { inherit pkgs; };
+  keysLoad = import ./keys-load.nix { inherit pkgs; };
   updateStartupTty = "${config.programs.gpg.package}/bin/gpg-connect-agent --quiet updatestartuptty /bye";
 in
 {
+  home.packages = [ keysLoad ];
 
   services.gpg-agent = {
     enable = true;
