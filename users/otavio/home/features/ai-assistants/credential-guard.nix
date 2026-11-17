@@ -7,8 +7,8 @@
 #
 #   * GPG goes through the long-lived gpg-agent daemon, so per-command env is not
 #     visible to its pinentry. The only lever is PINENTRY_USER_DATA, which gpg
-#     forwards to pinentry. The wrapper refuses when it sees an `agent:*` marker
-#     and otherwise execs the real curses pinentry.
+#     forwards to pinentry. SSH signing requests carry no environment at all,
+#     so ssh registers the agent's connection beforehand (see sshStartupEnv).
 #
 #   * SSH/git invoke their askpass helper directly, so a plain env var is enough.
 #     SSH_ASKPASS_REQUIRE=force makes ssh use it even when a tty is present.
@@ -18,13 +18,11 @@ let
   # Qt dialog on X; falls back to curses when there is no display.
   realPinentry = pkgs.lib.getExe' pkgs.pinentry-qt "pinentry-qt";
 
-  # Minimal Assuan pinentry: acknowledge the handshake/options, then refuse the
-  # first passphrase or confirmation with a canceled error (GPG_ERR_CANCELED,
-  # which stops gpg retrying). It deliberately does not write to the caller's
-  # tty — pinentry is spawned by the detached gpg-agent, so that tty is the
-  # agent's own terminal and a raw write corrupts a full-screen TUI; gpg
-  # surfaces the refusal on the failing command's stderr instead. It exits
-  # immediately rather than looping for a BYE that gpg-agent may never send.
+  # Refuses with GPG_ERR_CANCELED, which stops gpg retrying. It never writes to
+  # the caller's tty: pinentry is spawned by the detached gpg-agent, so that tty
+  # is the agent's own terminal and a raw write corrupts a full-screen TUI; gpg
+  # surfaces the refusal on the failing command's stderr instead. It exits right
+  # after refusing because gpg-agent may never send BYE.
   pinentry = pkgs.writeShellApplication {
     name = "pinentry";
     runtimeInputs = [
@@ -32,10 +30,9 @@ let
       pkgs.findutils
     ];
     text = ''
-      # SSH requests reach gpg-agent without the caller's environment, so an AI
-      # agent's ssh registers itself in agentSshDir (see sshStartupEnv). While
-      # any of those is alive, or was registered in the last few seconds, every
-      # prompt is refused: one that belongs to the user can be retried.
+      # A prompt cannot be tied to the ssh that caused it, so any live or recent
+      # registration refuses all prompts; one that belongs to the user can be
+      # retried.
       agentSsh=false
       for f in "${agentSshDir}"/*; do
         [ -e "$f" ] || continue
@@ -70,9 +67,7 @@ let
     '';
   };
 
-  # SSH / git askpass. Its mere invocation means an interactive prompt was about
-  # to appear, so it always refuses. The prompt text arrives as $1; SSH_ASKPASS
-  # also routes host-key confirmations here, so tailor the guidance to each.
+  # Being invoked at all means an interactive prompt was about to appear.
   askpass = pkgs.writeShellApplication {
     name = "agent-askpass-guard";
     text = ''
@@ -107,9 +102,9 @@ let
 
   agentSshDir = "\${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/agent-ssh";
 
-  # Run from ssh's Match exec. A user's ssh hands gpg-agent its tty and display
-  # so pinentry shows up where they are. An AI agent's ssh leaves that env
-  # alone and registers its pid instead, which the pinentry wrapper refuses.
+  # Run from ssh's Match exec, whose parent is ssh itself. A user's ssh hands
+  # gpg-agent its tty and display so pinentry shows up where they are. Nobody
+  # is watching an AI agent's ssh, so it registers instead.
   sshStartupEnv = pkgs.writeShellApplication {
     name = "gpg-agent-ssh-startup-env";
     runtimeInputs = [ pkgs.coreutils ];
