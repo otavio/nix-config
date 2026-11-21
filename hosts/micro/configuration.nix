@@ -104,6 +104,10 @@
       };
     };
   };
+  nix.settings = {
+    min-free = 100 * 1024 * 1024 * 1024;
+    max-free = 300 * 1024 * 1024 * 1024;
+  };
   networking = {
     domain = "casa.salvador";
     firewall.trustedInterfaces = [ "virbr0" ];
