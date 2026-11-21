@@ -33,6 +33,7 @@
 
       ../../users/otavio/system
 
+      flake.nixosModules.disk-cleanup
       flake.nixosModules.restic-r2
 
       ./chromium.nix
@@ -53,6 +54,11 @@
       ];
     };
     deployment.allowLocalDeployment = true;
+    diskCleanup = {
+      enable = true;
+      user = "otavio";
+      yoctoPaths = [ "src/oe" ];
+    };
   };
   home-manager.users.otavio = import ../../users/otavio/home/micro.nix;
   boot = {
