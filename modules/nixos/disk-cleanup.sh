@@ -1,4 +1,4 @@
-# Defaults (DC_USER, DC_AGE_DAYS, DC_DIRENV_PATHS, DC_YOCTO_PATHS,
+# Defaults (DC_USER, DC_HOME, DC_AGE_DAYS, DC_DIRENV_PATHS, DC_YOCTO_PATHS,
 # DC_CACHE_EXCLUDES, DC_STEPS) are injected by the NixOS module.
 
 usage() {
@@ -55,7 +55,7 @@ if ((EUID != 0)); then
   exec /run/wrappers/bin/sudo "$0" "${orig_args[@]}"
 fi
 
-home=$(getent passwd "$DC_USER" | cut -d: -f6)
+home="$DC_HOME"
 uid=$(id -u "$DC_USER")
 now=$(date +%s)
 cutoff=$((now - age * 86400))

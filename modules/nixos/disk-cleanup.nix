@@ -32,6 +32,7 @@ let
     ];
     text = ''
       DC_USER=${lib.escapeShellArg cfg.user}
+      DC_HOME=${lib.escapeShellArg config.users.users.${cfg.user}.home}
       DC_AGE_DAYS=${toString cfg.ageDays}
       DC_DIRENV_PATHS=${lib.escapeShellArg (toString cfg.direnvPaths)}
       DC_YOCTO_PATHS=${lib.escapeShellArg (toString cfg.yoctoPaths)}
