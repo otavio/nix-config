@@ -57,6 +57,11 @@ let
   # is the agent's own terminal and a raw write corrupts a full-screen TUI; gpg
   # surfaces the refusal on the failing command's stderr instead. It exits right
   # after refusing because gpg-agent may never send BYE.
+  #
+  # The ssh registrations only gate SSH key prompts, which gpg-agent marks with
+  # "SETKEYINFO s/<keygrip>". Telling them apart needs that line, so without an
+  # agent marker the real pinentry runs behind a line proxy and the decision is
+  # taken at GETPIN; it draws nothing before then.
   pinentry = pkgs.writeShellApplication {
     name = "pinentry";
     runtimeInputs = [
@@ -65,45 +70,74 @@ let
       pkgs.gnused
     ];
     text = ''
-      # A prompt cannot be tied to the ssh that caused it, so any live or recent
-      # registration refuses all prompts; one that belongs to the user can be
-      # retried.
-      refuse=false
-      callers=
-      for f in "${agentSshDir}"/*; do
-        [ -e "$f" ] || continue
-        pid="''${f##*/}"
-        if [ "$(cat "/proc/$pid/comm" 2>/dev/null)" = ssh ] || [ -n "$(find "$f" -newermt '15 seconds ago')" ]; then
-          refuse=true
-          callers+="$(cat "$f" 2>/dev/null || true)"$'\n'
-        else
-          rm -f "$f"
-        fi
-      done
-
-      case "''${PINENTRY_USER_DATA:-}" in
-        agent:*) refuse=true; callers+="''${PINENTRY_USER_DATA#agent:}: gpg"$'\n' ;;
-      esac
-      $refuse || exec ${realPinentry} "$@"
-
-      list="${agentSshDir}/.callers"
-      printf '%s' "$callers" | sed '/^$/d' >> "$list"
-      ${pkgs.systemd}/bin/systemd-run --user --quiet --collect --unit=keys-unlock-tray \
-        -E DISPLAY="''${DISPLAY:-:0}" ''${XAUTHORITY:+-E XAUTHORITY="$XAUTHORITY"} \
-        -p ExecStopPost="${pkgs.coreutils}/bin/rm -f $list" \
-        ${pkgs.lib.getExe unlockTray} "$list" > /dev/null 2>&1 || true
-
       notice="Passphrase entry is refused for AI agents and background processes. Ask the user to unlock the key (keys-load) or run this command themselves; do not retry."
 
-      printf 'OK Pleased to meet you\n'
+      refuse() {
+        local list="${agentSshDir}/.callers"
+        printf '%s\n' "$1" | sed '/^$/d' >> "$list"
+        ${pkgs.systemd}/bin/systemd-run --user --quiet --collect --unit=keys-unlock-tray \
+          -E DISPLAY="''${DISPLAY:-:0}" ''${XAUTHORITY:+-E XAUTHORITY="$XAUTHORITY"} \
+          -p ExecStopPost="${pkgs.coreutils}/bin/rm -f $list" \
+          ${pkgs.lib.getExe unlockTray} "$list" > /dev/null 2>&1 || true
+        printf 'ERR 83886179 Operation cancelled - %s\n' "$notice"
+        exit 0
+      }
+
+      # A prompt cannot be tied to the ssh that caused it, so any live or recent
+      # registration refuses every SSH key prompt; one that belongs to the user
+      # can be retried.
+      ssh_callers() {
+        local f pid callers=
+        for f in "${agentSshDir}"/*; do
+          [ -e "$f" ] || continue
+          pid="''${f##*/}"
+          if [ "$(cat "/proc/$pid/comm" 2>/dev/null)" = ssh ] || [ -n "$(find "$f" -newermt '15 seconds ago')" ]; then
+            callers+="$(cat "$f" 2>/dev/null || true)"$'\n'
+          else
+            rm -f "$f"
+          fi
+        done
+        printf '%s' "$callers"
+      }
+
+      case "''${PINENTRY_USER_DATA:-}" in
+        agent:*)
+          printf 'OK Pleased to meet you\n'
+          while IFS= read -r line; do
+            case "$line" in
+              GETPIN* | CONFIRM*) refuse "''${PINENTRY_USER_DATA#agent:}: gpg" ;;
+              BYE*) printf 'OK closing connection\n'; exit 0 ;;
+              *) printf 'OK\n' ;;
+            esac
+          done
+          exit 0 ;;
+      esac
+
+      coproc PIN { exec ${realPinentry} "$@"; }
+      trap 'kill "$PIN_PID" 2> /dev/null || true' EXIT
+
+      relay() {
+        local reply
+        while IFS= read -r reply <&"''${PIN[0]}"; do
+          printf '%s\n' "$reply"
+          case "$reply" in OK* | ERR* | INQUIRE*) return 0 ;; esac
+        done
+        exit 0
+      }
+
+      relay
+      ssh_key=false
       while IFS= read -r line; do
         case "$line" in
+          "SETKEYINFO s/"*) ssh_key=true ;;
           GETPIN* | CONFIRM*)
-            printf 'ERR 83886179 Operation cancelled - %s\n' "$notice"
-            exit 0 ;;
-          BYE*) printf 'OK closing connection\n'; exit 0 ;;
-          *) printf 'OK\n' ;;
+            if $ssh_key; then
+              callers=$(ssh_callers)
+              [ -z "$callers" ] || refuse "$callers"
+            fi ;;
         esac
+        printf '%s\n' "$line" >&"''${PIN[1]}"
+        relay
       done
     '';
   };
