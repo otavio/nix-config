@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ lib, ... }:
 
 let
   servers = {
@@ -18,12 +18,4 @@ in
       };
     }
   ) servers;
-
-  # The private zones are unsigned, so DNSSEC validation would reject them.
-  environment.etc."dnssec-trust-anchors.d/private.negative".text = lib.concatLines (
-    lib.attrNames servers
-  );
-  systemd.services.systemd-resolved.restartTriggers = [
-    config.environment.etc."dnssec-trust-anchors.d/private.negative".source
-  ];
 }
