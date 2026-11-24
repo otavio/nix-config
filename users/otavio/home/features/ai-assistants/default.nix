@@ -1,4 +1,9 @@
-{ pkgs, flake, ... }:
+{
+  lib,
+  pkgs,
+  flake,
+  ...
+}:
 
 let
   # Upstream replaced the per-agent awareness documents with shared variants.
@@ -7,13 +12,36 @@ let
   # without telling them to type the prefix themselves.
   awareness = "${pkgs.rtk.src}/hooks/rtk-awareness-high.md";
 
-  # The whole directory is deployed, not just the referenced file, so links
-  # between these documents resolve the same way they do in the repository.
+  # Inlined, not `@` imports: Claude Code resolves those from the symlink's
+  # target in the Nix store, where the imported files do not exist, and
+  # Codex has no import syntax. concatText avoids import-from-derivation.
+  # HTML comments mark where each source starts without adding headings to
+  # the document structure.
+  instructions = pkgs.concatText "instructions.md" (
+    lib.concatLists (
+      lib.intersperse [ (pkgs.writeText "separator" "\n") ] (
+        map
+          ({ file, name }: [
+            (pkgs.writeText "marker" "<!-- Source: ${name} -->\n\n")
+            file
+          ])
+          [
+            {
+              name = "USER.md";
+              file = ./USER.md;
+            }
+            {
+              name = "rtk: hooks/rtk-awareness-high.md";
+              file = awareness;
+            }
+          ]
+      )
+    )
+  );
+
   mkInstructions = { dir, indexFile }: {
-    "${dir}/USER.md".source = ./USER.md;
-    "${dir}/RTK.md".source = awareness;
     "${dir}/docs".source = "${flake}/docs/ai";
-    "${dir}/${indexFile}".text = "@USER.md\n@RTK.md\n";
+    "${dir}/${indexFile}".source = instructions;
   };
 in
 {
