@@ -80,6 +80,10 @@ in
         CLAUDE_CODE_NO_FLICKER = "1";
         CLAUDE_CODE_EXPERIMENTAL_CODE_MODE = "1";
         DISABLE_EXTRA_USAGE_COMMAND = "1";
+        # The Nix wrapper sets these, but a native install in ~/.local/bin
+        # does not: it updates itself and shadows the Nix build on PATH.
+        DISABLE_AUTOUPDATER = "1";
+        DISABLE_INSTALLATION_CHECKS = "1";
       }
       // credentialGuard.mkAgentEnv "claude";
       model = "opus";
